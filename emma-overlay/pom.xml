@@ -11,20 +11,14 @@
     <relativePath>..</relativePath>
   </parent>
 
-  <artifactId>emma-manager</artifactId>
+  <artifactId>emma-overlay</artifactId>
 
-  <name>emma :: manager</name>
+  <name>emma :: overlay</name>
 
   <dependencies>
-
     <dependency>
       <groupId>at.ac.tuwien.dsg.emma</groupId>
       <artifactId>emma-common</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>at.ac.tuwien.dsg.emma</groupId>
-      <artifactId>emma-overlay</artifactId>
       <version>${project.version}</version>
     </dependency>
 
@@ -34,35 +28,10 @@
     </dependency>
 
     <dependency>
-      <groupId>org.springframework.boot</groupId>
-      <artifactId>spring-boot-starter</artifactId>
-    </dependency>
-
-    <dependency>
-      <groupId>org.springframework.boot</groupId>
-      <artifactId>spring-boot-starter-web</artifactId>
-    </dependency>
-
-    <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
       <scope>test</scope>
     </dependency>
-
-
   </dependencies>
-
-  <dependencyManagement>
-    <dependencies>
-      <dependency>
-        <!-- Import dependency management from Spring Boot -->
-        <groupId>org.springframework.boot</groupId>
-        <artifactId>spring-boot-dependencies</artifactId>
-        <version>1.5.4.RELEASE</version>
-        <type>pom</type>
-        <scope>import</scope>
-      </dependency>
-    </dependencies>
-  </dependencyManagement>
 
 </project>
