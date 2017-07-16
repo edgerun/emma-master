@@ -20,6 +20,14 @@ public final class Concurrent {
         }
     }
 
+    public static void join(Thread thread) {
+        try {
+            thread.join();
+        } catch (InterruptedException e) {
+            // squelch
+        }
+    }
+
     public static void shutdownAndAwaitTermination(ExecutorService pool) {
         pool.shutdown(); // Disable new tasks from being submitted
         try {

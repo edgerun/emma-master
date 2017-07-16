@@ -7,6 +7,7 @@ import java.nio.channels.ClosedSelectorException;
 import java.nio.channels.SelectableChannel;
 import java.nio.channels.SelectionKey;
 import java.nio.channels.Selector;
+import java.time.Instant;
 import java.util.Iterator;
 import java.util.Set;
 
@@ -38,6 +39,8 @@ public abstract class AbstractCommandLoop implements CommandLoop {
                 }
 
                 int keys = selector.select();
+
+                System.out.printf("%s %d keys at %s%n", Thread.currentThread(), keys, Instant.now());
 
                 if (keys <= 0) {
                     continue;
