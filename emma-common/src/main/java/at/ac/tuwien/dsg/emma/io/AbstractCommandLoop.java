@@ -11,12 +11,17 @@ import java.time.Instant;
 import java.util.Iterator;
 import java.util.Set;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import at.ac.tuwien.dsg.emma.util.IOUtils;
 
 /**
  * AbstractCommandLoop.
  */
 public abstract class AbstractCommandLoop implements CommandLoop {
+
+    private static final Logger LOG = LoggerFactory.getLogger(AbstractCommandLoop.class);
 
     private final Object selectLock = new Object();
 
@@ -40,7 +45,9 @@ public abstract class AbstractCommandLoop implements CommandLoop {
 
                 int keys = selector.select();
 
-                System.out.printf("%s %d keys at %s%n", Thread.currentThread(), keys, Instant.now());
+                if (LOG.isDebugEnabled()) {
+                    LOG.debug("%s selected %d keys at %s%n", Thread.currentThread().getName(), keys, Instant.now());
+                }
 
                 if (keys <= 0) {
                     continue;

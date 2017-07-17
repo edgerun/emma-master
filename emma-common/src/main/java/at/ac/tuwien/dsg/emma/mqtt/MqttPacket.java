@@ -17,6 +17,13 @@ public class MqttPacket {
         this.data = data;
     }
 
+    public MqttPacket(ByteBuffer packet) {
+        header = packet.get();
+        remLen = Decode.readVariableInt(packet);
+        data = new byte[remLen];
+        packet.get(data);
+    }
+
     public byte getHeader() {
         return header;
     }
@@ -40,6 +47,7 @@ public class MqttPacket {
         packet.put(bRemLen);
         packet.put(data);
 
+        packet.flip();
         return packet;
     }
 
