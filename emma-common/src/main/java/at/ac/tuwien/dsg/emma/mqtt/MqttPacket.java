@@ -1,6 +1,7 @@
 package at.ac.tuwien.dsg.emma.mqtt;
 
 import java.nio.ByteBuffer;
+import java.nio.channels.SocketChannel;
 import java.util.Arrays;
 
 /**
@@ -10,6 +11,13 @@ public class MqttPacket {
     private final byte header;
     private final int remLen;
     private final byte[] data;
+
+    private SocketChannel origin;
+    private SocketChannel destination;
+
+    public MqttPacket(byte header) {
+        this(header, 0, new byte[0]);
+    }
 
     public MqttPacket(byte header, int remLen, byte[] data) {
         this.header = header;
@@ -22,6 +30,10 @@ public class MqttPacket {
         remLen = Decode.readVariableInt(packet);
         data = new byte[remLen];
         packet.get(data);
+    }
+
+    public ControlPacketType getType() {
+        return ControlPacketType.fromHeader(header);
     }
 
     public byte getHeader() {
@@ -49,6 +61,22 @@ public class MqttPacket {
 
         packet.flip();
         return packet;
+    }
+
+    public SocketChannel getOrigin() {
+        return origin;
+    }
+
+    public void setOrigin(SocketChannel origin) {
+        this.origin = origin;
+    }
+
+    public SocketChannel getDestination() {
+        return destination;
+    }
+
+    public void setDestination(SocketChannel destination) {
+        this.destination = destination;
     }
 
     @Override

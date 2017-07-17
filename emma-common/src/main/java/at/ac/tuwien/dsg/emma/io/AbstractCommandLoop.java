@@ -46,7 +46,7 @@ public abstract class AbstractCommandLoop implements CommandLoop {
                 int keys = selector.select();
 
                 if (LOG.isDebugEnabled()) {
-                    LOG.debug("%s selected %d keys at %s%n", Thread.currentThread().getName(), keys, Instant.now());
+                    LOG.debug("{} selected {} keys at {}", Thread.currentThread().getName(), keys, Instant.now());
                 }
 
                 if (keys <= 0) {
