@@ -1,6 +1,10 @@
-package at.ac.tuwien.dsg.emma.mqtt;
+package at.ac.tuwien.dsg.emma.mqtt.msg;
 
 import java.nio.ByteBuffer;
+
+import at.ac.tuwien.dsg.emma.mqtt.ControlPacketType;
+import at.ac.tuwien.dsg.emma.mqtt.Decode;
+import at.ac.tuwien.dsg.emma.mqtt.MqttPacket;
 
 /**
  * MqttMessageParser.
