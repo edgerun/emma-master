@@ -19,6 +19,8 @@ public class MqttMessageParser {
                 return createConnackMessage(len, buf);
             case DISCONNECT:
                 return createDisconnectMessage(len, buf);
+            case PUBLISH:
+                return createPublishMessage(header, len, buf);
             default:
                 throw new RuntimeException();
         }
@@ -30,6 +32,36 @@ public class MqttMessageParser {
 
     private ControlMessage createConnackMessage(int len, ByteBuffer buf) {
         return null;
+    }
+
+    private ControlMessage createPublishMessage(byte header, int len, ByteBuffer buf) {
+        PublishMessage msg = new PublishMessage();
+
+        // parse fixed header flags
+        boolean dup = (header & 0b00001000) != 0;
+        int qos = ((header >> 1) & 0b00000011);
+        boolean retain = (header & 0b00000001) != 0;
+
+        msg.setDup(dup);
+        msg.setQos(qos);
+        msg.setRetain(retain);
+
+        // parse variable header
+        msg.setTopic(Decode.readLengthEncodedString(buf));
+
+        if (qos > 0) {
+            msg.setPacketId(Decode.readTwoByteInt(buf));
+        }
+
+        if (buf.hasRemaining()) {
+            byte[] payload = new byte[buf.remaining()];
+            buf.get(payload);
+            msg.setPayload(payload);
+        } else {
+            msg.setPayload(new byte[0]);
+        }
+
+        return msg;
     }
 
     private ControlMessage createConnectMessage(int len, ByteBuffer packet) {
