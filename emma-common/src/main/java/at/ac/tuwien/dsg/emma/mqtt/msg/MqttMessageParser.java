@@ -1,10 +1,13 @@
 package at.ac.tuwien.dsg.emma.mqtt.msg;
 
 import java.nio.ByteBuffer;
+import java.util.ArrayList;
+import java.util.List;
 
 import at.ac.tuwien.dsg.emma.mqtt.ControlPacketType;
 import at.ac.tuwien.dsg.emma.mqtt.Decode;
 import at.ac.tuwien.dsg.emma.mqtt.MqttPacket;
+import at.ac.tuwien.dsg.emma.mqtt.QoS;
 
 /**
  * MqttMessageParser.
@@ -16,26 +19,83 @@ public class MqttMessageParser {
     }
 
     public ControlMessage parse(byte header, int len, ByteBuffer buf) {
-        switch (ControlPacketType.fromHeader(header)) {
+        ControlPacketType type = ControlPacketType.fromHeader(header);
+
+        switch (type) {
             case CONNECT:
                 return createConnectMessage(len, buf);
             case CONNACK:
                 return createConnackMessage(len, buf);
-            case DISCONNECT:
-                return createDisconnectMessage(len, buf);
             case PUBLISH:
                 return createPublishMessage(header, len, buf);
+            case PUBACK:
+            case PUBREC:
+            case PUBREL:
+            case PUBCOMP:
+            case UNSUBACK:
+                return createPacketIdentifierMessage(type, buf);
+            case SUBSCRIBE:
+                return createSubscribeMessage(len, buf);
+            case SUBACK:
+                return createSubackMessage(len, buf);
+            case UNSUBSCRIBE:
+                return createUnsubscribeMessage(header, len, buf);
+            case PINGREQ:
+                return SimpleMessage.PINGREQ;
+            case PINGRESP:
+                return SimpleMessage.PINGRESP;
+            case DISCONNECT:
+                return SimpleMessage.DISCONNECT;
             default:
-                throw new RuntimeException();
+                throw new UnsupportedOperationException("Unhandled message type: " + type);
         }
     }
 
-    private ControlMessage createDisconnectMessage(int len, ByteBuffer buf) {
-        return null;
+    private ControlMessage createSubscribeMessage(int len, ByteBuffer buf) {
+        int packetId = Decode.readTwoByteInt(buf);
+
+        List<String> topics = new ArrayList<>();
+        List<QoS> qos = new ArrayList<>();
+
+        while (buf.hasRemaining()) {
+            topics.add(Decode.readLengthEncodedString(buf));
+            qos.add(QoS.valueOf(buf.get()));
+        }
+
+        return new SubscribeMessage(packetId, topics, qos);
+    }
+
+    private ControlMessage createSubackMessage(int len, ByteBuffer buf) {
+        int packetId = Decode.readTwoByteInt(buf);
+
+        int n = len - 2;
+        QoS[] result = new QoS[n];
+
+        for (int i = 0; i < n; i++) {
+            result[i] = QoS.valueOf(buf.get());
+        }
+
+        return new SubackMessage(packetId, result);
+    }
+
+    private ControlMessage createUnsubscribeMessage(byte header, int len, ByteBuffer buf) {
+        int packetId = Decode.readTwoByteInt(buf);
+
+        List<String> topics = new ArrayList<>();
+
+        while (buf.hasRemaining()) {
+            topics.add(Decode.readLengthEncodedString(buf));
+        }
+
+        return new UnsubscribeMessage(packetId, topics);
+    }
+
+    private ControlMessage createPacketIdentifierMessage(ControlPacketType type, ByteBuffer buf) {
+        return new PacketIdentifierMessage(type, Decode.readTwoByteInt(buf));
     }
 
     private ControlMessage createConnackMessage(int len, ByteBuffer buf) {
-        return null;
+        return new SimpleMessage(ControlPacketType.CONNACK); // TODO
     }
 
     private ControlMessage createPublishMessage(byte header, int len, ByteBuffer buf) {

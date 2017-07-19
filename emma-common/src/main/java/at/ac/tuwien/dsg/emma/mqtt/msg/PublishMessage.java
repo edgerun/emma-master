@@ -74,13 +74,13 @@ public class PublishMessage implements ControlMessage {
 
     @Override
     public String toString() {
-        final StringBuilder sb = new StringBuilder("PublishMessage{");
+        final StringBuilder sb = new StringBuilder("PUBLISH     {");
         sb.append("retain=").append(retain);
         sb.append(", dup=").append(dup);
         sb.append(", qos=").append(qos);
         sb.append(", topic='").append(topic).append('\'');
         sb.append(", packetId=").append(packetId);
-        sb.append(", payload=").append(new String(payload));
+        sb.append(", payload='").append(new String(payload)).append('\'');
         sb.append('}');
         return sb.toString();
     }

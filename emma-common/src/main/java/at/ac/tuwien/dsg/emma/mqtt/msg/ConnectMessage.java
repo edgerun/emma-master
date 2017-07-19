@@ -101,12 +101,12 @@ public class ConnectMessage implements ControlMessage {
 
     @Override
     public String toString() {
-        final StringBuilder sb = new StringBuilder("ConnectMessage{");
+        final StringBuilder sb = new StringBuilder("CONNECT     {");
         sb.append("protocolName='").append(protocolName).append('\'');
         sb.append(", protocolLevel=").append(protocolLevel);
+        sb.append(", clientId='").append(clientId).append('\'');
         sb.append(", connectFlags=").append(connectFlags);
         sb.append(", keepAlive=").append(keepAlive);
-        sb.append(", clientId='").append(clientId).append('\'');
         sb.append(", willTopic='").append(willTopic).append('\'');
         sb.append(", willMessage=").append(Arrays.toString(willMessage));
         sb.append(", userName='").append(userName).append('\'');
