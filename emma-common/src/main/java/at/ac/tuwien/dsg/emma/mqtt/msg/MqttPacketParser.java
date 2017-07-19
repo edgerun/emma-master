@@ -10,9 +10,9 @@ import at.ac.tuwien.dsg.emma.mqtt.MqttPacket;
 import at.ac.tuwien.dsg.emma.mqtt.QoS;
 
 /**
- * MqttMessageParser.
+ * MqttPacketParser.
  */
-public class MqttMessageParser {
+public class MqttPacketParser {
 
     public ControlMessage parse(MqttPacket packet) {
         return parse(packet.getHeader(), packet.getRemLen(), ByteBuffer.wrap(packet.getData()));
