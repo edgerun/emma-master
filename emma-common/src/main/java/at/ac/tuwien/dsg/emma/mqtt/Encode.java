@@ -31,6 +31,10 @@ public final class Encode {
         buf.put(encoded);
     }
 
+    public static void writeOneByteInt(ByteBuffer buf, int i) {
+        buf.put((byte) (i & 0xff));
+    }
+
     public static void writeTwoByteInt(ByteBuffer buf, int i) {
         buf.put((byte) ((i >> 8) & 0xff)); // msb
         buf.put((byte) (i & 0xff)); // lsb

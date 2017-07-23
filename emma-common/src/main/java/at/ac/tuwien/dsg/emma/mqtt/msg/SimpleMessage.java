@@ -7,9 +7,9 @@ import at.ac.tuwien.dsg.emma.mqtt.ControlPacketType;
  */
 public class SimpleMessage implements ControlMessage {
 
-    public static final ControlMessage PINGREQ = new SimpleMessage(ControlPacketType.PINGREQ);
-    public static final ControlMessage PINGRESP = new SimpleMessage(ControlPacketType.PINGRESP);
-    public static final ControlMessage DISCONNECT = new SimpleMessage(ControlPacketType.DISCONNECT);
+    public static final SimpleMessage PINGREQ = new SimpleMessage(ControlPacketType.PINGREQ);
+    public static final SimpleMessage PINGRESP = new SimpleMessage(ControlPacketType.PINGRESP);
+    public static final SimpleMessage DISCONNECT = new SimpleMessage(ControlPacketType.DISCONNECT);
 
     private final ControlPacketType controlPacketType;
 

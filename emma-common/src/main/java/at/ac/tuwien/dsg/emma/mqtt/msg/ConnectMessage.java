@@ -2,6 +2,7 @@ package at.ac.tuwien.dsg.emma.mqtt.msg;
 
 import java.util.Arrays;
 
+import at.ac.tuwien.dsg.emma.mqtt.ConnectFlags;
 import at.ac.tuwien.dsg.emma.mqtt.ControlPacketType;
 
 /**
@@ -92,6 +93,30 @@ public class ConnectMessage implements ControlMessage {
 
     public void setPassword(byte[] password) {
         this.password = password;
+    }
+
+    public boolean hasWill() {
+        return ConnectFlags.hasWill(getConnectFlags());
+    }
+
+    public boolean hasUserName() {
+        return ConnectFlags.hasUserName(getConnectFlags());
+    }
+
+    public boolean hasPassword() {
+        return ConnectFlags.hasPassword(getConnectFlags());
+    }
+
+    public boolean hasCleanSession() {
+        return ConnectFlags.hasCleanSession(getConnectFlags());
+    }
+
+    public int getWillQos() {
+        return ConnectFlags.getWillQos(getConnectFlags());
+    }
+
+    public boolean hasWillRetain() {
+        return ConnectFlags.hasWillRetain(getConnectFlags());
     }
 
     @Override
