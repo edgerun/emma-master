@@ -8,6 +8,7 @@ import java.util.Arrays;
  * MqttPacket.
  */
 public class MqttPacket {
+
     private final byte header;
     private final int remLen;
     private final byte[] data;
