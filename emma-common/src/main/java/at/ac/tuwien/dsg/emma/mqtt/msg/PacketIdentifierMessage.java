@@ -3,7 +3,7 @@ package at.ac.tuwien.dsg.emma.mqtt.msg;
 import at.ac.tuwien.dsg.emma.mqtt.ControlPacketType;
 
 /**
- * PacketIdentifierMessage.
+ * PacketIdentifierMessages are: PUBACK, PUBREC, PUBREL, PUBCOMP, UNSUBACK
  */
 public class PacketIdentifierMessage extends SimpleMessage {
 

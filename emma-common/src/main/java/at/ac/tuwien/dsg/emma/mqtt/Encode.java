@@ -15,6 +15,10 @@ public final class Encode {
         buf.put((byte) t);
     }
 
+    public static void writeHeader(ByteBuffer buf, ControlPacketType type) {
+        writeHeader(buf, type.ordinal());
+    }
+
     public static void writeHeader(ByteBuffer buf, int type, int flags) {
         int t = (type << 4) & 0b11110000;
         int f = flags & 0b00001111;

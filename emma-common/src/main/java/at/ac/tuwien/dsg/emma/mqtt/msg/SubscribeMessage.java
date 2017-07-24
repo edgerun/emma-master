@@ -10,9 +10,13 @@ import at.ac.tuwien.dsg.emma.mqtt.QoS;
  */
 public class SubscribeMessage implements ControlMessage {
 
-    private final int packetId;
-    private final List<String> filter;
-    private final List<QoS> requestedQos;
+    private int packetId;
+    private List<String> filter;
+    private List<QoS> requestedQos;
+
+    public SubscribeMessage() {
+
+    }
 
     public SubscribeMessage(int packetId, List<String> filter, List<QoS> requestedQos) {
         this.packetId = packetId;
@@ -29,12 +33,24 @@ public class SubscribeMessage implements ControlMessage {
         return packetId;
     }
 
+    public void setPacketId(int packetId) {
+        this.packetId = packetId;
+    }
+
     public List<String> getFilter() {
         return filter;
     }
 
+    public void setFilter(List<String> filter) {
+        this.filter = filter;
+    }
+
     public List<QoS> getRequestedQos() {
         return requestedQos;
+    }
+
+    public void setRequestedQos(List<QoS> requestedQos) {
+        this.requestedQos = requestedQos;
     }
 
     @Override

@@ -2,6 +2,7 @@ package at.ac.tuwien.dsg.emma.mqtt.msg;
 
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import at.ac.tuwien.dsg.emma.mqtt.ControlPacketType;
@@ -25,7 +26,7 @@ public class MqttPacketParser {
             case CONNECT:
                 return createConnectMessage(len, buf);
             case CONNACK:
-                return createConnackMessage(len, buf);
+                return createConnackMessage(buf);
             case PUBLISH:
                 return createPublishMessage(header, len, buf);
             case PUBACK:
@@ -35,11 +36,11 @@ public class MqttPacketParser {
             case UNSUBACK:
                 return createPacketIdentifierMessage(type, buf);
             case SUBSCRIBE:
-                return createSubscribeMessage(len, buf);
+                return createSubscribeMessage(buf);
             case SUBACK:
                 return createSubackMessage(len, buf);
             case UNSUBSCRIBE:
-                return createUnsubscribeMessage(header, len, buf);
+                return createUnsubscribeMessage(buf);
             case PINGREQ:
                 return SimpleMessage.PINGREQ;
             case PINGRESP:
@@ -51,7 +52,7 @@ public class MqttPacketParser {
         }
     }
 
-    private ControlMessage createSubscribeMessage(int len, ByteBuffer buf) {
+    private ControlMessage createSubscribeMessage(ByteBuffer buf) {
         int packetId = Decode.readTwoByteInt(buf);
 
         List<String> topics = new ArrayList<>();
@@ -78,7 +79,7 @@ public class MqttPacketParser {
         return new SubackMessage(packetId, result);
     }
 
-    private ControlMessage createUnsubscribeMessage(byte header, int len, ByteBuffer buf) {
+    private ControlMessage createUnsubscribeMessage(ByteBuffer buf) {
         int packetId = Decode.readTwoByteInt(buf);
 
         List<String> topics = new ArrayList<>();
@@ -94,8 +95,11 @@ public class MqttPacketParser {
         return new PacketIdentifierMessage(type, Decode.readTwoByteInt(buf));
     }
 
-    private ControlMessage createConnackMessage(int len, ByteBuffer buf) {
-        return new SimpleMessage(ControlPacketType.CONNACK); // TODO
+    private ControlMessage createConnackMessage(ByteBuffer buf) {
+        boolean sessionPresent = buf.get() == 1;
+        ConnectReturnCode returnCode = ConnectReturnCode.valueOf(buf.get());
+
+        return new ConnackMessage(sessionPresent, returnCode);
     }
 
     private ControlMessage createPublishMessage(byte header, int len, ByteBuffer buf) {

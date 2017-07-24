@@ -40,8 +40,6 @@ public final class Decode {
         return new String(str, UTF8);
     }
 
-
-
     private Decode() {
 
     }

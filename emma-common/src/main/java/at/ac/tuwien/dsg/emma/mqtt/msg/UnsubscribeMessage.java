@@ -22,6 +22,14 @@ public class UnsubscribeMessage implements ControlMessage {
         return ControlPacketType.UNSUBSCRIBE;
     }
 
+    public int getPacketId() {
+        return packetId;
+    }
+
+    public List<String> getTopics() {
+        return topics;
+    }
+
     @Override
     public String toString() {
         return "UNSUBSCRIBE {" + "packetId=" + packetId + ", topics=" + topics + '}';
