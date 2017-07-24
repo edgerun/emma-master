@@ -7,7 +7,6 @@ import java.nio.channels.WritableByteChannel;
 import java.util.List;
 
 import at.ac.tuwien.dsg.emma.mqtt.Encode;
-import at.ac.tuwien.dsg.emma.mqtt.QoS;
 
 /**
  * ControlMessageWriter.

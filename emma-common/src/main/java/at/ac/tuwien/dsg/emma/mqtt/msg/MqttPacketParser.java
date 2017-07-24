@@ -2,13 +2,11 @@ package at.ac.tuwien.dsg.emma.mqtt.msg;
 
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import at.ac.tuwien.dsg.emma.mqtt.ControlPacketType;
 import at.ac.tuwien.dsg.emma.mqtt.Decode;
 import at.ac.tuwien.dsg.emma.mqtt.MqttPacket;
-import at.ac.tuwien.dsg.emma.mqtt.QoS;
 
 /**
  * MqttPacketParser.

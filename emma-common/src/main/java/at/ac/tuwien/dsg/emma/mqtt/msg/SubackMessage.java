@@ -1,7 +1,6 @@
 package at.ac.tuwien.dsg.emma.mqtt.msg;
 
 import at.ac.tuwien.dsg.emma.mqtt.ControlPacketType;
-import at.ac.tuwien.dsg.emma.mqtt.QoS;
 
 /**
  * SubackMessage.

@@ -1,4 +1,4 @@
-package at.ac.tuwien.dsg.emma.mqtt;
+package at.ac.tuwien.dsg.emma.mqtt.msg;
 
 /**
  * QoS.

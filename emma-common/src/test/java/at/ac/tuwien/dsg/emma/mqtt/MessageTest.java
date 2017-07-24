@@ -27,6 +27,7 @@ import at.ac.tuwien.dsg.emma.mqtt.msg.ControlMessageWriter;
 import at.ac.tuwien.dsg.emma.mqtt.msg.MqttPacketParser;
 import at.ac.tuwien.dsg.emma.mqtt.msg.PacketIdentifierMessage;
 import at.ac.tuwien.dsg.emma.mqtt.msg.PublishMessage;
+import at.ac.tuwien.dsg.emma.mqtt.msg.QoS;
 import at.ac.tuwien.dsg.emma.mqtt.msg.SimpleMessage;
 import at.ac.tuwien.dsg.emma.mqtt.msg.SubackMessage;
 import at.ac.tuwien.dsg.emma.mqtt.msg.SubscribeMessage;

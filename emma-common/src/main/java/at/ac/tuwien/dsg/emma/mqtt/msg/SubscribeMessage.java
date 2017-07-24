@@ -3,7 +3,6 @@ package at.ac.tuwien.dsg.emma.mqtt.msg;
 import java.util.List;
 
 import at.ac.tuwien.dsg.emma.mqtt.ControlPacketType;
-import at.ac.tuwien.dsg.emma.mqtt.QoS;
 
 /**
  * SubscribeMessage.
