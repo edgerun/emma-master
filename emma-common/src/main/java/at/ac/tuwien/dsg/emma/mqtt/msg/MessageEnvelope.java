@@ -10,9 +10,18 @@ public class MessageEnvelope {
     private SocketChannel origin;
     private SocketChannel destination;
     private ControlMessage message;
+    private boolean multicast;
 
     public MessageEnvelope(ControlMessage message) {
         this.message = message;
+    }
+
+    public void setMulticast(boolean multicast) {
+        this.multicast = multicast;
+    }
+
+    public boolean isMulticast() {
+        return multicast;
     }
 
     public SocketChannel getOrigin() {
