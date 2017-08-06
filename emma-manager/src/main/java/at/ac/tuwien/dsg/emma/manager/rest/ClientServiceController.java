@@ -7,7 +7,11 @@ import org.springframework.web.bind.annotation.RestController;
 public class ClientServiceController {
 
     @RequestMapping("/client/connect")
-    public ConnectResponse connect() {
-        return new ConnectResponse("tcp://my.real.broker:1883");
+    public String connect() {
+        return getRootBroker();
+    }
+
+    public String getRootBroker() {
+        return "tcp://localhost:1883";
     }
 }

@@ -2,7 +2,9 @@ package at.ac.tuwien.dsg.emma.util;
 
 import java.io.Closeable;
 import java.io.IOException;
+import java.net.URL;
 import java.nio.channels.SelectionKey;
+import java.util.Scanner;
 
 /**
  * IOUtils.
@@ -13,6 +15,12 @@ public final class IOUtils {
 
     private IOUtils() {
         // util class
+    }
+
+    public static String read(URL url) throws IOException {
+        try (Scanner scanner = new Scanner(url.openStream(), "UTF-8")) {
+            return scanner.useDelimiter("\\A").next();
+        }
     }
 
     public static void close(Closeable closeable) {
