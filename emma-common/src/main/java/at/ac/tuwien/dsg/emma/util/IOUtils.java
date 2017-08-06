@@ -2,7 +2,10 @@ package at.ac.tuwien.dsg.emma.util;
 
 import java.io.Closeable;
 import java.io.IOException;
+import java.io.UncheckedIOException;
+import java.io.UnsupportedEncodingException;
 import java.net.URL;
+import java.nio.ByteBuffer;
 import java.nio.channels.SelectionKey;
 import java.util.Scanner;
 
@@ -36,6 +39,18 @@ public final class IOUtils {
     public static void close(Closeable... closeables) {
         for (Closeable closeable : closeables) {
             close(closeable);
+        }
+    }
+
+    public static String toString(ByteBuffer buf) {
+        byte[] bytes = new byte[buf.remaining()];
+
+        buf.get(bytes);
+
+        try {
+            return new String(bytes, "UTF-8");
+        } catch (UnsupportedEncodingException e) {
+            throw new UncheckedIOException(e);
         }
     }
 

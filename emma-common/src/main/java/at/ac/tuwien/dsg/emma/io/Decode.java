@@ -1,4 +1,4 @@
-package at.ac.tuwien.dsg.emma.mqtt;
+package at.ac.tuwien.dsg.emma.io;
 
 import java.nio.ByteBuffer;
 import java.nio.charset.Charset;

@@ -1,9 +1,9 @@
 package at.ac.tuwien.dsg.emma.mqtt;
 
-import static at.ac.tuwien.dsg.emma.mqtt.Decode.readLengthEncodedString;
-import static at.ac.tuwien.dsg.emma.mqtt.Decode.readVariableInt;
-import static at.ac.tuwien.dsg.emma.mqtt.Encode.writeLengthEncodedString;
-import static at.ac.tuwien.dsg.emma.mqtt.Encode.writeVariableInt;
+import static at.ac.tuwien.dsg.emma.io.Decode.readLengthEncodedString;
+import static at.ac.tuwien.dsg.emma.io.Decode.readVariableInt;
+import static at.ac.tuwien.dsg.emma.io.Encode.writeLengthEncodedString;
+import static at.ac.tuwien.dsg.emma.io.Encode.writeVariableInt;
 import static org.junit.Assert.assertEquals;
 
 import java.nio.ByteBuffer;

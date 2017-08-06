@@ -6,7 +6,7 @@ import java.nio.channels.GatheringByteChannel;
 import java.nio.channels.WritableByteChannel;
 import java.util.List;
 
-import at.ac.tuwien.dsg.emma.mqtt.Encode;
+import at.ac.tuwien.dsg.emma.io.Encode;
 
 /**
  * ControlMessageWriter.
@@ -86,7 +86,7 @@ public class ControlMessageWriter {
     public void write(WritableByteChannel channel, ConnackMessage msg) throws IOException {
         ByteBuffer buf = ByteBuffer.allocate(4);
 
-        Encode.writeHeader(buf, msg.getControlPacketType());
+        buf.put(msg.getControlPacketType().toHeader());
         buf.put((byte) 2); // rem len
         buf.put((byte) (msg.isSessionPresent() ? 1 : 0));
         buf.put((byte) msg.getReturnCode().ordinal());

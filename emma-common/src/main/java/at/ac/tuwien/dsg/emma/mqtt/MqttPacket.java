@@ -4,6 +4,9 @@ import java.nio.ByteBuffer;
 import java.nio.channels.SocketChannel;
 import java.util.Arrays;
 
+import at.ac.tuwien.dsg.emma.io.Decode;
+import at.ac.tuwien.dsg.emma.io.Encode;
+
 /**
  * MqttPacket.
  */

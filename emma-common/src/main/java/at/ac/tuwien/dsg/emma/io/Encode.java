@@ -1,4 +1,4 @@
-package at.ac.tuwien.dsg.emma.mqtt;
+package at.ac.tuwien.dsg.emma.io;
 
 import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
@@ -9,22 +9,6 @@ import java.nio.charset.Charset;
 public final class Encode {
 
     public static final Charset UTF8 = Charset.forName("UTF-8");
-
-    public static void writeHeader(ByteBuffer buf, int type) {
-        int t = (type << 4) & 0b11110000;
-        buf.put((byte) t);
-    }
-
-    public static void writeHeader(ByteBuffer buf, ControlPacketType type) {
-        writeHeader(buf, type.ordinal());
-    }
-
-    public static void writeHeader(ByteBuffer buf, int type, int flags) {
-        int t = (type << 4) & 0b11110000;
-        int f = flags & 0b00001111;
-
-        buf.put((byte) (t | f));
-    }
 
     public static void writeLengthEncodedString(ByteBuffer buf, String str) {
         byte[] encoded = str.getBytes(UTF8);

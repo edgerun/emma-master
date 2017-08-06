@@ -14,7 +14,7 @@ import org.junit.rules.TemporaryFolder;
 
 import at.ac.tuwien.dsg.emma.mqtt.ConnectFlags;
 import at.ac.tuwien.dsg.emma.mqtt.ControlPacketType;
-import at.ac.tuwien.dsg.emma.mqtt.Decode;
+import at.ac.tuwien.dsg.emma.io.Decode;
 
 /**
  * ControlMessageWriterTest.

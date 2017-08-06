@@ -4,8 +4,8 @@ import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.List;
 
+import at.ac.tuwien.dsg.emma.io.Decode;
 import at.ac.tuwien.dsg.emma.mqtt.ControlPacketType;
-import at.ac.tuwien.dsg.emma.mqtt.Decode;
 import at.ac.tuwien.dsg.emma.mqtt.MqttPacket;
 
 /**
