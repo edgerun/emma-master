@@ -13,14 +13,14 @@ import at.ac.tuwien.dsg.emma.util.IOUtils;
 
 public class ServerSocketListener implements Runnable, Closeable {
 
-    private int port;
+    private InetSocketAddress bind;
     private Consumer<SocketChannel> acceptHandler;
 
     private ServerSocketChannel serverSocket;
     private CommandLoop commandLoop;
 
-    public ServerSocketListener(int port, Consumer<SocketChannel> acceptHandler) {
-        this.port = port;
+    public ServerSocketListener(InetSocketAddress bind, Consumer<SocketChannel> acceptHandler) {
+        this.bind = bind;
         this.acceptHandler = acceptHandler;
     }
 
@@ -42,7 +42,7 @@ public class ServerSocketListener implements Runnable, Closeable {
         commandLoop = new SimpleCommandLoop();
 
         serverSocket = ServerSocketChannel.open();
-        serverSocket.bind(new InetSocketAddress(port));
+        serverSocket.bind(bind);
         serverSocket.configureBlocking(false);
 
         commandLoop.register(serverSocket, new AcceptHandler(acceptHandler));

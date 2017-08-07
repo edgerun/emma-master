@@ -14,14 +14,18 @@ import at.ac.tuwien.dsg.emma.util.IOUtils;
  */
 public abstract class DatagramLoop implements Runnable, Closeable, ChannelHandler<DatagramChannel> {
 
-    private int port;
+    protected InetSocketAddress bind;
 
     protected CommandLoop loop;
     protected DatagramChannel channel;
     protected SelectionKey key;
 
     public DatagramLoop(int port) {
-        this.port = port;
+        this(new InetSocketAddress(port));
+    }
+
+    public DatagramLoop(InetSocketAddress bind) {
+        this.bind = bind;
     }
 
     @Override
@@ -38,7 +42,7 @@ public abstract class DatagramLoop implements Runnable, Closeable, ChannelHandle
 
         channel = DatagramChannel.open();
         channel.configureBlocking(false);
-        channel.bind(new InetSocketAddress(port));
+        channel.bind(bind);
 
         key = loop.register(channel, SelectionKey.OP_READ, this);
 
