@@ -31,6 +31,10 @@ public final class Decode {
         return ((msb << 8) & 0xff00) | (lsb & 0x00ff);
     }
 
+    public static int readTwoByteInt(byte[] buf) {
+        return ((buf[0] << 8) & 0xff00) | (buf[1] & 0x00ff);
+    }
+
     public static String readLengthEncodedString(ByteBuffer buf) {
         int len = readTwoByteInt(buf);
 

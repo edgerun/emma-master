@@ -28,6 +28,13 @@ public final class Encode {
         buf.put((byte) (i & 0xff)); // lsb
     }
 
+    public static byte[] toTwoByteInt(int i) {
+        byte[] data = new byte[2];
+        data[0] = ((byte) ((i >> 8) & 0xff)); // msb
+        data[1] = ((byte) (i & 0xff)); // lsb
+        return data;
+    }
+
     public static void writeVariableInt(ByteBuffer buf, int i) {
         if (i < 127) {
             buf.put((byte) (i & 0b01111111));
