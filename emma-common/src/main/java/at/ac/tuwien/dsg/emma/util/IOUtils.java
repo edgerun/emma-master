@@ -2,6 +2,7 @@ package at.ac.tuwien.dsg.emma.util;
 
 import java.io.Closeable;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.UncheckedIOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URL;
@@ -40,6 +41,10 @@ public final class IOUtils {
         for (Closeable closeable : closeables) {
             close(closeable);
         }
+    }
+
+    public static String toString(InputStream stream) {
+        return new Scanner(stream).useDelimiter("\\A").next();
     }
 
     public static String toString(ByteBuffer buf) {

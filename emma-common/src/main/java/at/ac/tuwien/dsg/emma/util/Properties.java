@@ -38,6 +38,10 @@ public class Properties extends java.util.Properties {
         return Integer.parseInt(getProperty(key));
     }
 
+    public Object setProperty(String key, Object value) {
+        return setProperty(key, String.valueOf(value));
+    }
+
     public void load(String resource) {
         load(resource, Properties.class.getClassLoader());
     }

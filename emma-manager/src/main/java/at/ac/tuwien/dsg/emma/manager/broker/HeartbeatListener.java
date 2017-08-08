@@ -3,6 +3,7 @@ package at.ac.tuwien.dsg.emma.manager.broker;
 import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
+import java.net.InetSocketAddress;
 import java.net.SocketException;
 
 import org.slf4j.Logger;
@@ -15,41 +16,42 @@ import org.springframework.stereotype.Component;
 import at.ac.tuwien.dsg.emma.io.Decode;
 import at.ac.tuwien.dsg.emma.util.IOUtils;
 
-/**
- * KeepaliveReceiver.
- */
 @Component
-public class KeepaliveReceiver implements Runnable, InitializingBean, DisposableBean {
+public class HeartbeatListener implements Runnable, InitializingBean, DisposableBean {
 
-    private static final Logger LOG = LoggerFactory.getLogger(KeepaliveReceiver.class);
+    private static final Logger LOG = LoggerFactory.getLogger(HeartbeatListener.class);
 
     @Autowired
     private BrokerRepository brokers;
 
-    private int port;
+    private InetSocketAddress bind;
 
     private Thread thread;
     private DatagramSocket socket;
 
-    public KeepaliveReceiver() {
+    public HeartbeatListener() {
         this(60042);
     }
 
-    private KeepaliveReceiver(int port) {
-        // TODO parameterize
-        this.port = port;
+    private HeartbeatListener(int port) {
+        this(new InetSocketAddress("10.42.0.1", port));
+    }
+
+    public HeartbeatListener(InetSocketAddress bind) {
+        this.bind = bind;
     }
 
     @Override
     public void afterPropertiesSet() throws Exception {
-        socket = new DatagramSocket(port);
-        thread = new Thread(this, "emma.KeepaliveReceiver");
+        LOG.info("Opening socket for HeartbeatListener on {}", bind);
+        socket = new DatagramSocket(bind); // TODO parameterize
+        thread = new Thread(this, "emma.HeartbeatListener");
         thread.start();
     }
 
     @Override
     public void run() {
-        LOG.debug("Starting KeepaliveReceiver");
+        LOG.debug("Starting HeartbeatListener", bind);
         DatagramPacket packet = new DatagramPacket(new byte[2], 2);
 
         while (true) {
@@ -60,7 +62,7 @@ public class KeepaliveReceiver implements Runnable, InitializingBean, Disposable
                 String id = packet.getAddress().getHostAddress() + ":" + brokerPort;
 
                 if (LOG.isDebugEnabled()) {
-                    LOG.debug("Received keepalive packet for {}", id);
+                    LOG.debug("Received heartbeat packet for {}", id);
                 }
 
                 BrokerInfo brokerInfo = brokers.getBrokerInfo(id);
@@ -79,7 +81,7 @@ public class KeepaliveReceiver implements Runnable, InitializingBean, Disposable
                 LOG.error("IOException while listening on UDP socket", e);
             }
         }
-        LOG.debug("Stopped KeepAliveReceiver");
+        LOG.debug("Stopped HeartbeatListener");
     }
 
     @Override
