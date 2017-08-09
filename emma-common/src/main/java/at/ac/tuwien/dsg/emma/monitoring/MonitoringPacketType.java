@@ -1,4 +1,4 @@
-package at.ac.tuwien.dsg.emma.ec;
+package at.ac.tuwien.dsg.emma.monitoring;
 
 /**
  * MonitoringPacketType.
@@ -8,7 +8,9 @@ public enum MonitoringPacketType {
     PINGREQ,
     PINGRESP,
     PING,
-    PONG;
+    PONG,
+    USAGEREQ,
+    USAGERESP;
 
     private static final MonitoringPacketType[] values = values();
 
