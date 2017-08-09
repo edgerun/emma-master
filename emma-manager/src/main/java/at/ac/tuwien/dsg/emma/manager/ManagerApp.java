@@ -1,6 +1,7 @@
 package at.ac.tuwien.dsg.emma.manager;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -20,9 +21,12 @@ public class ManagerApp implements CommandLineRunner {
     @Autowired
     private ManagerShell managerShell;
 
+    @Value("${emma.manager.shell.port}")
+    private Integer shellPort;
+
     @Override
     public void run(String... args) throws Exception {
-        new TcpShellServer(this::init).run();
+        new TcpShellServer(shellPort, this::init).run();
     }
 
     private void init(Shell shell) {

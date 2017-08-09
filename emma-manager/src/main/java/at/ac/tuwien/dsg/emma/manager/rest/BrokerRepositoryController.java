@@ -3,10 +3,12 @@ package at.ac.tuwien.dsg.emma.manager.rest;
 import java.io.IOException;
 import java.util.Collection;
 
-import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -22,20 +24,19 @@ import at.ac.tuwien.dsg.emma.manager.broker.BrokerRepository;
 @RestController
 public class BrokerRepositoryController {
 
+    private static final Logger LOG = LoggerFactory.getLogger(BrokerRepositoryController.class);
+
     @Autowired
     private BrokerRepository brokerRepository;
 
     @RequestMapping(value = "/broker/register", method = RequestMethod.GET)
     public @ResponseBody
     void register(
-            @RequestParam(required = false) String address,
+            @RequestParam String address,
             @RequestParam int port,
-            HttpServletRequest request,
             HttpServletResponse response) throws IOException {
 
-        if (address == null) {
-            address = request.getRemoteAddr();
-        }
+        LOG.debug("/broker/register({}, {})", address, port);
 
         if (brokerRepository.getBrokerInfo(address, port) != null) {
             response.sendError(409, "broker exists");
@@ -49,14 +50,11 @@ public class BrokerRepositoryController {
     @RequestMapping(value = "/broker/deregister", method = RequestMethod.GET)
     public @ResponseBody
     void deregister(
-            @RequestParam(required = false) String address,
+            @RequestParam String address,
             @RequestParam int port,
-            HttpServletRequest request,
             HttpServletResponse response) throws IOException {
 
-        if (address == null) {
-            address = request.getRemoteAddr();
-        }
+        LOG.debug("/broker/deregister({}, {})", address, port);
 
         if (brokerRepository.getBrokerInfo(address, port) == null) {
             response.sendError(409, "broker doesn't exist");
@@ -75,6 +73,8 @@ public class BrokerRepositoryController {
 
     @RequestMapping(value = "/broker/list")
     public Collection<BrokerInfo> list() {
+        LOG.debug("/broker/list");
+
         return brokerRepository.getBrokers().values();
     }
 

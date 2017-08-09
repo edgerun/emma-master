@@ -11,6 +11,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import at.ac.tuwien.dsg.emma.io.Decode;
@@ -29,15 +30,14 @@ public class HeartbeatListener implements Runnable, InitializingBean, Disposable
     private Thread thread;
     private DatagramSocket socket;
 
-    public HeartbeatListener() {
-        this(60042);
+    @Autowired
+    public HeartbeatListener(
+            @Value("${emma.manager.address}") String address,
+            @Value("${emma.manager.heartbeat.port}") Integer port) {
+        this(new InetSocketAddress(address, port));
     }
 
-    private HeartbeatListener(int port) {
-        this(new InetSocketAddress("10.42.0.1", port));
-    }
-
-    public HeartbeatListener(InetSocketAddress bind) {
+    private HeartbeatListener(InetSocketAddress bind) {
         this.bind = bind;
     }
 
@@ -61,14 +61,14 @@ public class HeartbeatListener implements Runnable, InitializingBean, Disposable
                 int brokerPort = Decode.readTwoByteInt(packet.getData());
                 String id = packet.getAddress().getHostAddress() + ":" + brokerPort;
 
-                if (LOG.isDebugEnabled()) {
-                    LOG.debug("Received heartbeat packet for {}", id);
+                if (LOG.isTraceEnabled()) {
+                    LOG.trace("Received heartbeat packet for {}", id);
                 }
 
                 BrokerInfo brokerInfo = brokers.getBrokerInfo(id);
 
                 if (brokerInfo != null) {
-                    if (LOG.isDebugEnabled()) {
+                    if (LOG.isDebugEnabled() && !brokerInfo.isAlive()) {
                         LOG.debug("Updating alive status for broker {}", brokerInfo);
                     }
                     brokerInfo.setAlive(true);

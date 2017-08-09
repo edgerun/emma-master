@@ -1,0 +1,10 @@
+logging.level:
+  org.springframework: INFO
+  at.ac.tuwien.dsg.emma: DEBUG
+
+emma.manager:
+  address: 10.42.0.1
+  heartbeat:
+    port: 60042
+  shell:
+    port: 50042

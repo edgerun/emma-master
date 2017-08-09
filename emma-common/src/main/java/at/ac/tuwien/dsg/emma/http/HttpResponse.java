@@ -1,6 +1,7 @@
 package at.ac.tuwien.dsg.emma.http;
 
 import java.io.Closeable;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.UncheckedIOException;
@@ -18,18 +19,22 @@ public class HttpResponse implements Closeable {
     private int responseCode = -1;
     private String content;
 
+    private InputStream in;
+
     public HttpResponse(HttpURLConnection connection) throws IOException {
         this.connection = connection;
     }
 
     public HttpResponse open() throws IOException {
         try {
-            connection.getInputStream();
+            in = connection.getInputStream();
+        } catch (FileNotFoundException e) {
+            // ignore
         } catch (IOException e) {
             if (e.getMessage().contains("returned HTTP response code")) {
-                //
+                // ignore
             } else {
-                throw new IOException();
+                throw e;
             }
         }
         return this;
@@ -45,7 +50,8 @@ public class HttpResponse implements Closeable {
         }
 
         try {
-            content = IOUtils.toString(getInputStream());
+            content = IOUtils.read(getInputStream());
+            getInputStream().reset();
             return content;
         } catch (IOException e) {
             throw new UncheckedIOException(e);
@@ -53,7 +59,10 @@ public class HttpResponse implements Closeable {
     }
 
     public InputStream getInputStream() throws IOException {
-        return connection.getInputStream();
+        if (in == null) {
+            open();
+        }
+        return in;
     }
 
     public int getResponseCode() {
@@ -69,8 +78,9 @@ public class HttpResponse implements Closeable {
     }
 
     @Override
-    public void close() throws IOException {
-        IOUtils.close(connection.getInputStream());
+    public void close() {
+        IOUtils.close(in);
+        in = null;
         connection = null;
     }
 

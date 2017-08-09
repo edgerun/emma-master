@@ -22,9 +22,13 @@ public final class IOUtils {
     }
 
     public static String read(URL url) throws IOException {
-        try (Scanner scanner = new Scanner(url.openStream(), "UTF-8")) {
-            return scanner.useDelimiter("\\A").next();
+        try (InputStream in = url.openStream()) {
+            return read(in);
         }
+    }
+
+    public static String read(InputStream stream) {
+        return new Scanner(stream, "UTF-8").useDelimiter("\\A").next();
     }
 
     public static void close(Closeable closeable) {
@@ -41,10 +45,6 @@ public final class IOUtils {
         for (Closeable closeable : closeables) {
             close(closeable);
         }
-    }
-
-    public static String toString(InputStream stream) {
-        return new Scanner(stream).useDelimiter("\\A").next();
     }
 
     public static String toString(ByteBuffer buf) {
