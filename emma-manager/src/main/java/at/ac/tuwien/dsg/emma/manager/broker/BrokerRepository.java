@@ -22,11 +22,12 @@ public class BrokerRepository {
         return getBrokerInfo(id(host, port));
     }
 
-    public void register(String host, int port) {
+    public BrokerInfo register(String host, int port) {
         String id = id(host, port);
 
         BrokerInfo brokerInfo = new BrokerInfo(host, port);
         getBrokers().put(id, brokerInfo);
+        return brokerInfo;
     }
 
     public BrokerInfo remove(String host, int port) {

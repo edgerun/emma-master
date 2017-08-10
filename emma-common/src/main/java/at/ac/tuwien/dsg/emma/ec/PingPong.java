@@ -1,6 +1,6 @@
 package at.ac.tuwien.dsg.emma.ec;
 
-import java.net.SocketAddress;
+import java.net.InetSocketAddress;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 
@@ -15,9 +15,9 @@ public class PingPong {
     private Instant sent;
     private Instant received;
 
-    private SocketAddress requestor;
-    private SocketAddress source;
-    private SocketAddress target;
+    private InetSocketAddress requestor;
+    private InetSocketAddress source;
+    private InetSocketAddress target;
 
     public PingPong(int id) {
         this.id = id;
@@ -55,27 +55,27 @@ public class PingPong {
         this.received = received;
     }
 
-    public SocketAddress getRequestor() {
+    public InetSocketAddress getRequestor() {
         return requestor;
     }
 
-    public void setRequestor(SocketAddress requestor) {
+    public void setRequestor(InetSocketAddress requestor) {
         this.requestor = requestor;
     }
 
-    public SocketAddress getSource() {
+    public InetSocketAddress getSource() {
         return source;
     }
 
-    public void setSource(SocketAddress source) {
+    public void setSource(InetSocketAddress source) {
         this.source = source;
     }
 
-    public SocketAddress getTarget() {
+    public InetSocketAddress getTarget() {
         return target;
     }
 
-    public void setTarget(SocketAddress target) {
+    public void setTarget(InetSocketAddress target) {
         this.target = target;
     }
 

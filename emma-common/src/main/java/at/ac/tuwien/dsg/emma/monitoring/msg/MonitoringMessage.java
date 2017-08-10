@@ -1,6 +1,6 @@
 package at.ac.tuwien.dsg.emma.monitoring.msg;
 
-import java.net.SocketAddress;
+import java.net.InetSocketAddress;
 
 import at.ac.tuwien.dsg.emma.monitoring.MonitoringPacketType;
 
@@ -10,11 +10,11 @@ import at.ac.tuwien.dsg.emma.monitoring.MonitoringPacketType;
 public interface MonitoringMessage {
     MonitoringPacketType getMonitoringPacketType();
 
-    SocketAddress getSource();
+    InetSocketAddress getSource();
 
-    void setSource(SocketAddress address);
+    void setSource(InetSocketAddress address);
 
-    SocketAddress getDestination();
+    InetSocketAddress getDestination();
 
-    void setDestination(SocketAddress address);
+    void setDestination(InetSocketAddress address);
 }

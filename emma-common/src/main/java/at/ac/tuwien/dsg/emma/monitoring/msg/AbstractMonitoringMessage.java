@@ -1,32 +1,32 @@
 package at.ac.tuwien.dsg.emma.monitoring.msg;
 
-import java.net.SocketAddress;
+import java.net.InetSocketAddress;
 
 /**
  * AbstractMonitoringMessage.
  */
 public abstract class AbstractMonitoringMessage implements MonitoringMessage {
 
-    private SocketAddress source;
-    private SocketAddress destination;
+    private InetSocketAddress source;
+    private InetSocketAddress destination;
 
     @Override
-    public SocketAddress getSource() {
+    public InetSocketAddress getSource() {
         return source;
     }
 
     @Override
-    public void setSource(SocketAddress source) {
+    public void setSource(InetSocketAddress source) {
         this.source = source;
     }
 
     @Override
-    public SocketAddress getDestination() {
+    public InetSocketAddress getDestination() {
         return destination;
     }
 
     @Override
-    public void setDestination(SocketAddress address) {
+    public void setDestination(InetSocketAddress address) {
         this.destination = address;
     }
 }

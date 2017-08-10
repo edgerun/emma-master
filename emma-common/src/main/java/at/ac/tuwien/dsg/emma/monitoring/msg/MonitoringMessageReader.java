@@ -2,6 +2,7 @@ package at.ac.tuwien.dsg.emma.monitoring.msg;
 
 import java.nio.ByteBuffer;
 
+import at.ac.tuwien.dsg.emma.io.Decode;
 import at.ac.tuwien.dsg.emma.monitoring.MonitoringPacketType;
 
 /**
@@ -11,14 +12,37 @@ public class MonitoringMessageReader {
     public MonitoringMessage read(ByteBuffer buffer) {
         byte header = buffer.get();
 
-        switch (MonitoringPacketType.fromHeader(header)) {
+        MonitoringPacketType type = MonitoringPacketType.fromHeader(header);
+        switch (type) {
             case PING:
                 return readPingMessage(buffer);
             case PONG:
                 return readPongMessage(buffer);
+            case PINGREQ:
+                return readPingReqMessage(buffer);
+            case PINGRESP:
+                return readPingRespMessage(buffer);
             default:
-                throw new UnsupportedOperationException();
+                throw new UnsupportedOperationException("Unhandled message type: " + type);
         }
+    }
+
+    private MonitoringMessage readPingRespMessage(ByteBuffer buffer) {
+        int id = buffer.getInt();
+        int latency = buffer.getInt();
+
+        return new PingRespMessage(id, latency);
+    }
+
+    private PingReqMessage readPingReqMessage(ByteBuffer buffer) {
+        int id = buffer.getInt();
+        String targetHost = Decode.readLengthEncodedString(buffer);
+        int targetPort = buffer.getInt();
+
+        PingReqMessage msg = new PingReqMessage(id);
+        msg.setTargetHost(targetHost);
+        msg.setTargetPort(targetPort);
+        return msg;
     }
 
     private PongMessage readPongMessage(ByteBuffer buffer) {

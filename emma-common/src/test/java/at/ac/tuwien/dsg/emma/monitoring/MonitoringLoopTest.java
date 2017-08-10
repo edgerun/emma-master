@@ -22,7 +22,7 @@ public class MonitoringLoopTest {
         List<PongMessage> pongs = new ArrayList<>();
         List<PingMessage> pings = new ArrayList<>();
 
-        MonitoringLoop l1 = new MonitoringLoop(new InetSocketAddress(43201), new MonitoringMessageHandlerAdapter() {
+        MonitoringLoop l1 = new MonitoringLoop(new InetSocketAddress(43201)).setReadHandler(new MonitoringMessageHandlerAdapter() {
             @Override
             public void onMessage(MonitoringLoop loop, PingMessage message) {
                 pings.add(message);
@@ -36,7 +36,7 @@ public class MonitoringLoopTest {
                 pongs.add(message);
             }
         });
-        MonitoringLoop l2 = new MonitoringLoop(new InetSocketAddress(43202), new MonitoringMessageHandlerAdapter() {
+        MonitoringLoop l2 = new MonitoringLoop(new InetSocketAddress(43202)).setReadHandler(new MonitoringMessageHandlerAdapter() {
             @Override
             public void onMessage(MonitoringLoop loop, PingMessage message) {
                 pings.add(message);

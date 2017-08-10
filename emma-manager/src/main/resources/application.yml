@@ -6,5 +6,7 @@ emma.manager:
   address: 10.42.0.1
   heartbeat:
     port: 60042
+  monitoring:
+    port: 60043
   shell:
     port: 50042
