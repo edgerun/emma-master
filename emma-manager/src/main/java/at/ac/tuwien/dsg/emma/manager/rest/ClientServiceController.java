@@ -8,8 +8,8 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
-import at.ac.tuwien.dsg.emma.manager.broker.BrokerInfo;
-import at.ac.tuwien.dsg.emma.manager.broker.BrokerRepository;
+import at.ac.tuwien.dsg.emma.manager.network.BrokerInfo;
+import at.ac.tuwien.dsg.emma.manager.network.BrokerRepository;
 
 @RestController
 public class ClientServiceController {

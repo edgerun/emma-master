@@ -1,4 +1,4 @@
-package at.ac.tuwien.dsg.emma.manager.overlay;
+package at.ac.tuwien.dsg.emma.manager.network.graph;
 
 /**
  * CompleteGraph.

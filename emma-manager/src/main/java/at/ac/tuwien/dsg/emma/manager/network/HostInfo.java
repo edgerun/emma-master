@@ -1,19 +1,19 @@
-package at.ac.tuwien.dsg.emma.manager.ec;
+package at.ac.tuwien.dsg.emma.manager.network;
 
 import java.util.Objects;
 
 /**
- * NodeInfo.
+ * Value object to identify and store store information about a host.
  */
-public class NodeInfo {
+public class HostInfo {
 
     private String host;
     private int port;
 
-    public NodeInfo() {
+    public HostInfo() {
     }
 
-    public NodeInfo(String host, int port) {
+    public HostInfo(String host, int port) {
         this.host = host;
         this.port = port;
     }
@@ -46,9 +46,9 @@ public class NodeInfo {
         if (o == null || getClass() != o.getClass()) {
             return false;
         }
-        NodeInfo nodeInfo = (NodeInfo) o;
-        return port == nodeInfo.port &&
-                Objects.equals(host, nodeInfo.host);
+        HostInfo hostInfo = (HostInfo) o;
+        return port == hostInfo.port &&
+                Objects.equals(host, hostInfo.host);
     }
 
     @Override

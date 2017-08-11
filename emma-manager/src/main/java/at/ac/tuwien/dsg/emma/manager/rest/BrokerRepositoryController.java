@@ -14,10 +14,10 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
-import at.ac.tuwien.dsg.emma.manager.broker.BrokerInfo;
-import at.ac.tuwien.dsg.emma.manager.broker.BrokerRepository;
-import at.ac.tuwien.dsg.emma.manager.ec.MonitoringService;
-import at.ac.tuwien.dsg.emma.manager.ec.NetworkManager;
+import at.ac.tuwien.dsg.emma.manager.network.BrokerInfo;
+import at.ac.tuwien.dsg.emma.manager.network.BrokerRepository;
+import at.ac.tuwien.dsg.emma.manager.network.monitoring.MonitoringService;
+import at.ac.tuwien.dsg.emma.manager.network.NetworkManager;
 
 /**
  * BrokerRepositoryController.

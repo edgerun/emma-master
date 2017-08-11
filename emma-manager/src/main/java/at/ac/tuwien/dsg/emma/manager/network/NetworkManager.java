@@ -1,4 +1,4 @@
-package at.ac.tuwien.dsg.emma.manager.ec;
+package at.ac.tuwien.dsg.emma.manager.network;
 
 import java.util.NoSuchElementException;
 
@@ -6,10 +6,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
-import at.ac.tuwien.dsg.emma.manager.broker.BrokerInfo;
-import at.ac.tuwien.dsg.emma.manager.overlay.CompleteGraph;
-import at.ac.tuwien.dsg.emma.manager.overlay.Node;
-import at.ac.tuwien.dsg.emma.manager.overlay.NodeType;
+import at.ac.tuwien.dsg.emma.manager.network.graph.CompleteGraph;
+import at.ac.tuwien.dsg.emma.manager.network.graph.Node;
+import at.ac.tuwien.dsg.emma.manager.network.graph.NodeType;
 
 /**
  * NetworkManager.
@@ -53,16 +52,16 @@ public class NetworkManager {
         onUpdate();
     }
 
-    public void updateMetrics(NodeInfo nodeInfo, String metric, double value) {
+    public void updateMetrics(HostInfo hostInfo, String metric, double value) {
         network.getNodes()
-                .find(nodeInfo.getId())
+                .find(hostInfo.getId())
                 .ifPresent(n -> n.getMetrics().put(metric, value));
     }
 
-    public Double getMetric(NodeInfo nodeInfo, String metric) {
+    public Double getMetric(HostInfo hostInfo, String metric) {
         return network.getNodes()
-                .find(nodeInfo.getId())
-                .orElseThrow(() -> new NoSuchElementException("No such element: " + nodeInfo.getId()))
+                .find(hostInfo.getId())
+                .orElseThrow(() -> new NoSuchElementException("No such element: " + hostInfo.getId()))
                 .getMetrics()
                 .get(metric);
     }

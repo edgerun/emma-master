@@ -2,6 +2,10 @@ package at.ac.tuwien.dsg.emma.manager.overlay;
 
 import org.junit.Test;
 
+import at.ac.tuwien.dsg.emma.manager.network.graph.Node;
+import at.ac.tuwien.dsg.emma.manager.network.graph.NodeType;
+import at.ac.tuwien.dsg.emma.manager.network.graph.UndirectedEdge;
+
 /**
  * GraphTest.
  */

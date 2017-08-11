@@ -6,6 +6,8 @@ import static org.junit.Assert.assertTrue;
 
 import org.junit.Test;
 
+import at.ac.tuwien.dsg.emma.manager.network.graph.AscendingPair;
+
 /**
  * AscendingPairTest.
  */

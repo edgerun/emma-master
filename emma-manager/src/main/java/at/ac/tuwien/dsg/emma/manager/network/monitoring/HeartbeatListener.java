@@ -1,4 +1,4 @@
-package at.ac.tuwien.dsg.emma.manager.broker;
+package at.ac.tuwien.dsg.emma.manager.network.monitoring;
 
 import java.io.IOException;
 import java.net.DatagramPacket;
@@ -15,6 +15,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import at.ac.tuwien.dsg.emma.io.Decode;
+import at.ac.tuwien.dsg.emma.manager.network.BrokerRepository;
+import at.ac.tuwien.dsg.emma.manager.network.BrokerInfo;
 import at.ac.tuwien.dsg.emma.util.IOUtils;
 
 @Component

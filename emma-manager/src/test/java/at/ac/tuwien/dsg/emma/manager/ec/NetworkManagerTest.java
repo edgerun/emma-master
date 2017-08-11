@@ -6,8 +6,10 @@ import java.util.NoSuchElementException;
 
 import org.junit.Test;
 
-import at.ac.tuwien.dsg.emma.manager.broker.BrokerInfo;
-import at.ac.tuwien.dsg.emma.manager.overlay.Node;
+import at.ac.tuwien.dsg.emma.manager.network.BrokerInfo;
+import at.ac.tuwien.dsg.emma.manager.network.ClientInfo;
+import at.ac.tuwien.dsg.emma.manager.network.NetworkManager;
+import at.ac.tuwien.dsg.emma.manager.network.graph.Node;
 
 /**
  * NetworkManagerTest.

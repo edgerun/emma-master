@@ -1,11 +1,9 @@
-package at.ac.tuwien.dsg.emma.manager.broker;
-
-import at.ac.tuwien.dsg.emma.manager.ec.NodeInfo;
+package at.ac.tuwien.dsg.emma.manager.network;
 
 /**
  * BrokerInfo.
  */
-public class BrokerInfo extends NodeInfo {
+public class BrokerInfo extends HostInfo {
 
     // TODO: keepalive
     private long lastSeen;

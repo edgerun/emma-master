@@ -7,6 +7,12 @@ import static org.junit.Assert.assertTrue;
 
 import org.junit.Test;
 
+import at.ac.tuwien.dsg.emma.manager.network.graph.CompleteGraph;
+import at.ac.tuwien.dsg.emma.manager.network.graph.Edge;
+import at.ac.tuwien.dsg.emma.manager.network.graph.Node;
+import at.ac.tuwien.dsg.emma.manager.network.graph.NodeSet;
+import at.ac.tuwien.dsg.emma.manager.network.graph.NodeType;
+
 /**
  * CompleteGraphTest.
  */

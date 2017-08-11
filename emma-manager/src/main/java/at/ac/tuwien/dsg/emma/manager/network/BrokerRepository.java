@@ -1,9 +1,11 @@
-package at.ac.tuwien.dsg.emma.manager.broker;
+package at.ac.tuwien.dsg.emma.manager.network;
 
 import java.util.HashMap;
 import java.util.Map;
 
 import org.springframework.stereotype.Component;
+
+import at.ac.tuwien.dsg.emma.manager.network.BrokerInfo;
 
 @Component
 public class BrokerRepository {
