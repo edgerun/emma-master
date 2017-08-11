@@ -9,6 +9,7 @@ public class HostInfo {
 
     private final String host;
     private final int port;
+    private Metrics metrics;
 
     public HostInfo(String host, int port) {
         this.host = host;
@@ -25,6 +26,14 @@ public class HostInfo {
 
     public String getId() {
         return host + ":" + port;
+    }
+
+    public Metrics getMetrics() {
+        if (metrics == null) {
+            metrics = new Metrics();
+        }
+
+        return metrics;
     }
 
     @Override

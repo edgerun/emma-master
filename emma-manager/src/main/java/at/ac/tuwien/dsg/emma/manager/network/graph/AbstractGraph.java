@@ -2,6 +2,7 @@ package at.ac.tuwien.dsg.emma.manager.network.graph;
 
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Optional;
 
 /**
@@ -59,5 +60,25 @@ public abstract class AbstractGraph implements Graph {
     @Override
     public boolean isConnected(Node u, Node v) {
         return findEdge(u, v).isPresent();
+    }
+
+    @Override
+    public String toString() {
+        StringBuilder str = new StringBuilder(getClass().getSimpleName());
+        str.append("{");
+
+        Iterator<Edge> iterator = getEdges().iterator();
+
+        if (iterator.hasNext()) {
+            str.append(System.lineSeparator());
+        }
+
+        while (iterator.hasNext()) {
+            Edge next = iterator.next();
+            str.append("  ").append(next).append(System.lineSeparator());
+        }
+
+        str.append("}");
+        return str.toString();
     }
 }

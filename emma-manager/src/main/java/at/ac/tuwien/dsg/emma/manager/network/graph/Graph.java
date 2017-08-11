@@ -14,7 +14,7 @@ public interface Graph {
 
     boolean addNode(Node node);
 
-    Edge addEdge(Node u, Node v);
+    <V> Edge<V> addEdge(Node u, Node v);
 
     Node getNode(String nodeId);
 
