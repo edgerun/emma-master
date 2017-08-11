@@ -1,30 +1,95 @@
 package at.ac.tuwien.dsg.emma.manager.network.graph;
 
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
+
 /**
  * UndirectedGraph.
  */
-public interface UndirectedGraph {
+public class UndirectedGraph extends AbstractGraph {
 
-    EdgeSet getEdges();
+    private Map<AscendingPair<Node>, Edge> edges;
 
-    NodeSet getNodes();
+    public UndirectedGraph() {
+        this.edges = new HashMap<>();
+    }
 
-    void add(Node node);
+    @Override
+    public Collection<Edge> getEdges() {
+        return edges.values();
+    }
 
-    void add(Edge edge);
+    @Override
+    public Edge addEdge(Node u, Node v) {
+        return edges.computeIfAbsent(pair(u, v), EdgeImpl::new);
+    }
 
-    void remove(Edge edge);
+    @Override
+    public Edge getEdge(Node u, Node v) {
+        return edges.get(pair(u, v));
+    }
 
-    void remove(Node node);
+    @Override
+    public boolean removeEdge(Edge edge) {
+        if (!(edge instanceof EdgeImpl)) {
+            return false;
+        }
 
-    Edge connect(Node nodeU, Node nodeV);
+        EdgeImpl e = ((EdgeImpl) edge);
 
-    NodeSet getNeighbours(Node node);
+        return edges.remove(e.nodes) != null;
+    }
 
-    EdgeSet getEdges(Node node);
+    @Override
+    public Collection<Node> getNeighbours(Node node) {
+        Set<Node> neighbours = new HashSet<>();
 
-    boolean contains(Node node);
+        for (Edge edge : getEdges()) {
+            Node other = edge.opposite(node);
+            if (other != null) {
+                neighbours.add(other);
+            }
+        }
 
-    boolean contains(Edge edge);
+        return neighbours;
+    }
 
+    private AscendingPair<Node> pair(Node u, Node v) {
+        return AscendingPair.of(u, v, NodeKeyComparator.getInstance());
+    }
+
+    /**
+     * UndirectedEdge.
+     */
+    public static class EdgeImpl<V> extends AbstractEdge<V> {
+
+        private final AscendingPair<Node> nodes;
+
+        public EdgeImpl(AscendingPair<Node> nodes) {
+            this.nodes = nodes;
+        }
+
+        public Pair<Node> getNodes() {
+            return nodes;
+        }
+
+        @Override
+        public Node getNodeU() {
+            return nodes.getFirst();
+        }
+
+        @Override
+        public Node getNodeV() {
+            return nodes.getSecond();
+        }
+
+        @Override
+        public boolean isDirected() {
+            return false;
+        }
+
+    }
 }

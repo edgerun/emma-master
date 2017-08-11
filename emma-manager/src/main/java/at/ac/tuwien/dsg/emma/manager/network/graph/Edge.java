@@ -1,11 +1,9 @@
 package at.ac.tuwien.dsg.emma.manager.network.graph;
 
-import java.util.Map;
-
 /**
  * Edge.
  */
-public interface Edge {
+public interface Edge<V> {
 
     Node getNodeU();
 
@@ -17,5 +15,7 @@ public interface Edge {
 
     Node opposite(Node node);
 
-    Map<String, Object> getMetrics();
+    V getValue();
+
+    void setValue(V value);
 }

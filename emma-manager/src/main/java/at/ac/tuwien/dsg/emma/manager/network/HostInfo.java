@@ -7,11 +7,8 @@ import java.util.Objects;
  */
 public class HostInfo {
 
-    private String host;
-    private int port;
-
-    public HostInfo() {
-    }
+    private final String host;
+    private final int port;
 
     public HostInfo(String host, int port) {
         this.host = host;
@@ -22,16 +19,8 @@ public class HostInfo {
         return host;
     }
 
-    public void setHost(String host) {
-        this.host = host;
-    }
-
     public int getPort() {
         return port;
-    }
-
-    public void setPort(int port) {
-        this.port = port;
     }
 
     public String getId() {

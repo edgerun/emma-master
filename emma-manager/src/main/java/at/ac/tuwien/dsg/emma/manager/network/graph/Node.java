@@ -1,55 +1,29 @@
 package at.ac.tuwien.dsg.emma.manager.network.graph;
 
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Objects;
 
 /**
  * Node.
  */
-public class Node {
+public class Node<V> {
 
     private final String id;
-    private final NodeType type;
-    private final Map<String, Double> metrics;
 
-    public Node(String id, NodeType type) {
+    private V value;
+
+    public Node(String id) {
         this.id = Objects.requireNonNull(id);
-        this.type = Objects.requireNonNull(type);
-        this.metrics = new HashMap<>();
     }
 
     public String getId() {
         return id;
     }
 
-    public NodeType getType() {
-        return type;
+    public V getValue() {
+        return value;
     }
 
-    public Map<String, Double> getMetrics() {
-        return metrics;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) {
-            return true;
-        }
-        if (o == null || getClass() != o.getClass()) {
-            return false;
-        }
-        Node node = (Node) o;
-        return Objects.equals(id, node.id);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id);
-    }
-
-    @Override
-    public String toString() {
-        return type + "{" + id + "}";
+    public void setValue(V value) {
+        this.value = value;
     }
 }

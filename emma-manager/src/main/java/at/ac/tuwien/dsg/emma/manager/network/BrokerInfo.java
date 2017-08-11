@@ -10,10 +10,6 @@ public class BrokerInfo extends HostInfo {
 
     private boolean isAlive;
 
-    public BrokerInfo() {
-        super();
-    }
-
     public BrokerInfo(String host, int port) {
         super(host, port);
     }
