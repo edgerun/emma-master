@@ -23,11 +23,6 @@
       <version>${project.version}</version>
     </dependency>
     <dependency>
-      <groupId>at.ac.tuwien.dsg.emma</groupId>
-      <artifactId>emma-overlay</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-    <dependency>
       <groupId>at.ac.tuwien.dsg.orvell</groupId>
       <artifactId>orvell-core</artifactId>
     </dependency>
