@@ -55,7 +55,7 @@ public class BrokerRepositoryController {
                 continue;
             }
 
-            monitoringService.pingRequest(registered.getAddress(), brokerInfo.getAddress());
+            monitoringService.pingRequest(registered.getHost(), brokerInfo.getHost());
         }
 
     }

@@ -5,7 +5,7 @@ package at.ac.tuwien.dsg.emma.manager.broker;
  */
 public class BrokerInfo {
 
-    private String address;
+    private String host;
     private int port;
 
     // TODO: keepalive
@@ -16,17 +16,17 @@ public class BrokerInfo {
     public BrokerInfo() {
     }
 
-    public BrokerInfo(String address, int port) {
-        this.address = address;
+    public BrokerInfo(String host, int port) {
+        this.host = host;
         this.port = port;
     }
 
-    public String getAddress() {
-        return address;
+    public String getHost() {
+        return host;
     }
 
-    public void setAddress(String address) {
-        this.address = address;
+    public void setHost(String host) {
+        this.host = host;
     }
 
     public int getPort() {
@@ -54,13 +54,13 @@ public class BrokerInfo {
     }
 
     public String getId() {
-        return address + ":" + port;
+        return host + ":" + port;
     }
 
     @Override
     public String toString() {
         return "BrokerInfo{" +
-                "address='" + address + '\'' +
+                "host='" + host + '\'' +
                 ", port=" + port +
                 ", lastSeen=" + lastSeen +
                 ", isAlive=" + isAlive +

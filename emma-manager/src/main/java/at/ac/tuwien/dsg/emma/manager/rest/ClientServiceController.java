@@ -30,7 +30,7 @@ public class ClientServiceController {
     }
 
     private String uri(BrokerInfo brokerInfo) {
-        return "tcp://" + brokerInfo.getAddress() + ":" + brokerInfo.getPort();
+        return "tcp://" + brokerInfo.getHost() + ":" + brokerInfo.getPort();
     }
 
     public String getRootBroker() {
