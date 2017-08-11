@@ -1,6 +1,7 @@
 package at.ac.tuwien.dsg.emma.manager.ec;
 
 import java.net.InetSocketAddress;
+import java.util.concurrent.Executor;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.IntUnaryOperator;
 
@@ -29,6 +30,9 @@ public class MonitoringService implements InitializingBean, DisposableBean {
 
     private static AtomicInteger messageIds = new AtomicInteger();
     private static IntUnaryOperator messageIdUpdater = i -> i >= Integer.MAX_VALUE ? 0 : i + 1;
+
+    @Autowired
+    private Executor monitoringCommandExecutor;
 
     private Thread thread;
 
