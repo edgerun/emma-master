@@ -1,12 +1,11 @@
 package at.ac.tuwien.dsg.emma.manager.broker;
 
+import at.ac.tuwien.dsg.emma.manager.ec.NodeInfo;
+
 /**
  * BrokerInfo.
  */
-public class BrokerInfo {
-
-    private String host;
-    private int port;
+public class BrokerInfo extends NodeInfo {
 
     // TODO: keepalive
     private long lastSeen;
@@ -14,27 +13,11 @@ public class BrokerInfo {
     private boolean isAlive;
 
     public BrokerInfo() {
+        super();
     }
 
     public BrokerInfo(String host, int port) {
-        this.host = host;
-        this.port = port;
-    }
-
-    public String getHost() {
-        return host;
-    }
-
-    public void setHost(String host) {
-        this.host = host;
-    }
-
-    public int getPort() {
-        return port;
-    }
-
-    public void setPort(int port) {
-        this.port = port;
+        super(host, port);
     }
 
     public long getLastSeen() {
@@ -53,15 +36,11 @@ public class BrokerInfo {
         isAlive = alive;
     }
 
-    public String getId() {
-        return host + ":" + port;
-    }
 
     @Override
     public String toString() {
         return "BrokerInfo{" +
-                "host='" + host + '\'' +
-                ", port=" + port +
+                "id='" + getId() + '\'' +
                 ", lastSeen=" + lastSeen +
                 ", isAlive=" + isAlive +
                 '}';
