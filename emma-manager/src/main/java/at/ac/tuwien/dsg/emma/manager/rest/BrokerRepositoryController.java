@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
 import at.ac.tuwien.dsg.emma.manager.broker.BrokerInfo;
 import at.ac.tuwien.dsg.emma.manager.broker.BrokerRepository;
 import at.ac.tuwien.dsg.emma.manager.ec.MonitoringService;
+import at.ac.tuwien.dsg.emma.manager.ec.NetworkManager;
 
 /**
  * BrokerRepositoryController.
@@ -31,6 +32,9 @@ public class BrokerRepositoryController {
 
     @Autowired
     private MonitoringService monitoringService;
+
+    @Autowired
+    private NetworkManager networkManager;
 
     @RequestMapping(value = "/broker/register", method = RequestMethod.GET)
     public @ResponseBody
@@ -48,6 +52,7 @@ public class BrokerRepositoryController {
 
         BrokerInfo registered = brokerRepository.register(address, port);
         response.setStatus(201);
+        networkManager.add(registered);
 
         for (BrokerInfo brokerInfo : brokerRepository.getBrokers().values()) {
             // TODO: this is questionable
@@ -81,6 +86,8 @@ public class BrokerRepositoryController {
             brokerInfo.setAlive(false);
             response.setStatus(201);
         }
+
+        networkManager.remove(brokerInfo);
     }
 
 
