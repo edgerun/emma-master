@@ -6,6 +6,8 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 
+import at.ac.tuwien.dsg.emma.manager.service.sub.SubscriptionTable;
+
 /**
  * ManagerAppConfig.
  */
@@ -23,4 +25,8 @@ public class ManagerAppConfig {
         return executor;
     }
 
+    @Bean
+    public SubscriptionTable subscriptionTable() {
+        return new SubscriptionTable();
+    }
 }

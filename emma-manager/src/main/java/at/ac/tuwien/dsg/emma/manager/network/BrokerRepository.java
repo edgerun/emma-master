@@ -14,6 +14,16 @@ public class BrokerRepository {
         this.brokers = new HashMap<>();
     }
 
+    public Broker getBrokerByHost(String host) {
+        for (Map.Entry<String, Broker> entry : brokers.entrySet()) {
+            if (host.equals(entry.getKey().split(":")[0])) {
+                return entry.getValue();
+            }
+        }
+
+        return null;
+    }
+
     public Broker getBroker(String id) {
         return brokers.get(id);
     }
