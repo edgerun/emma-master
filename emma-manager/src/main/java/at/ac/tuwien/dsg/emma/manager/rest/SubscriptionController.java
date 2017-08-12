@@ -1,7 +1,5 @@
 package at.ac.tuwien.dsg.emma.manager.rest;
 
-import javax.servlet.http.HttpServletRequest;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,13 +27,13 @@ public class SubscriptionController {
     private SubscriptionTable subscriptionTable;
 
     @RequestMapping(value = "/broker/onSubscribe", method = RequestMethod.GET)
-    public void onSubscribe(String topic, HttpServletRequest request) {
-        LOG.info("/broker/onSubscribe({},{})", topic, request.getRemoteHost());
+    public void onSubscribe(String id, String topic) {
+        LOG.debug("/broker/onSubscribe({},{})", id, topic);
 
-        Broker broker = brokerRepository.getBrokerByHost(request.getRemoteHost());
+        Broker broker = brokerRepository.getBroker(id);
 
         if (broker == null) {
-            LOG.warn("Broker with host {} not found", request.getRemoteHost());
+            LOG.warn("Broker with host {} not found", id);
             // FIXME
             return;
         }
@@ -43,18 +41,16 @@ public class SubscriptionController {
         Subscription subscription = subscriptionTable.getOrCreate(broker, topic);
         subscription.increment();
 
-        if (LOG.isDebugEnabled()) {
-            LOG.debug("Updated subscription {}", subscription);
-        }
+        LOG.debug("Updated subscription {}", subscription);
     }
 
     @RequestMapping(value = "/broker/onUnsubscribe", method = RequestMethod.GET)
-    public void onUnsubscribe(String topic, HttpServletRequest request) {
-        LOG.info("/broker/onUnsubscribe(request: {})", topic, request.getRemoteHost());
+    public void onUnsubscribe(String id, String topic) {
+        LOG.debug("/broker/onUnsubscribe({},{})", id, topic);
 
-        Broker broker = brokerRepository.getBrokerByHost(request.getRemoteHost());
+        Broker broker = brokerRepository.getBroker(id);
         if (broker == null) {
-            LOG.warn("Broker with host {} not found", request.getRemoteHost());
+            LOG.warn("Broker with host {} not found", id);
             // FIXME
             return;
         }
@@ -65,8 +61,6 @@ public class SubscriptionController {
             subscription.decrement();
         }
 
-        if (LOG.isDebugEnabled()) {
-            LOG.debug("Updated subscription {}", subscription);
-        }
+        LOG.debug("Updated subscription {}", subscription);
     }
 }
