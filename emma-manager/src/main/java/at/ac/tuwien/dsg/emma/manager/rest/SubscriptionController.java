@@ -30,10 +30,12 @@ public class SubscriptionController {
 
     @RequestMapping(value = "/broker/onSubscribe", method = RequestMethod.GET)
     public void onSubscribe(String topic, HttpServletRequest request) {
-        Broker broker = brokerRepository.getBrokerByHost(request.getRemoteAddr());
+        LOG.info("/broker/onSubscribe({},{})", topic, request.getRemoteHost());
+
+        Broker broker = brokerRepository.getBrokerByHost(request.getRemoteHost());
 
         if (broker == null) {
-            LOG.warn("Broker with host {} not found", request.getRemoteAddr());
+            LOG.warn("Broker with host {} not found", request.getRemoteHost());
             // FIXME
             return;
         }
@@ -48,9 +50,9 @@ public class SubscriptionController {
 
     @RequestMapping(value = "/broker/onUnsubscribe", method = RequestMethod.GET)
     public void onUnsubscribe(String topic, HttpServletRequest request) {
-        LOG.info("/broker/onUnsubscribe(request: {})", topic, request.getRemoteAddr());
+        LOG.info("/broker/onUnsubscribe(request: {})", topic, request.getRemoteHost());
 
-        Broker broker = brokerRepository.getBrokerByHost(request.getRemoteAddr());
+        Broker broker = brokerRepository.getBrokerByHost(request.getRemoteHost());
         if (broker == null) {
             LOG.warn("Broker with host {} not found", request.getRemoteHost());
             // FIXME
