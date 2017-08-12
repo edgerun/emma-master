@@ -50,11 +50,9 @@ public class SubscriptionTable {
         return subscription;
     }
 
-
     public Subscription get(Broker broker, String filter) {
         return getSubscriptionTable(broker).map(m -> m.get(filter)).orElse(null);
     }
-
 
     public void remove(Subscription subscription) {
         subscriptions.remove(subscription);
