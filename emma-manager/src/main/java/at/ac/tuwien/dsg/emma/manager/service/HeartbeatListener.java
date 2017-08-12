@@ -1,4 +1,4 @@
-package at.ac.tuwien.dsg.emma.manager.network.monitoring;
+package at.ac.tuwien.dsg.emma.manager.service;
 
 import java.io.IOException;
 import java.net.DatagramPacket;

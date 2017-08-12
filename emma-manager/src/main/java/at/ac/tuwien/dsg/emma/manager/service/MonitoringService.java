@@ -1,4 +1,4 @@
-package at.ac.tuwien.dsg.emma.manager.network.monitoring;
+package at.ac.tuwien.dsg.emma.manager.service;
 
 import java.net.InetSocketAddress;
 import java.util.concurrent.Executor;
