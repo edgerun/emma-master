@@ -33,7 +33,7 @@ public class NetworkManager {
 
             for (Node node : network.getNodes()) {
                 if (node != newNode) {
-                    Edge<Metrics> edge = network.addEdge(newNode, node);
+                    Edge edge = network.addEdge(newNode, node);
                     edge.setValue(new Metrics());
                 }
             }

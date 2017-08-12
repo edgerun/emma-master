@@ -53,4 +53,12 @@ public class HostInfo {
     public int hashCode() {
         return Objects.hash(host, port);
     }
+
+    @Override
+    public String toString() {
+        return getClass().getSimpleName() + "{" +
+                "id='" + getId() + '\'' +
+                ", metrics=" + metrics +
+                '}';
+    }
 }

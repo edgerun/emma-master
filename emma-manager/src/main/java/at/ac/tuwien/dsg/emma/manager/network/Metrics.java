@@ -18,6 +18,11 @@ public class Metrics {
         return table;
     }
 
+    public Metrics set(String k, double v) {
+        table.put(k, v);
+        return this;
+    }
+
     @Override
     public String toString() {
         return table.toString();

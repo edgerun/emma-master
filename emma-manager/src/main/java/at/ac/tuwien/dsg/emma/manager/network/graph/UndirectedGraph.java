@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * UndirectedGraph.
@@ -20,6 +21,13 @@ public class UndirectedGraph extends AbstractGraph {
     @Override
     public Collection<Edge> getEdges() {
         return edges.values();
+    }
+
+    @Override
+    public Collection<Edge> getEdges(Node node) {
+        return edges.values().stream()
+                .filter(e -> e.contains(node))
+                .collect(Collectors.toSet());
     }
 
     @Override

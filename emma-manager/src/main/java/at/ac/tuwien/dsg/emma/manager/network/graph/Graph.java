@@ -12,13 +12,15 @@ public interface Graph {
 
     Collection<Edge> getEdges();
 
+    Collection<Edge> getEdges(Node node);
+
     boolean addNode(Node node);
 
     <V> Edge<V> addEdge(Node u, Node v);
 
-    Node getNode(String nodeId);
+    <V> Node<V> getNode(String nodeId);
 
-    Edge getEdge(Node u, Node v);
+    <V> Edge<V> getEdge(Node u, Node v);
 
     boolean removeEdge(Edge edge);
 
