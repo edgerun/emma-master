@@ -28,10 +28,10 @@ public class NetworkManager {
             if (network.findNode(info.getId()).isPresent()) {
                 return;
             }
-            Node<BrokerInfo> newNode = new Node<>(info.getId(), info);
+            Node<HostInfo> newNode = new Node<>(info.getId(), info);
             network.addNode(newNode);
 
-            for (Node node : network.getNodes()) {
+            for (Node<HostInfo> node : network.getNodes()) {
                 if (node != newNode) {
                     Edge edge = network.addEdge(newNode, node);
                     edge.setValue(new Metrics());
@@ -74,14 +74,6 @@ public class NetworkManager {
         }
 
         onUpdate();
-    }
-
-    public void updateMetrics(HostInfo hostInfo, String metric, double value) {
-
-    }
-
-    public Double getMetric(HostInfo hostInfo, String metric) {
-        return null;
     }
 
     public Graph getNetwork() {

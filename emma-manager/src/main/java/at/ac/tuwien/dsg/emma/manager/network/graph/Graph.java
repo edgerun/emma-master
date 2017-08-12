@@ -34,4 +34,6 @@ public interface Graph {
 
     boolean isConnected(Node u, Node v);
 
+    int degree(Node node);
+
 }

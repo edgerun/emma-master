@@ -63,6 +63,11 @@ public abstract class AbstractGraph implements Graph {
     }
 
     @Override
+    public int degree(Node node) {
+        return getEdges(node).size();
+    }
+
+    @Override
     public String toString() {
         StringBuilder str = new StringBuilder(getClass().getSimpleName());
         str.append("{");
