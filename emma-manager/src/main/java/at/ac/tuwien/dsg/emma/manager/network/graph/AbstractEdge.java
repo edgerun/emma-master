@@ -5,9 +5,9 @@ import java.util.Objects;
 /**
  * AbstractEdge.
  */
-public abstract class AbstractEdge<V> implements Edge<V> {
+public abstract class AbstractEdge<V, E> implements Edge<V, E> {
 
-    protected V value;
+    protected E value;
 
     @Override
     public boolean contains(Node node) {
@@ -15,7 +15,7 @@ public abstract class AbstractEdge<V> implements Edge<V> {
     }
 
     @Override
-    public Node opposite(Node node) {
+    public Node<V> opposite(Node node) {
         if (Objects.equals(node, getNodeU())) {
             return getNodeV();
         } else if (Objects.equals(node, getNodeV())) {
@@ -26,12 +26,12 @@ public abstract class AbstractEdge<V> implements Edge<V> {
     }
 
     @Override
-    public V getValue() {
+    public E getValue() {
         return value;
     }
 
     @Override
-    public void setValue(V value) {
+    public void setValue(E value) {
         this.value = value;
     }
 

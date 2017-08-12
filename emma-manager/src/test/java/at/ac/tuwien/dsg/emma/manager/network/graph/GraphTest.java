@@ -84,7 +84,7 @@ public abstract class GraphTest {
         graph.addNode(new Node("foo"));
         assertFalse(graph.getNodes().isEmpty());
 
-        Node found = graph.getNodes().iterator().next();
+        Node found = (Node) graph.getNodes().iterator().next();
 
         assertEquals("foo", found.getId());
     }

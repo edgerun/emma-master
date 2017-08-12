@@ -6,31 +6,31 @@ import java.util.Optional;
 /**
  * Graph.
  */
-public interface Graph {
+public interface Graph<V, E> {
 
-    Collection<Node> getNodes();
+    Collection<Node<V>> getNodes();
 
-    Collection<Edge> getEdges();
+    Collection<Edge<V,E>> getEdges();
 
-    Collection<Edge> getEdges(Node node);
+    Collection<Edge<V,E>> getEdges(Node node);
 
     boolean addNode(Node node);
 
-    <V> Edge<V> addEdge(Node u, Node v);
+    Edge<V, E> addEdge(Node u, Node v);
 
-    <V> Node<V> getNode(String nodeId);
+    Node<V> getNode(String nodeId);
 
-    <V> Edge<V> getEdge(Node u, Node v);
+    Edge<V, E> getEdge(Node u, Node v);
 
     boolean removeEdge(Edge edge);
 
     boolean removeNode(Node node);
 
-    Collection<Node> getNeighbours(Node node);
+    Collection<Node<V>> getNeighbours(Node node);
 
-    Optional<Node> findNode(String nodeId);
+    Optional<Node<V>> findNode(String nodeId);
 
-    Optional<Edge> findEdge(Node u, Node v);
+    Optional<Edge<V, E>> findEdge(Node u, Node v);
 
     boolean isConnected(Node u, Node v);
 

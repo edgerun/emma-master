@@ -8,16 +8,16 @@ import java.util.Optional;
 /**
  * AbstractGraph.
  */
-public abstract class AbstractGraph implements Graph {
+public abstract class AbstractGraph<V, E> implements Graph<V, E> {
 
-    protected HashMap<String, Node> nodes;
+    protected HashMap<String, Node<V>> nodes;
 
     public AbstractGraph() {
         this.nodes = new HashMap<>();
     }
 
     @Override
-    public Collection<Node> getNodes() {
+    public Collection<Node<V>> getNodes() {
         return nodes.values();
     }
 
@@ -32,7 +32,7 @@ public abstract class AbstractGraph implements Graph {
     }
 
     @Override
-    public Node getNode(String nodeId) {
+    public Node<V> getNode(String nodeId) {
         return nodes.get(nodeId);
     }
 
@@ -48,12 +48,12 @@ public abstract class AbstractGraph implements Graph {
     }
 
     @Override
-    public Optional<Node> findNode(String nodeId) {
+    public Optional<Node<V>> findNode(String nodeId) {
         return Optional.ofNullable(getNode(nodeId));
     }
 
     @Override
-    public Optional<Edge> findEdge(Node u, Node v) {
+    public Optional<Edge<V, E>> findEdge(Node u, Node v) {
         return Optional.ofNullable(getEdge(u, v));
     }
 
@@ -72,7 +72,7 @@ public abstract class AbstractGraph implements Graph {
         StringBuilder str = new StringBuilder(getClass().getSimpleName());
         str.append("{");
 
-        Iterator<Edge> iterator = getEdges().iterator();
+        Iterator<Edge<V, E>> iterator = getEdges().iterator();
 
         if (iterator.hasNext()) {
             str.append(System.lineSeparator());

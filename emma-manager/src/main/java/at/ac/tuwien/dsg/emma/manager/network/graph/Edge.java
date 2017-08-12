@@ -3,19 +3,19 @@ package at.ac.tuwien.dsg.emma.manager.network.graph;
 /**
  * Edge.
  */
-public interface Edge<V> {
+public interface Edge<V, E> {
 
-    Node getNodeU();
+    Node<V> getNodeU();
 
-    Node getNodeV();
+    Node<V> getNodeV();
 
     boolean isDirected();
 
     boolean contains(Node node);
 
-    Node opposite(Node node);
+    Node<V> opposite(Node node);
 
-    V getValue();
+    E getValue();
 
-    void setValue(V value);
+    void setValue(E value);
 }

@@ -17,10 +17,10 @@ public class NetworkManager {
 
     private static final Logger LOG = LoggerFactory.getLogger(NetworkManager.class);
 
-    private final Graph network;
+    private final Graph<HostInfo, Metrics> network;
 
     public NetworkManager() {
-        this.network = new UndirectedGraph();
+        this.network = new UndirectedGraph<>();
     }
 
     public void add(BrokerInfo info) {
@@ -76,7 +76,7 @@ public class NetworkManager {
         onUpdate();
     }
 
-    public Graph getNetwork() {
+    public Graph<HostInfo, Metrics> getNetwork() {
         return network;
     }
 

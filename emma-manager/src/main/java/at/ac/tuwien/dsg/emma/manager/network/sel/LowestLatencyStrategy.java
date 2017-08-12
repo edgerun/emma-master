@@ -19,7 +19,7 @@ public class LowestLatencyStrategy implements BrokerSelectionStrategy {
     private LatencyComparator comparator = new LatencyComparator();
 
     @Override
-    public BrokerInfo select(ClientInfo client, Graph graph) {
+    public BrokerInfo select(ClientInfo client, Graph<HostInfo, Metrics> graph) {
         Node<HostInfo> node = graph.getNode(client.getId());
 
         if (node == null) {
@@ -28,7 +28,6 @@ public class LowestLatencyStrategy implements BrokerSelectionStrategy {
 
         Optional<Node> best = graph.getEdges(node)
                 .stream()
-                .map(e -> (Edge<Metrics>) e)
                 .min(comparator)
                 .map(e -> e.opposite(node));
 
@@ -37,14 +36,14 @@ public class LowestLatencyStrategy implements BrokerSelectionStrategy {
                 .getValue();
     }
 
-    private static class LatencyComparator implements Comparator<Edge<Metrics>> {
+    private static class LatencyComparator implements Comparator<Edge<HostInfo, Metrics>> {
 
         @Override
-        public int compare(Edge<Metrics> o1, Edge<Metrics> o2) {
+        public int compare(Edge<HostInfo, Metrics> o1, Edge<HostInfo, Metrics> o2) {
             return Double.compare(getLatency(o1), getLatency(o2));
         }
 
-        private double getLatency(Edge<Metrics> node) {
+        private double getLatency(Edge<HostInfo, Metrics> node) {
             return node.getValue().getTable().getOrDefault("lat", Double.MAX_VALUE);
         }
     }

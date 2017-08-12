@@ -10,33 +10,33 @@ import java.util.stream.Collectors;
 /**
  * UndirectedGraph.
  */
-public class UndirectedGraph extends AbstractGraph {
+public class UndirectedGraph<V, E> extends AbstractGraph<V, E> {
 
-    private Map<AscendingPair<Node>, Edge> edges;
+    private Map<AscendingPair<Node<V>>, Edge<V, E>> edges;
 
     public UndirectedGraph() {
         this.edges = new HashMap<>();
     }
 
     @Override
-    public Collection<Edge> getEdges() {
+    public Collection<Edge<V, E>> getEdges() {
         return edges.values();
     }
 
     @Override
-    public Collection<Edge> getEdges(Node node) {
+    public Collection<Edge<V, E>> getEdges(Node node) {
         return edges.values().stream()
                 .filter(e -> e.contains(node))
                 .collect(Collectors.toSet());
     }
 
     @Override
-    public Edge addEdge(Node u, Node v) {
+    public Edge<V, E> addEdge(Node u, Node v) {
         return edges.computeIfAbsent(pair(u, v), EdgeImpl::new);
     }
 
     @Override
-    public Edge getEdge(Node u, Node v) {
+    public Edge<V, E> getEdge(Node u, Node v) {
         return edges.get(pair(u, v));
     }
 
@@ -52,11 +52,11 @@ public class UndirectedGraph extends AbstractGraph {
     }
 
     @Override
-    public Collection<Node> getNeighbours(Node node) {
-        Set<Node> neighbours = new HashSet<>();
+    public Collection<Node<V>> getNeighbours(Node node) {
+        Set<Node<V>> neighbours = new HashSet<>();
 
-        for (Edge edge : getEdges()) {
-            Node other = edge.opposite(node);
+        for (Edge<V, E> edge : getEdges()) {
+            Node<V> other = edge.opposite(node);
             if (other != null) {
                 neighbours.add(other);
             }
@@ -65,32 +65,32 @@ public class UndirectedGraph extends AbstractGraph {
         return neighbours;
     }
 
-    private AscendingPair<Node> pair(Node u, Node v) {
+    private AscendingPair<Node<V>> pair(Node<V> u, Node<V> v) {
         return AscendingPair.of(u, v, NodeKeyComparator.getInstance());
     }
 
     /**
      * UndirectedEdge.
      */
-    public static class EdgeImpl<V> extends AbstractEdge<V> {
+    static class EdgeImpl<V, E> extends AbstractEdge<V, E> {
 
-        private final AscendingPair<Node> nodes;
+        private final AscendingPair<Node<V>> nodes;
 
-        public EdgeImpl(AscendingPair<Node> nodes) {
+        public EdgeImpl(AscendingPair<Node<V>> nodes) {
             this.nodes = nodes;
         }
 
-        public Pair<Node> getNodes() {
+        public Pair<Node<V>> getNodes() {
             return nodes;
         }
 
         @Override
-        public Node getNodeU() {
+        public Node<V> getNodeU() {
             return nodes.getFirst();
         }
 
         @Override
-        public Node getNodeV() {
+        public Node<V> getNodeV() {
             return nodes.getSecond();
         }
 
