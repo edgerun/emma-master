@@ -5,7 +5,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 import at.ac.tuwien.dsg.emma.manager.network.graph.Edge;
-import at.ac.tuwien.dsg.emma.manager.network.graph.Graph;
 import at.ac.tuwien.dsg.emma.manager.network.graph.Node;
 
 /**
@@ -32,8 +31,8 @@ public class NetworkManager {
 
             for (Node<Host> node : network.getNodes()) {
                 if (node != newNode) {
-                    Edge edge = network.addEdge(newNode, node);
-                    edge.setValue(new Metrics());
+                    Edge<Host, Link> edge = network.addEdge(newNode, node);
+                    edge.setValue(new Link());
                 }
             }
         }
@@ -75,7 +74,7 @@ public class NetworkManager {
         onUpdate();
     }
 
-    public Graph<Host, Metrics> getNetwork() {
+    public Network getNetwork() {
         return network;
     }
 

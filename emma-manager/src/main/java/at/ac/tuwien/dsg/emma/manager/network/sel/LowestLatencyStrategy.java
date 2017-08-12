@@ -6,7 +6,7 @@ import java.util.Optional;
 import at.ac.tuwien.dsg.emma.manager.network.Broker;
 import at.ac.tuwien.dsg.emma.manager.network.Client;
 import at.ac.tuwien.dsg.emma.manager.network.Host;
-import at.ac.tuwien.dsg.emma.manager.network.Metrics;
+import at.ac.tuwien.dsg.emma.manager.network.Link;
 import at.ac.tuwien.dsg.emma.manager.network.Network;
 import at.ac.tuwien.dsg.emma.manager.network.graph.Edge;
 import at.ac.tuwien.dsg.emma.manager.network.graph.Node;
@@ -26,7 +26,7 @@ public class LowestLatencyStrategy implements BrokerSelectionStrategy {
             return null;
         }
 
-        Optional<Node> best = graph.getEdges(node)
+        Optional<Node<Host>> best = graph.getEdges(node)
                 .stream()
                 .min(comparator)
                 .map(e -> e.opposite(node));
@@ -36,15 +36,16 @@ public class LowestLatencyStrategy implements BrokerSelectionStrategy {
                 .getValue();
     }
 
-    private static class LatencyComparator implements Comparator<Edge<Host, Metrics>> {
+    private static class LatencyComparator implements Comparator<Edge<Host, Link>> {
 
         @Override
-        public int compare(Edge<Host, Metrics> o1, Edge<Host, Metrics> o2) {
+        public int compare(Edge<Host, Link> o1, Edge<Host, Link> o2) {
             return Double.compare(getLatency(o1), getLatency(o2));
         }
 
-        private double getLatency(Edge<Host, Metrics> node) {
-            return node.getValue().getTable().getOrDefault("lat", Double.MAX_VALUE);
+        private double getLatency(Edge<Host, Link> node) {
+            Double latency = node.getValue().getLatency();
+            return latency != null ? latency : Double.MAX_VALUE;
         }
     }
 }

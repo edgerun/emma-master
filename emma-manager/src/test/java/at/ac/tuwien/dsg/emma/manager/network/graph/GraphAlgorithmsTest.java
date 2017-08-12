@@ -8,7 +8,7 @@ import org.junit.Test;
 import at.ac.tuwien.dsg.emma.manager.network.Broker;
 import at.ac.tuwien.dsg.emma.manager.network.Client;
 import at.ac.tuwien.dsg.emma.manager.network.Host;
-import at.ac.tuwien.dsg.emma.manager.network.Metrics;
+import at.ac.tuwien.dsg.emma.manager.network.Link;
 import at.ac.tuwien.dsg.emma.manager.network.Network;
 import at.ac.tuwien.dsg.emma.manager.network.sel.LowestLatencyStrategy;
 
@@ -44,21 +44,21 @@ public class GraphAlgorithmsTest {
         graph.addNode(c1);
         graph.addNode(c2);
 
-        graph.addEdge(b1, b2).setValue(new Metrics().set("lat", 100));
-        graph.addEdge(b1, b3).setValue(new Metrics().set("lat", 150));
-        graph.addEdge(b1, b4).setValue(new Metrics().set("lat", 150));
-        graph.addEdge(b2, b3).setValue(new Metrics().set("lat", 10));
-        graph.addEdge(b2, b4).setValue(new Metrics().set("lat", 20));
-        graph.addEdge(b3, b4).setValue(new Metrics().set("lat", 5));
+        graph.addEdge(b1, b2).setValue(new Link().setLatency(100));
+        graph.addEdge(b1, b3).setValue(new Link().setLatency(150));
+        graph.addEdge(b1, b4).setValue(new Link().setLatency(150));
+        graph.addEdge(b2, b3).setValue(new Link().setLatency(10));
+        graph.addEdge(b2, b4).setValue(new Link().setLatency(20));
+        graph.addEdge(b3, b4).setValue(new Link().setLatency(5));
 
-        graph.addEdge(c1, b1).setValue(new Metrics().set("lat", 10));
-        graph.addEdge(c1, b2).setValue(new Metrics().set("lat", 150));
-        graph.addEdge(c1, b3).setValue(new Metrics().set("lat", 200));
-        graph.addEdge(c1, b4).setValue(new Metrics().set("lat", 200));
-        graph.addEdge(c2, b1).setValue(new Metrics().set("lat", 160));
-        graph.addEdge(c2, b2).setValue(new Metrics().set("lat", 50));
-        graph.addEdge(c2, b3).setValue(new Metrics().set("lat", 5));
-        graph.addEdge(c2, b4).setValue(new Metrics().set("lat", 5));
+        graph.addEdge(c1, b1).setValue(new Link().setLatency(10));
+        graph.addEdge(c1, b2).setValue(new Link().setLatency(150));
+        graph.addEdge(c1, b3).setValue(new Link().setLatency(200));
+        graph.addEdge(c1, b4).setValue(new Link().setLatency(200));
+        graph.addEdge(c2, b1).setValue(new Link().setLatency(160));
+        graph.addEdge(c2, b2).setValue(new Link().setLatency(50));
+        graph.addEdge(c2, b3).setValue(new Link().setLatency(5));
+        graph.addEdge(c2, b4).setValue(new Link().setLatency(5));
     }
 
     @Test
