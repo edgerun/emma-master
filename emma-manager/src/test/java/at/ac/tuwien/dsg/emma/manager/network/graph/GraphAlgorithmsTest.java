@@ -9,6 +9,7 @@ import at.ac.tuwien.dsg.emma.manager.network.BrokerInfo;
 import at.ac.tuwien.dsg.emma.manager.network.ClientInfo;
 import at.ac.tuwien.dsg.emma.manager.network.HostInfo;
 import at.ac.tuwien.dsg.emma.manager.network.Metrics;
+import at.ac.tuwien.dsg.emma.manager.network.Network;
 import at.ac.tuwien.dsg.emma.manager.network.sel.LowestLatencyStrategy;
 
 /**
@@ -23,11 +24,11 @@ public class GraphAlgorithmsTest {
     Node<HostInfo> c1;
     Node<HostInfo> c2;
 
-    Graph graph;
+    Network graph;
 
     @Before
     public void setUp() throws Exception {
-        graph = new UndirectedGraph();
+        graph = new Network();
 
         b1 = new Node<>("10.0.0.1:1883", new BrokerInfo("10.0.0.1", 1883));
         b2 = new Node<>("10.0.0.2:1883", new BrokerInfo("10.0.0.2", 1883));

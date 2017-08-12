@@ -7,7 +7,6 @@ import org.springframework.stereotype.Component;
 import at.ac.tuwien.dsg.emma.manager.network.graph.Edge;
 import at.ac.tuwien.dsg.emma.manager.network.graph.Graph;
 import at.ac.tuwien.dsg.emma.manager.network.graph.Node;
-import at.ac.tuwien.dsg.emma.manager.network.graph.UndirectedGraph;
 
 /**
  * NetworkManager.
@@ -17,10 +16,10 @@ public class NetworkManager {
 
     private static final Logger LOG = LoggerFactory.getLogger(NetworkManager.class);
 
-    private final Graph<HostInfo, Metrics> network;
+    private final Network network;
 
     public NetworkManager() {
-        this.network = new UndirectedGraph<>();
+        this.network = new Network();
     }
 
     public void add(BrokerInfo info) {

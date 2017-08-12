@@ -7,8 +7,8 @@ import at.ac.tuwien.dsg.emma.manager.network.BrokerInfo;
 import at.ac.tuwien.dsg.emma.manager.network.ClientInfo;
 import at.ac.tuwien.dsg.emma.manager.network.HostInfo;
 import at.ac.tuwien.dsg.emma.manager.network.Metrics;
+import at.ac.tuwien.dsg.emma.manager.network.Network;
 import at.ac.tuwien.dsg.emma.manager.network.graph.Edge;
-import at.ac.tuwien.dsg.emma.manager.network.graph.Graph;
 import at.ac.tuwien.dsg.emma.manager.network.graph.Node;
 
 /**
@@ -19,7 +19,7 @@ public class LowestLatencyStrategy implements BrokerSelectionStrategy {
     private LatencyComparator comparator = new LatencyComparator();
 
     @Override
-    public BrokerInfo select(ClientInfo client, Graph<HostInfo, Metrics> graph) {
+    public BrokerInfo select(ClientInfo client, Network graph) {
         Node<HostInfo> node = graph.getNode(client.getId());
 
         if (node == null) {
