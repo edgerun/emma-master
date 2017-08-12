@@ -5,9 +5,9 @@ import static org.junit.Assert.assertEquals;
 import org.junit.Before;
 import org.junit.Test;
 
-import at.ac.tuwien.dsg.emma.manager.network.BrokerInfo;
-import at.ac.tuwien.dsg.emma.manager.network.ClientInfo;
-import at.ac.tuwien.dsg.emma.manager.network.HostInfo;
+import at.ac.tuwien.dsg.emma.manager.network.Broker;
+import at.ac.tuwien.dsg.emma.manager.network.Client;
+import at.ac.tuwien.dsg.emma.manager.network.Host;
 import at.ac.tuwien.dsg.emma.manager.network.Metrics;
 import at.ac.tuwien.dsg.emma.manager.network.Network;
 import at.ac.tuwien.dsg.emma.manager.network.sel.LowestLatencyStrategy;
@@ -17,12 +17,12 @@ import at.ac.tuwien.dsg.emma.manager.network.sel.LowestLatencyStrategy;
  */
 public class GraphAlgorithmsTest {
 
-    Node<HostInfo> b1;
-    Node<HostInfo> b2;
-    Node<HostInfo> b3;
-    Node<HostInfo> b4;
-    Node<HostInfo> c1;
-    Node<HostInfo> c2;
+    Node<Host> b1;
+    Node<Host> b2;
+    Node<Host> b3;
+    Node<Host> b4;
+    Node<Host> c1;
+    Node<Host> c2;
 
     Network graph;
 
@@ -30,12 +30,12 @@ public class GraphAlgorithmsTest {
     public void setUp() throws Exception {
         graph = new Network();
 
-        b1 = new Node<>("10.0.0.1:1883", new BrokerInfo("10.0.0.1", 1883));
-        b2 = new Node<>("10.0.0.2:1883", new BrokerInfo("10.0.0.2", 1883));
-        b3 = new Node<>("10.0.0.3:1883", new BrokerInfo("10.0.0.3", 1883));
-        b4 = new Node<>("10.0.0.4:1883", new BrokerInfo("10.0.0.4", 1883));
-        c1 = new Node<>("10.0.1.1:1883", new ClientInfo("10.0.1.1", 1883));
-        c2 = new Node<>("10.0.1.2:1883", new ClientInfo("10.0.1.2", 1883));
+        b1 = new Node<>("10.0.0.1:1883", new Broker("10.0.0.1", 1883));
+        b2 = new Node<>("10.0.0.2:1883", new Broker("10.0.0.2", 1883));
+        b3 = new Node<>("10.0.0.3:1883", new Broker("10.0.0.3", 1883));
+        b4 = new Node<>("10.0.0.4:1883", new Broker("10.0.0.4", 1883));
+        c1 = new Node<>("10.0.1.1:1883", new Client("10.0.1.1", 1883));
+        c2 = new Node<>("10.0.1.2:1883", new Client("10.0.1.2", 1883));
 
         graph.addNode(b1);
         graph.addNode(b2);
@@ -65,7 +65,7 @@ public class GraphAlgorithmsTest {
     public void testLowestLatencySelection() throws Exception {
         LowestLatencyStrategy strategy = new LowestLatencyStrategy();
 
-        BrokerInfo broker = strategy.select((ClientInfo) c1.getValue(), graph);
+        Broker broker = strategy.select((Client) c1.getValue(), graph);
 
         assertEquals(broker, b1.getValue());
     }

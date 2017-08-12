@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
-import at.ac.tuwien.dsg.emma.manager.network.BrokerInfo;
+import at.ac.tuwien.dsg.emma.manager.network.Broker;
 import at.ac.tuwien.dsg.emma.manager.network.BrokerRepository;
 import at.ac.tuwien.dsg.emma.manager.network.monitoring.MonitoringService;
 import at.ac.tuwien.dsg.emma.manager.network.NetworkManager;
@@ -45,16 +45,16 @@ public class BrokerRepositoryController {
 
         LOG.debug("/broker/register({}, {})", address, port);
 
-        if (brokerRepository.getBrokerInfo(address, port) != null) {
+        if (brokerRepository.getBroker(address, port) != null) {
             response.sendError(409, "broker exists");
             return;
         }
 
-        BrokerInfo registered = brokerRepository.register(address, port);
+        Broker registered = brokerRepository.register(address, port);
         response.setStatus(201);
         networkManager.add(registered);
 
-        for (BrokerInfo brokerInfo : brokerRepository.getBrokers().values()) {
+        for (Broker brokerInfo : brokerRepository.getBrokers().values()) {
             // TODO: this is questionable
             if (brokerInfo == registered) {
                 continue;
@@ -74,12 +74,12 @@ public class BrokerRepositoryController {
 
         LOG.debug("/broker/deregister({}, {})", address, port);
 
-        if (brokerRepository.getBrokerInfo(address, port) == null) {
+        if (brokerRepository.getBroker(address, port) == null) {
             response.sendError(409, "broker doesn't exist");
             return;
         }
 
-        BrokerInfo brokerInfo = brokerRepository.remove(address, port);
+        Broker brokerInfo = brokerRepository.remove(address, port);
         if (brokerInfo == null) {
             response.setStatus(200);
         } else {
@@ -92,7 +92,7 @@ public class BrokerRepositoryController {
 
 
     @RequestMapping(value = "/broker/list")
-    public Collection<BrokerInfo> list() {
+    public Collection<Broker> list() {
         LOG.debug("/broker/list");
         return brokerRepository.getBrokers().values();
     }

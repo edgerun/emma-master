@@ -1,16 +1,16 @@
 package at.ac.tuwien.dsg.emma.manager.network;
 
 /**
- * BrokerInfo.
+ * Broker.
  */
-public class BrokerInfo extends HostInfo {
+public class Broker extends Host {
 
     // TODO: keepalive
     private long lastSeen;
 
     private boolean isAlive;
 
-    public BrokerInfo(String host, int port) {
+    public Broker(String host, int port) {
         super(host, port);
     }
 
@@ -33,7 +33,7 @@ public class BrokerInfo extends HostInfo {
 
     @Override
     public String toString() {
-        return "BrokerInfo{" +
+        return "Broker{" +
                 "id='" + getId() + '\'' +
                 ", lastSeen=" + lastSeen +
                 ", isAlive=" + isAlive +

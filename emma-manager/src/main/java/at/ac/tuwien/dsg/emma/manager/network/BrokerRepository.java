@@ -5,42 +5,40 @@ import java.util.Map;
 
 import org.springframework.stereotype.Component;
 
-import at.ac.tuwien.dsg.emma.manager.network.BrokerInfo;
-
 @Component
 public class BrokerRepository {
 
-    private Map<String, BrokerInfo> brokers;
+    private Map<String, Broker> brokers;
 
     public BrokerRepository() {
         this.brokers = new HashMap<>();
     }
 
-    public BrokerInfo getBrokerInfo(String id) {
+    public Broker getBroker(String id) {
         return brokers.get(id);
     }
 
-    public BrokerInfo getBrokerInfo(String host, int port) {
-        return getBrokerInfo(id(host, port));
+    public Broker getBroker(String host, int port) {
+        return getBroker(id(host, port));
     }
 
-    public BrokerInfo register(String host, int port) {
+    public Broker register(String host, int port) {
         String id = id(host, port);
 
-        BrokerInfo brokerInfo = new BrokerInfo(host, port);
+        Broker brokerInfo = new Broker(host, port);
         getBrokers().put(id, brokerInfo);
         return brokerInfo;
     }
 
-    public BrokerInfo remove(String host, int port) {
-        BrokerInfo brokerInfo = getBrokerInfo(host, port);
+    public Broker remove(String host, int port) {
+        Broker brokerInfo = getBroker(host, port);
         if (brokerInfo != null) {
             brokers.remove(id(host, port));
         }
         return brokerInfo;
     }
 
-    public Map<String, BrokerInfo> getBrokers() {
+    public Map<String, Broker> getBrokers() {
         return brokers;
     }
 

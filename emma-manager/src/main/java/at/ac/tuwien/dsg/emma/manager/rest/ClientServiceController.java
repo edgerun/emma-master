@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
-import at.ac.tuwien.dsg.emma.manager.network.BrokerInfo;
+import at.ac.tuwien.dsg.emma.manager.network.Broker;
 import at.ac.tuwien.dsg.emma.manager.network.BrokerRepository;
 
 @RestController
@@ -22,14 +22,14 @@ public class ClientServiceController {
     String connect(HttpServletRequest request) {
 
         // TODO broker selection mechanism
-        for (BrokerInfo brokerInfo : brokerRepository.getBrokers().values()) {
+        for (Broker brokerInfo : brokerRepository.getBrokers().values()) {
             return uri(brokerInfo);
         }
 
         return getRootBroker();
     }
 
-    private String uri(BrokerInfo brokerInfo) {
+    private String uri(Broker brokerInfo) {
         return "tcp://" + brokerInfo.getHost() + ":" + brokerInfo.getPort();
     }
 

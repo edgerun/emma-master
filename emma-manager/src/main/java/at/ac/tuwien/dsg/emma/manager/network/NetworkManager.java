@@ -22,15 +22,15 @@ public class NetworkManager {
         this.network = new Network();
     }
 
-    public void add(BrokerInfo info) {
+    public void add(Broker info) {
         synchronized (network) {
             if (network.findNode(info.getId()).isPresent()) {
                 return;
             }
-            Node<HostInfo> newNode = new Node<>(info.getId(), info);
+            Node<Host> newNode = new Node<>(info.getId(), info);
             network.addNode(newNode);
 
-            for (Node<HostInfo> node : network.getNodes()) {
+            for (Node<Host> node : network.getNodes()) {
                 if (node != newNode) {
                     Edge edge = network.addEdge(newNode, node);
                     edge.setValue(new Metrics());
@@ -41,16 +41,16 @@ public class NetworkManager {
         onUpdate();
     }
 
-    public void add(ClientInfo info) {
+    public void add(Client info) {
         synchronized (network) {
             if (network.findNode(info.getId()).isPresent()) {
                 return;
             }
-            Node<ClientInfo> newNode = new Node<>(info.getId(), info);
+            Node<Client> newNode = new Node<>(info.getId(), info);
             network.addNode(newNode);
 
             for (Node node : network.getNodes()) {
-                if (node.getValue() instanceof BrokerInfo) {
+                if (node.getValue() instanceof Broker) {
                     network.addEdge(newNode, node);
                 }
             }
@@ -59,7 +59,7 @@ public class NetworkManager {
         onUpdate();
     }
 
-    public void remove(ClientInfo info) {
+    public void remove(Client info) {
         synchronized (network) {
             network.findNode(info.getId()).ifPresent(network::removeNode);
         }
@@ -67,7 +67,7 @@ public class NetworkManager {
         onUpdate();
     }
 
-    public void remove(BrokerInfo info) {
+    public void remove(Broker info) {
         synchronized (network) {
             network.findNode(info.getId()).ifPresent(network::removeNode);
         }
@@ -75,7 +75,7 @@ public class NetworkManager {
         onUpdate();
     }
 
-    public Graph<HostInfo, Metrics> getNetwork() {
+    public Graph<Host, Metrics> getNetwork() {
         return network;
     }
 

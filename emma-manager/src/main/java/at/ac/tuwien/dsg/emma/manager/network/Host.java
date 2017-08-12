@@ -5,13 +5,13 @@ import java.util.Objects;
 /**
  * Value object to identify and store store information about a host.
  */
-public class HostInfo {
+public class Host {
 
     private final String host;
     private final int port;
     private Metrics metrics;
 
-    public HostInfo(String host, int port) {
+    public Host(String host, int port) {
         this.host = host;
         this.port = port;
     }
@@ -44,9 +44,9 @@ public class HostInfo {
         if (o == null || getClass() != o.getClass()) {
             return false;
         }
-        HostInfo hostInfo = (HostInfo) o;
-        return port == hostInfo.port &&
-                Objects.equals(host, hostInfo.host);
+        Host host = (Host) o;
+        return port == host.port &&
+                Objects.equals(this.host, host.host);
     }
 
     @Override

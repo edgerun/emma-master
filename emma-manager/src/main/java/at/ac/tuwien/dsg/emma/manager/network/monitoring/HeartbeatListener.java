@@ -16,7 +16,7 @@ import org.springframework.stereotype.Component;
 
 import at.ac.tuwien.dsg.emma.io.Decode;
 import at.ac.tuwien.dsg.emma.manager.network.BrokerRepository;
-import at.ac.tuwien.dsg.emma.manager.network.BrokerInfo;
+import at.ac.tuwien.dsg.emma.manager.network.Broker;
 import at.ac.tuwien.dsg.emma.util.IOUtils;
 
 @Component
@@ -67,7 +67,7 @@ public class HeartbeatListener implements Runnable, InitializingBean, Disposable
                     LOG.trace("Received heartbeat packet for {}", id);
                 }
 
-                BrokerInfo brokerInfo = brokers.getBrokerInfo(id);
+                Broker brokerInfo = brokers.getBroker(id);
 
                 if (brokerInfo != null) {
                     if (LOG.isDebugEnabled() && !brokerInfo.isAlive()) {
