@@ -10,7 +10,8 @@ public enum MonitoringPacketType {
     PING,
     PONG,
     USAGEREQ,
-    USAGERESP;
+    USAGERESP,
+    RECONNECT;
 
     private static final MonitoringPacketType[] values = values();
 

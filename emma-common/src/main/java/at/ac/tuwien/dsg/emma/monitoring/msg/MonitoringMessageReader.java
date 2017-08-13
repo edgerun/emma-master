@@ -22,6 +22,8 @@ public class MonitoringMessageReader {
                 return readPingReqMessage(buffer);
             case PINGRESP:
                 return readPingRespMessage(buffer);
+            case RECONNECT:
+                return readReconnectMessage(buffer);
             default:
                 throw new UnsupportedOperationException("Unhandled message type: " + type);
         }
@@ -54,5 +56,9 @@ public class MonitoringMessageReader {
     private PingMessage readPingMessage(ByteBuffer buffer) {
         int id = buffer.getInt();
         return new PingMessage(id);
+    }
+
+    private MonitoringMessage readReconnectMessage(ByteBuffer buffer) {
+        return new ReconnectMessage();
     }
 }

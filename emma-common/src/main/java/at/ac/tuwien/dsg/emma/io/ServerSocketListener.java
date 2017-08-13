@@ -9,9 +9,14 @@ import java.nio.channels.ServerSocketChannel;
 import java.nio.channels.SocketChannel;
 import java.util.function.Consumer;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import at.ac.tuwien.dsg.emma.util.IOUtils;
 
 public class ServerSocketListener implements Runnable, Closeable {
+
+    private static final Logger LOG = LoggerFactory.getLogger(ServerSocketListener.class);
 
     private InetSocketAddress bind;
     private Consumer<SocketChannel> acceptHandler;
@@ -42,6 +47,7 @@ public class ServerSocketListener implements Runnable, Closeable {
         commandLoop = new SimpleCommandLoop();
 
         serverSocket = ServerSocketChannel.open();
+        LOG.info("Binding server socket to {}", bind);
         serverSocket.bind(bind);
         serverSocket.configureBlocking(false);
 

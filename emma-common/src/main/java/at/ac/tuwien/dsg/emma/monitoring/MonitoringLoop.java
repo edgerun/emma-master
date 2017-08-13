@@ -16,6 +16,7 @@ import at.ac.tuwien.dsg.emma.monitoring.msg.PingMessage;
 import at.ac.tuwien.dsg.emma.monitoring.msg.PingReqMessage;
 import at.ac.tuwien.dsg.emma.monitoring.msg.PingRespMessage;
 import at.ac.tuwien.dsg.emma.monitoring.msg.PongMessage;
+import at.ac.tuwien.dsg.emma.monitoring.msg.ReconnectMessage;
 
 /**
  * MonitoringLoop.
@@ -148,6 +149,9 @@ public class MonitoringLoop extends DatagramLoop {
                 return;
             case PINGRESP:
                 handler.onMessage(this, (PingRespMessage) message);
+                return;
+            case RECONNECT:
+                handler.onMessage(this, (ReconnectMessage) message);
                 return;
             default:
                 throw new UnsupportedOperationException();

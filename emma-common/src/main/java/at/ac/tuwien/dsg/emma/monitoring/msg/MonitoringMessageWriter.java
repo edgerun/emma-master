@@ -26,6 +26,9 @@ public class MonitoringMessageWriter {
             case PINGRESP:
                 write(buf, (PingRespMessage) message);
                 return;
+            case RECONNECT:
+                write(buf, (ReconnectMessage) message);
+                return;
             default:
                 throw new UnsupportedOperationException("Unhandled message type: " + type);
         }
@@ -53,5 +56,9 @@ public class MonitoringMessageWriter {
         buf.put(message.getMonitoringPacketType().toHeader());
         buf.putInt(message.getRequestId());
         buf.putInt(message.getLatency());
+    }
+
+    public void write(ByteBuffer buf, ReconnectMessage message) {
+        buf.put(message.getMonitoringPacketType().toHeader());
     }
 }

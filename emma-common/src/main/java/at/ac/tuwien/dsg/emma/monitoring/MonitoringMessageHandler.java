@@ -4,6 +4,7 @@ import at.ac.tuwien.dsg.emma.monitoring.msg.PingMessage;
 import at.ac.tuwien.dsg.emma.monitoring.msg.PingReqMessage;
 import at.ac.tuwien.dsg.emma.monitoring.msg.PingRespMessage;
 import at.ac.tuwien.dsg.emma.monitoring.msg.PongMessage;
+import at.ac.tuwien.dsg.emma.monitoring.msg.ReconnectMessage;
 
 /**
  * MonitoringMessageHandler.
@@ -16,5 +17,7 @@ public interface MonitoringMessageHandler {
     void onMessage(MonitoringLoop loop, PingReqMessage message);
 
     void onMessage(MonitoringLoop loop, PingRespMessage message);
+
+    void onMessage(MonitoringLoop loop, ReconnectMessage message);
 
 }
