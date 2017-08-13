@@ -30,6 +30,12 @@ public abstract class HostRepository<H extends Host> {
         return brokerInfo;
     }
 
+    public H register(String id) {
+        H brokerInfo = createHostObject(id);
+        getHosts().put(id, brokerInfo);
+        return brokerInfo;
+    }
+
     public H remove(String host, int port) {
         H brokerInfo = getHost(host, port);
         if (brokerInfo != null) {
@@ -47,5 +53,10 @@ public abstract class HostRepository<H extends Host> {
     }
 
     protected abstract H createHostObject(String host, int port);
+
+    protected H createHostObject(String id) {
+        String[] parts = id.split(":");
+        return createHostObject(parts[0], Integer.parseInt(parts[1]));
+    }
 
 }
