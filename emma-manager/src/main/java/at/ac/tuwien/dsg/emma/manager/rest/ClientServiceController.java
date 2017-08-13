@@ -1,6 +1,6 @@
 package at.ac.tuwien.dsg.emma.manager.rest;
 
-import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -11,9 +11,10 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import at.ac.tuwien.dsg.emma.manager.model.Broker;
-import at.ac.tuwien.dsg.emma.manager.model.BrokerRepository;
 import at.ac.tuwien.dsg.emma.manager.model.Client;
 import at.ac.tuwien.dsg.emma.manager.model.ClientRepository;
+import at.ac.tuwien.dsg.emma.manager.network.NetworkManager;
+import at.ac.tuwien.dsg.emma.manager.network.sel.BrokerSelectionStrategy;
 
 @RestController
 public class ClientServiceController {
@@ -21,39 +22,58 @@ public class ClientServiceController {
     private static final Logger LOG = LoggerFactory.getLogger(ClientServiceController.class);
 
     @Autowired
-    private BrokerRepository brokerRepository;
+    private ClientRepository clientRepository;
 
     @Autowired
-    private ClientRepository clientRepository;
+    private BrokerSelectionStrategy brokerSelectionStrategy;
+
+    @Autowired
+    private NetworkManager networkManager;
 
     @RequestMapping(value = "/client/connect", method = RequestMethod.GET)
     public @ResponseBody
-    String connect(String gatewayId, HttpServletRequest request) {
+    String connect(String gatewayId, HttpServletResponse response) {
+        LOG.debug("/client/connect({})", gatewayId);
 
         Client client = clientRepository.getById(gatewayId);
 
         if (client == null) {
-            String host = gatewayId.split(":")[0];
-            int port = Integer.parseInt(gatewayId.split(":")[1]);
-            client = clientRepository.register(host, port);
+            LOG.debug("Client {} not known, registering", gatewayId);
+            client = clientRepository.register(gatewayId);
+            networkManager.add(client);
         }
 
-        LOG.info("client: {}", client);
+        try {
+            Broker broker = brokerSelectionStrategy.select(client, networkManager.getNetwork());
 
-        // TODO broker selection mechanism
-        for (Broker brokerInfo : brokerRepository.getHosts().values()) {
-            return uri(brokerInfo);
+            if (broker == null) {
+                throw new IllegalStateException("No broker in networks");
+            }
+
+            LOG.info("Selected broker for client {}: {}", client, broker);
+            return uri(broker);
+        } catch (IllegalStateException e) {
+            LOG.warn("No broker connected {}", e.getMessage());
+            response.setStatus(503);
+            return "";
         }
+    }
 
-        return getRootBroker();
+    @RequestMapping(value = "/client/disconnect", method = RequestMethod.GET)
+    public @ResponseBody
+    void disconnect(String gatewayId, HttpServletResponse response) {
+        LOG.debug("/client/disconnect({})", gatewayId);
+
+        Client client = clientRepository.getById(gatewayId);
+        if (client == null) {
+            LOG.debug("Client {} not known, registering", gatewayId);
+            return;
+        }
+        networkManager.remove(client);
     }
 
     private String uri(Broker brokerInfo) {
         return "tcp://" + brokerInfo.getHost() + ":" + brokerInfo.getPort();
     }
 
-    public String getRootBroker() {
-        // TODO
-        return "tcp://localhost:1883";
-    }
 }
