@@ -3,9 +3,9 @@ package at.ac.tuwien.dsg.emma.manager.network.sel;
 import java.util.Comparator;
 import java.util.Optional;
 
-import at.ac.tuwien.dsg.emma.manager.network.Broker;
-import at.ac.tuwien.dsg.emma.manager.network.Client;
-import at.ac.tuwien.dsg.emma.manager.network.Host;
+import at.ac.tuwien.dsg.emma.manager.model.Broker;
+import at.ac.tuwien.dsg.emma.manager.model.Client;
+import at.ac.tuwien.dsg.emma.manager.model.Host;
 import at.ac.tuwien.dsg.emma.manager.network.Link;
 import at.ac.tuwien.dsg.emma.manager.network.Network;
 import at.ac.tuwien.dsg.emma.manager.network.graph.Edge;

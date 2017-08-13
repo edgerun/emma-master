@@ -8,7 +8,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
-import at.ac.tuwien.dsg.emma.manager.network.Broker;
+import at.ac.tuwien.dsg.emma.manager.model.Broker;
 
 /**
  * SubscriptionTable.

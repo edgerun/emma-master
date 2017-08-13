@@ -1,6 +1,8 @@
-package at.ac.tuwien.dsg.emma.manager.network;
+package at.ac.tuwien.dsg.emma.manager.model;
 
 import java.util.Objects;
+
+import at.ac.tuwien.dsg.emma.manager.network.Metrics;
 
 /**
  * Value object to identify and store store information about a host.

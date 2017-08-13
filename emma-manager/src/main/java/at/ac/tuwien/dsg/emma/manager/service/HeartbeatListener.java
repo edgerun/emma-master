@@ -15,8 +15,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import at.ac.tuwien.dsg.emma.io.Decode;
-import at.ac.tuwien.dsg.emma.manager.network.BrokerRepository;
-import at.ac.tuwien.dsg.emma.manager.network.Broker;
+import at.ac.tuwien.dsg.emma.manager.model.BrokerRepository;
+import at.ac.tuwien.dsg.emma.manager.model.Broker;
 import at.ac.tuwien.dsg.emma.util.IOUtils;
 
 @Component

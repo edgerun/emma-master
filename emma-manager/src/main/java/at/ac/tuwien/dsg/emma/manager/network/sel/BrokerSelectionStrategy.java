@@ -1,7 +1,7 @@
 package at.ac.tuwien.dsg.emma.manager.network.sel;
 
-import at.ac.tuwien.dsg.emma.manager.network.Broker;
-import at.ac.tuwien.dsg.emma.manager.network.Client;
+import at.ac.tuwien.dsg.emma.manager.model.Broker;
+import at.ac.tuwien.dsg.emma.manager.model.Client;
 import at.ac.tuwien.dsg.emma.manager.network.Network;
 
 /**

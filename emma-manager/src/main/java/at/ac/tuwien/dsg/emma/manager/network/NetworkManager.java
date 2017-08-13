@@ -4,6 +4,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
+import at.ac.tuwien.dsg.emma.manager.model.Broker;
+import at.ac.tuwien.dsg.emma.manager.model.Client;
+import at.ac.tuwien.dsg.emma.manager.model.Host;
 import at.ac.tuwien.dsg.emma.manager.network.graph.Edge;
 import at.ac.tuwien.dsg.emma.manager.network.graph.Node;
 

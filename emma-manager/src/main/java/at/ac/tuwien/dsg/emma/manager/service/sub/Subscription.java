@@ -2,7 +2,7 @@ package at.ac.tuwien.dsg.emma.manager.service.sub;
 
 import java.util.Objects;
 
-import at.ac.tuwien.dsg.emma.manager.network.Broker;
+import at.ac.tuwien.dsg.emma.manager.model.Broker;
 
 /**
  * Subscription.

@@ -1,4 +1,4 @@
-package at.ac.tuwien.dsg.emma.manager.network;
+package at.ac.tuwien.dsg.emma.manager.model;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -6,6 +6,9 @@ import static org.junit.Assert.assertNull;
 
 import org.junit.Before;
 import org.junit.Test;
+
+import at.ac.tuwien.dsg.emma.manager.model.Host;
+import at.ac.tuwien.dsg.emma.manager.model.HostRepository;
 
 /**
  * AbstractHostRepositoryTest.

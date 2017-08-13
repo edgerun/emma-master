@@ -7,9 +7,9 @@ import java.util.NoSuchElementException;
 
 import org.junit.Test;
 
-import at.ac.tuwien.dsg.emma.manager.network.Broker;
-import at.ac.tuwien.dsg.emma.manager.network.Client;
-import at.ac.tuwien.dsg.emma.manager.network.Host;
+import at.ac.tuwien.dsg.emma.manager.model.Broker;
+import at.ac.tuwien.dsg.emma.manager.model.Client;
+import at.ac.tuwien.dsg.emma.manager.model.Host;
 import at.ac.tuwien.dsg.emma.manager.network.NetworkManager;
 import at.ac.tuwien.dsg.emma.manager.network.graph.Edge;
 import at.ac.tuwien.dsg.emma.manager.network.graph.Graph;

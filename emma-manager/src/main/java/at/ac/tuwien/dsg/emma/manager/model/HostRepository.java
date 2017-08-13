@@ -1,4 +1,4 @@
-package at.ac.tuwien.dsg.emma.manager.network;
+package at.ac.tuwien.dsg.emma.manager.model;
 
 import java.util.HashMap;
 import java.util.Map;

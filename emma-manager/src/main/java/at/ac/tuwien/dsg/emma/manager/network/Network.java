@@ -1,5 +1,6 @@
 package at.ac.tuwien.dsg.emma.manager.network;
 
+import at.ac.tuwien.dsg.emma.manager.model.Host;
 import at.ac.tuwien.dsg.emma.manager.network.graph.UndirectedGraph;
 
 /**

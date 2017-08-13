@@ -14,8 +14,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
-import at.ac.tuwien.dsg.emma.manager.network.Broker;
-import at.ac.tuwien.dsg.emma.manager.network.BrokerRepository;
+import at.ac.tuwien.dsg.emma.manager.model.Broker;
+import at.ac.tuwien.dsg.emma.manager.model.BrokerRepository;
 import at.ac.tuwien.dsg.emma.manager.service.MonitoringService;
 import at.ac.tuwien.dsg.emma.manager.network.NetworkManager;
 
