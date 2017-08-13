@@ -45,7 +45,7 @@ public class BrokerRepositoryController {
 
         LOG.debug("/broker/register({}, {})", address, port);
 
-        if (brokerRepository.getBroker(address, port) != null) {
+        if (brokerRepository.getHost(address, port) != null) {
             response.sendError(409, "broker exists");
             return;
         }
@@ -54,7 +54,7 @@ public class BrokerRepositoryController {
         response.setStatus(201);
         networkManager.add(registered);
 
-        for (Broker brokerInfo : brokerRepository.getBrokers().values()) {
+        for (Broker brokerInfo : brokerRepository.getHosts().values()) {
             // TODO: this is questionable
             if (brokerInfo == registered) {
                 continue;
@@ -74,7 +74,7 @@ public class BrokerRepositoryController {
 
         LOG.debug("/broker/deregister({}, {})", address, port);
 
-        if (brokerRepository.getBroker(address, port) == null) {
+        if (brokerRepository.getHost(address, port) == null) {
             response.sendError(409, "broker doesn't exist");
             return;
         }
@@ -94,7 +94,7 @@ public class BrokerRepositoryController {
     @RequestMapping(value = "/broker/list")
     public Collection<Broker> list() {
         LOG.debug("/broker/list");
-        return brokerRepository.getBrokers().values();
+        return brokerRepository.getHosts().values();
     }
 
 }

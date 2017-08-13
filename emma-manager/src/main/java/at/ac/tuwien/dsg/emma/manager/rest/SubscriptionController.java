@@ -30,7 +30,7 @@ public class SubscriptionController {
     public void onSubscribe(String id, String topic) {
         LOG.debug("/broker/onSubscribe({},{})", id, topic);
 
-        Broker broker = brokerRepository.getBroker(id);
+        Broker broker = brokerRepository.getById(id);
 
         if (broker == null) {
             LOG.warn("Broker with host {} not found", id);
@@ -48,7 +48,7 @@ public class SubscriptionController {
     public void onUnsubscribe(String id, String topic) {
         LOG.debug("/broker/onUnsubscribe({},{})", id, topic);
 
-        Broker broker = brokerRepository.getBroker(id);
+        Broker broker = brokerRepository.getById(id);
         if (broker == null) {
             LOG.warn("Broker with host {} not found", id);
             // FIXME

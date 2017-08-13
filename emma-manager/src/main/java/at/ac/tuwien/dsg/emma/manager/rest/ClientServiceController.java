@@ -22,7 +22,7 @@ public class ClientServiceController {
     String connect(HttpServletRequest request) {
 
         // TODO broker selection mechanism
-        for (Broker brokerInfo : brokerRepository.getBrokers().values()) {
+        for (Broker brokerInfo : brokerRepository.getHosts().values()) {
             return uri(brokerInfo);
         }
 

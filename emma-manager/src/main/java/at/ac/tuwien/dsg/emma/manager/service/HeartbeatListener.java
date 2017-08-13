@@ -67,7 +67,7 @@ public class HeartbeatListener implements Runnable, InitializingBean, Disposable
                     LOG.trace("Received heartbeat packet for {}", id);
                 }
 
-                Broker brokerInfo = brokers.getBroker(id);
+                Broker brokerInfo = brokers.getById(id);
 
                 if (brokerInfo != null) {
                     if (LOG.isDebugEnabled() && !brokerInfo.isAlive()) {
