@@ -36,12 +36,13 @@ public abstract class HostRepository<H extends Host> {
         return brokerInfo;
     }
 
-    public H remove(String host, int port) {
-        H brokerInfo = getHost(host, port);
-        if (brokerInfo != null) {
-            hosts.remove(id(host, port));
-        }
-        return brokerInfo;
+    public boolean remove(String address, int port) {
+        H host = getHost(address, port);
+        return host != null && remove(host);
+    }
+
+    public boolean remove(H host) {
+        return hosts.remove(host.getId(), host);
     }
 
     public Map<String, H> getHosts() {

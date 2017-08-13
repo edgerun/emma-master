@@ -1,8 +1,10 @@
 package at.ac.tuwien.dsg.emma.manager.model;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -52,10 +54,29 @@ public abstract class AbstractHostRepositoryTest<H extends Host, R extends HostR
     public void remove_removesRegisteredObject() throws Exception {
         H host = repo.register("10.42.0.1", 1883);
 
-        repo.remove(host.getHost(), host.getPort());
+        assertTrue(repo.remove(host.getHost(), host.getPort()));
 
         assertNull(repo.getHost("10.42.0.1", 1883));
         assertNull(repo.getById("10.42.0.1:1883"));
+    }
+
+    @Test
+    public void remove_object_removesRegisteredObject() throws Exception {
+        repo.register("10.42.0.1", 1883);
+
+        H host = repo.getHost("10.42.0.1", 1883);
+
+        assertTrue(repo.remove(host));
+        assertNull(repo.getHost("10.42.0.1", 1883));
+        assertNull(repo.getById("10.42.0.1:1883"));
+    }
+
+    @Test
+    public void remove_withRemovedObject_returnsFalse() throws Exception {
+        H host = repo.register("10.42.0.1", 1883);
+
+        repo.remove(host);
+        assertFalse(repo.remove(host));
     }
 
     protected abstract R createRepository();

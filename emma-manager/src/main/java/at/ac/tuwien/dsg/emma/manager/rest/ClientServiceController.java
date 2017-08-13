@@ -1,5 +1,7 @@
 package at.ac.tuwien.dsg.emma.manager.rest;
 
+import java.io.IOException;
+
 import javax.servlet.http.HttpServletResponse;
 
 import org.slf4j.Logger;
@@ -32,15 +34,30 @@ public class ClientServiceController {
 
     @RequestMapping(value = "/client/connect", method = RequestMethod.GET)
     public @ResponseBody
-    String connect(String gatewayId, HttpServletResponse response) {
+    void connect(String gatewayId, HttpServletResponse response) throws IOException {
         LOG.debug("/client/connect({})", gatewayId);
 
         Client client = clientRepository.getById(gatewayId);
 
+        if (client != null) {
+            response.sendError(409, "client connected");
+            return;
+        }
+
+        client = clientRepository.register(gatewayId);
+        networkManager.add(client);
+        LOG.info("Registered client {}", client);
+    }
+
+    @RequestMapping(value = "/client/broker", method = RequestMethod.GET)
+    public @ResponseBody
+    String getBroker(String gatewayId, HttpServletResponse response) throws IOException {
+        LOG.debug("/client/broker({})", gatewayId);
+
+        Client client = clientRepository.getById(gatewayId);
         if (client == null) {
-            LOG.debug("Client {} not known, registering", gatewayId);
-            client = clientRepository.register(gatewayId);
-            networkManager.add(client);
+            response.sendError(428, "register client first");
+            return null;
         }
 
         try {
@@ -53,7 +70,7 @@ public class ClientServiceController {
             LOG.info("Selected broker for client {}: {}", client, broker);
             return uri(broker);
         } catch (IllegalStateException e) {
-            LOG.warn("No broker connected {}", e.getMessage());
+            LOG.info("No broker connected {}", e.getMessage());
             response.setStatus(503);
             return "";
         }
@@ -66,8 +83,11 @@ public class ClientServiceController {
 
         Client client = clientRepository.getById(gatewayId);
         if (client == null) {
-            LOG.debug("Client {} not known, registering", gatewayId);
             return;
+        }
+
+        if (clientRepository.remove(client)) {
+            response.setStatus(201);
         }
         networkManager.remove(client);
     }

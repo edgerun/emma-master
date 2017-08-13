@@ -16,8 +16,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 import at.ac.tuwien.dsg.emma.manager.model.Broker;
 import at.ac.tuwien.dsg.emma.manager.model.BrokerRepository;
-import at.ac.tuwien.dsg.emma.manager.service.MonitoringService;
 import at.ac.tuwien.dsg.emma.manager.network.NetworkManager;
+import at.ac.tuwien.dsg.emma.manager.service.MonitoringService;
 
 /**
  * BrokerRepositoryController.
@@ -74,20 +74,20 @@ public class BrokerRepositoryController {
 
         LOG.debug("/broker/deregister({}, {})", address, port);
 
-        if (brokerRepository.getHost(address, port) == null) {
+        Broker broker = brokerRepository.getHost(address, port);
+
+        if (broker == null) {
             response.sendError(409, "broker doesn't exist");
             return;
         }
 
-        Broker brokerInfo = brokerRepository.remove(address, port);
-        if (brokerInfo == null) {
-            response.setStatus(200);
-        } else {
-            brokerInfo.setAlive(false);
+        boolean removed = brokerRepository.remove(address, port);
+        if (removed) {
+            broker.setAlive(false);
             response.setStatus(201);
         }
 
-        networkManager.remove(brokerInfo);
+        networkManager.remove(broker);
     }
 
 
