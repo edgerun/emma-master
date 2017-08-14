@@ -53,7 +53,8 @@ public class NetworkManager {
 
             for (Node node : network.getNodes()) {
                 if (node.getValue() instanceof Broker) {
-                    network.addEdge(newNode, node);
+                    Edge<Host, Link> edge = network.addEdge(newNode, node);
+                    edge.setValue(new Link());
                 }
             }
         }
