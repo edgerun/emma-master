@@ -9,6 +9,8 @@ import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import at.ac.tuwien.dsg.emma.manager.network.sel.BrokerSelectionStrategy;
 import at.ac.tuwien.dsg.emma.manager.network.sel.LowestLatencyStrategy;
 import at.ac.tuwien.dsg.emma.manager.service.sub.SubscriptionTable;
+import redis.clients.jedis.Jedis;
+import redis.clients.jedis.JedisPool;
 
 /**
  * ManagerAppConfig.
@@ -35,5 +37,10 @@ public class ManagerAppConfig {
     @Bean
     public BrokerSelectionStrategy brokerSelectionStrategy() {
         return new LowestLatencyStrategy();
+    }
+
+    @Bean(destroyMethod = "close")
+    public JedisPool jedis() {
+        return new JedisPool("localhost");
     }
 }
