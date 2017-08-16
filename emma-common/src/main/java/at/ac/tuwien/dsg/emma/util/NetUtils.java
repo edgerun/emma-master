@@ -3,8 +3,10 @@ package at.ac.tuwien.dsg.emma.util;
 import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.net.InetAddress;
+import java.net.InetSocketAddress;
 import java.net.ServerSocket;
 import java.net.UnknownHostException;
+import java.nio.channels.SocketChannel;
 
 /**
  * NetUtils.
@@ -43,6 +45,52 @@ public final class NetUtils {
         } catch (IOException e) {
             throw new UncheckedIOException(e);
         }
+    }
+
+    /**
+     * Calls {@link SocketChannel#getRemoteAddress()} and casts it to an {@link InetSocketAddress}.
+     *
+     * @param channel the channel
+     * @return The remote address; null if the channel's socket is not connected
+     */
+    public static InetSocketAddress getRemoteAddress(SocketChannel channel) {
+        try {
+            return (InetSocketAddress) channel.getRemoteAddress();
+        } catch (IOException e) {
+            return null;
+        }
+    }
+
+    /**
+     * Calls {@link SocketChannel#getLocalAddress()} ()} and casts it to an {@link InetSocketAddress}.
+     *
+     * @param channel the channel
+     * @return The remote address; null if the channel's socket is not connected
+     */
+    public static InetSocketAddress getLocalAddress(SocketChannel channel) {
+        try {
+            return (InetSocketAddress) channel.getLocalAddress();
+        } catch (IOException e) {
+            return null;
+        }
+    }
+
+    public static InetSocketAddress parseSocketAddress(String socketAddress) {
+        String[] parts = socketAddress.split(":");
+
+        if (parts.length != 2) {
+            throw new IllegalArgumentException(socketAddress + " is not a valid socket address");
+        }
+
+        String host = parts[0];
+        int port;
+        try {
+            port = Integer.parseInt(parts[1]);
+        } catch (NumberFormatException e) {
+            throw new IllegalArgumentException("Port is valid", e);
+        }
+
+        return new InetSocketAddress(host, port);
     }
 
     private NetUtils() {

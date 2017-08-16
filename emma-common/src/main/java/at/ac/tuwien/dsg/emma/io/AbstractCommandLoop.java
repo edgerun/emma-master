@@ -90,6 +90,11 @@ public abstract class AbstractCommandLoop implements CommandLoop {
     protected abstract void processKey(SelectionKey key);
 
     @Override
+    public Selector getSelector() {
+        return selector;
+    }
+
+    @Override
     public void close() throws IOException {
         IOUtils.close(selector);
     }
