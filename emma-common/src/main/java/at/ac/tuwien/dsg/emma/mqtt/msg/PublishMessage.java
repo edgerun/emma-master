@@ -72,6 +72,10 @@ public class PublishMessage implements ControlMessage {
         return ControlPacketType.PUBLISH;
     }
 
+    public PacketIdentifierMessage createPuback() {
+        return new PacketIdentifierMessage(ControlPacketType.PUBACK, getPacketId());
+    }
+
     @Override
     public String toString() {
         final StringBuilder sb = new StringBuilder("PUBLISH     {");
