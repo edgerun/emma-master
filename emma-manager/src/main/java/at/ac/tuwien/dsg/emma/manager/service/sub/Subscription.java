@@ -18,6 +18,10 @@ public class Subscription {
         this.filter = filter;
     }
 
+    public synchronized int getCount() {
+        return count;
+    }
+
     public synchronized void increment() {
         count++;
     }
