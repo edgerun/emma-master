@@ -18,6 +18,9 @@ public abstract class AbstractSocketHandler implements ChannelHandler<SocketChan
         try {
             if (key.isConnectable()) {
                 doConnect(channel, key);
+                if (!key.isValid()) {
+                    return;
+                }
             }
 
             if (key.isReadable()) {
