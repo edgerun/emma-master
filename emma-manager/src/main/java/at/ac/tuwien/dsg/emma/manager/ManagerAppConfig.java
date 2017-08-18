@@ -6,10 +6,11 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 
+import at.ac.tuwien.dsg.emma.bridge.BridgingTable;
 import at.ac.tuwien.dsg.emma.manager.network.sel.BrokerSelectionStrategy;
 import at.ac.tuwien.dsg.emma.manager.network.sel.LowestLatencyStrategy;
+import at.ac.tuwien.dsg.emma.manager.service.RedisBridgingTable;
 import at.ac.tuwien.dsg.emma.manager.service.sub.SubscriptionTable;
-import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisPool;
 
 /**
@@ -42,5 +43,10 @@ public class ManagerAppConfig {
     @Bean(destroyMethod = "close")
     public JedisPool jedis() {
         return new JedisPool("localhost");
+    }
+
+    @Bean
+    public BridgingTable bridgingTable(JedisPool jedis) {
+        return new RedisBridgingTable(jedis);
     }
 }
