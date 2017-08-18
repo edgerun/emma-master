@@ -24,7 +24,7 @@ public abstract class AbstractSocketHandler implements ChannelHandler<SocketChan
                 doRead(channel, key);
             }
 
-            if (key.isWritable()) {
+            if (key.isValid() && key.isWritable()) {
                 doWrite(channel, key);
             }
         } catch (ClosedChannelException | EOFException e) {

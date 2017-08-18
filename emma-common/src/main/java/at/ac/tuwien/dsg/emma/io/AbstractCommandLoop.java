@@ -58,6 +58,9 @@ public abstract class AbstractCommandLoop implements CommandLoop {
 
                 while (iterator.hasNext()) {
                     SelectionKey key = iterator.next();
+                    if (LOG.isTraceEnabled()) {
+                        LOG.trace("Processing key {}", IOUtils.toString(key));
+                    }
                     processKey(key);
                     iterator.remove();
                 }
