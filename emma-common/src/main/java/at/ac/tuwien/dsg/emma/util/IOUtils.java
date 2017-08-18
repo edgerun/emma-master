@@ -60,7 +60,7 @@ public final class IOUtils {
     }
 
     public static String toString(SelectionKey key) {
-        return "SelectionKey { " + key.channel() + LN +
+        return "SelectionKey@" + key.hashCode() + " { " + key.channel() + LN +
                 "   isValid: " + key.isValid() + LN +
                 "   isAcceptable: " + key.isAcceptable() + LN +
                 "   isConnectable: " + key.isConnectable() + LN +
