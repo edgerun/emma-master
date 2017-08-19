@@ -8,12 +8,15 @@ import javax.servlet.http.HttpServletResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import at.ac.tuwien.dsg.emma.manager.event.BrokerConnectEvent;
+import at.ac.tuwien.dsg.emma.manager.event.BrokerDisconnectEvent;
 import at.ac.tuwien.dsg.emma.manager.model.Broker;
 import at.ac.tuwien.dsg.emma.manager.model.BrokerRepository;
 import at.ac.tuwien.dsg.emma.manager.network.NetworkManager;
@@ -36,6 +39,9 @@ public class BrokerRepositoryController {
     @Autowired
     private NetworkManager networkManager;
 
+    @Autowired
+    private ApplicationEventPublisher systemEvents;
+
     @RequestMapping(value = "/broker/register", method = RequestMethod.GET)
     public @ResponseBody
     void register(
@@ -53,6 +59,8 @@ public class BrokerRepositoryController {
         Broker registered = brokerRepository.register(address, port);
         response.setStatus(201);
         networkManager.add(registered);
+
+        systemEvents.publishEvent(new BrokerConnectEvent(registered));
 
         for (Broker brokerInfo : brokerRepository.getHosts().values()) {
             // TODO: this is questionable
@@ -85,9 +93,9 @@ public class BrokerRepositoryController {
         if (removed) {
             broker.setAlive(false);
             response.setStatus(201);
-        }
 
-        networkManager.remove(broker);
+            systemEvents.publishEvent(new BrokerDisconnectEvent(broker));
+        }
     }
 
     @RequestMapping(value = "/broker/list")
