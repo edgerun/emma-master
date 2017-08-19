@@ -11,25 +11,10 @@ public class Subscription {
 
     private Broker broker;
     private String filter;
-    private int count;
 
     public Subscription(Broker broker, String filter) {
         this.broker = broker;
         this.filter = filter;
-    }
-
-    public synchronized int getCount() {
-        return count;
-    }
-
-    public synchronized void increment() {
-        count++;
-    }
-
-    public synchronized void decrement() {
-        if (count > 0) {
-            count--;
-        }
     }
 
     public Broker getBroker() {
@@ -71,7 +56,6 @@ public class Subscription {
         return "Subscription{" +
                 "broker=" + broker +
                 ", filter='" + filter + '\'' +
-                ", count=" + count +
                 '}';
     }
 }
