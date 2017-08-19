@@ -12,6 +12,8 @@ import org.springframework.core.env.MapPropertySource;
 import org.springframework.core.env.PropertySource;
 import org.springframework.stereotype.Component;
 
+import at.ac.tuwien.dsg.emma.manager.service.sub.Subscription;
+import at.ac.tuwien.dsg.emma.manager.service.sub.SubscriptionTable;
 import at.ac.tuwien.dsg.orvell.Context;
 import at.ac.tuwien.dsg.orvell.annotation.Command;
 import at.ac.tuwien.dsg.orvell.annotation.CommandGroup;
@@ -23,9 +25,19 @@ public class ManagerShell {
     @Autowired
     private Environment environment;
 
+    @Autowired
+    private SubscriptionTable subscriptions;
+
     @Command
     public void status(Context ctx) {
         ctx.out().println("status unknown");
+    }
+
+    @Command(name = "sub-list")
+    public void listSubscriptions(Context ctx) {
+        for (Subscription sub : subscriptions.getSubscriptions()) {
+            ctx.out().printf("%-16s : %s%n", sub.getBroker().getId(), sub.getFilter());
+        }
     }
 
     @Command
