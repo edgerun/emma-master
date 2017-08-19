@@ -34,12 +34,6 @@ public class BrokerRepositoryController {
     private BrokerRepository brokerRepository;
 
     @Autowired
-    private MonitoringService monitoringService;
-
-    @Autowired
-    private NetworkManager networkManager;
-
-    @Autowired
     private ApplicationEventPublisher systemEvents;
 
     @RequestMapping(value = "/broker/register", method = RequestMethod.GET)
@@ -58,18 +52,7 @@ public class BrokerRepositoryController {
 
         Broker registered = brokerRepository.register(address, port);
         response.setStatus(201);
-        networkManager.add(registered);
-
         systemEvents.publishEvent(new BrokerConnectEvent(registered));
-
-        for (Broker brokerInfo : brokerRepository.getHosts().values()) {
-            // TODO: this is questionable
-            if (brokerInfo == registered) {
-                continue;
-            }
-
-            monitoringService.pingRequest(registered.getHost(), brokerInfo.getHost());
-        }
 
     }
 
