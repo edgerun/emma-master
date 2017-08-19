@@ -8,16 +8,18 @@ import javax.servlet.http.HttpServletResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import at.ac.tuwien.dsg.emma.manager.event.BrokerConnectEvent;
+import at.ac.tuwien.dsg.emma.manager.event.BrokerDisconnectEvent;
 import at.ac.tuwien.dsg.emma.manager.model.Broker;
 import at.ac.tuwien.dsg.emma.manager.model.BrokerRepository;
 import at.ac.tuwien.dsg.emma.manager.network.NetworkManager;
-import at.ac.tuwien.dsg.emma.manager.service.BridgeInformationBase;
 import at.ac.tuwien.dsg.emma.manager.service.MonitoringService;
 
 /**
@@ -32,13 +34,7 @@ public class BrokerRepositoryController {
     private BrokerRepository brokerRepository;
 
     @Autowired
-    private BridgeInformationBase bridgeInformationBase;
-
-    @Autowired
-    private MonitoringService monitoringService;
-
-    @Autowired
-    private NetworkManager networkManager;
+    private ApplicationEventPublisher systemEvents;
 
     @RequestMapping(value = "/broker/register", method = RequestMethod.GET)
     public @ResponseBody
@@ -56,17 +52,7 @@ public class BrokerRepositoryController {
 
         Broker registered = brokerRepository.register(address, port);
         response.setStatus(201);
-        networkManager.add(registered);
-        bridgeInformationBase.add(registered);
-
-        for (Broker brokerInfo : brokerRepository.getHosts().values()) {
-            // TODO: this is questionable
-            if (brokerInfo == registered) {
-                continue;
-            }
-
-            monitoringService.pingRequest(registered.getHost(), brokerInfo.getHost());
-        }
+        systemEvents.publishEvent(new BrokerConnectEvent(registered));
 
     }
 
@@ -90,10 +76,9 @@ public class BrokerRepositoryController {
         if (removed) {
             broker.setAlive(false);
             response.setStatus(201);
-        }
 
-        networkManager.remove(broker);
-        bridgeInformationBase.remove(broker);
+            systemEvents.publishEvent(new BrokerDisconnectEvent(broker));
+        }
     }
 
     @RequestMapping(value = "/broker/list")

@@ -26,19 +26,19 @@ public class SubscriptionTable {
         this.filterIndex = new HashMap<>();
     }
 
-    public Set<Subscription> getSubscriptions() {
+    public synchronized Set<Subscription> getSubscriptions() {
         return subscriptions;
     }
 
-    public Collection<Subscription> getSubscriptions(String filter) {
+    public synchronized Collection<Subscription> getSubscriptions(String filter) {
         return getSubscriptionTable(filter).map(Map::values).orElse(Collections.emptySet());
     }
 
-    public Collection<Subscription> getSubscriptions(Broker broker) {
+    public synchronized Collection<Subscription> getSubscriptions(Broker broker) {
         return getSubscriptionTable(broker).map(Map::values).orElse(Collections.emptySet());
     }
 
-    public Subscription getOrCreate(Broker broker, String filter) {
+    public synchronized Subscription getOrCreate(Broker broker, String filter) {
         Subscription subscription = new Subscription(broker, filter);
 
         if (subscriptions.contains(subscription)) {
@@ -50,13 +50,21 @@ public class SubscriptionTable {
         return subscription;
     }
 
-    public Subscription get(Broker broker, String filter) {
+    public synchronized Subscription get(Broker broker, String filter) {
         return getSubscriptionTable(broker).map(m -> m.get(filter)).orElse(null);
     }
 
-    public void remove(Subscription subscription) {
-        subscriptions.remove(subscription);
+    public synchronized boolean remove(Subscription subscription) {
+        boolean removed = subscriptions.remove(subscription);
         onAfterRemove(subscription);
+        return removed;
+    }
+
+    public synchronized Collection<Subscription> remove(Broker broker) {
+        // FIXME efficiency
+        Collection<Subscription> subscriptions = new HashSet<>(getSubscriptions(broker));
+        subscriptions.removeIf(next -> !remove(next));
+        return subscriptions;
     }
 
     private void onAfterAdd(Subscription subscription) {

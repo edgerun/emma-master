@@ -5,6 +5,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.scheduling.annotation.EnableAsync;
 
 import at.ac.tuwien.dsg.orvell.Shell;
 import at.ac.tuwien.dsg.orvell.net.TcpShellServer;
@@ -13,6 +14,7 @@ import at.ac.tuwien.dsg.orvell.net.TcpShellServer;
  * ManagerApp.
  */
 @SpringBootApplication
+@EnableAsync
 public class ManagerApp implements CommandLineRunner {
     public static void main(String[] args) throws Exception {
         SpringApplication.run(ManagerApp.class, args);
