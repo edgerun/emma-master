@@ -1,6 +1,7 @@
 package at.ac.tuwien.dsg.emma.manager.service;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -25,11 +26,7 @@ public class RedisBridgingTable implements BridgingTable {
 
     @Override
     public void insert(BridgingTableEntry entry) {
-        try (Jedis jedis = jedisPool.getResource()) {
-            Pipeline pipeline = jedis.pipelined();
-            insert(pipeline, entry);
-            pipeline.sync();
-        }
+        insert(Collections.singleton(entry));
     }
 
     @Override
@@ -47,12 +44,31 @@ public class RedisBridgingTable implements BridgingTable {
 
     @Override
     public void delete(BridgingTableEntry entry) {
+        delete(Collections.singleton(entry));
+    }
+
+    @Override
+    public void delete(Collection<BridgingTableEntry> entries) {
         try (Jedis jedis = jedisPool.getResource()) {
             Pipeline pipeline = jedis.pipelined();
-            delete(pipeline, entry);
+            entries.forEach(e -> delete(pipeline, e));
             pipeline.sync();
         }
-        // TODO: prune
+    }
+
+    @Override
+    public void deleteBridge(String id) {
+        // FIXME efficiency, atomicity
+        Collection<BridgingTableEntry> entries = getAll();
+
+        entries.removeIf(e -> !id.equals(e.getSource()) && !id.equals(e.getDestination()));
+
+        try (Jedis jedis = jedisPool.getResource()) {
+            Pipeline pipeline = jedis.pipelined();
+            entries.forEach(e -> delete(pipeline, e));
+            pipeline.srem("emma.bridges", id);
+            pipeline.sync();
+        }
     }
 
     @Override

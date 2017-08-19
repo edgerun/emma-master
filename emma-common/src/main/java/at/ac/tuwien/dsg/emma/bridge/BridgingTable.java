@@ -13,6 +13,10 @@ public interface BridgingTable {
 
     void delete(BridgingTableEntry entry);
 
+    void delete(Collection<BridgingTableEntry> entries);
+
+    void deleteBridge(String id);
+
     Collection<BridgingTableEntry> getAll();
 
     Collection<BridgingTableEntry> getForSource(String source);

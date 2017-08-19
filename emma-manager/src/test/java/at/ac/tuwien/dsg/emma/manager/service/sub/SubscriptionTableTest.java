@@ -1,7 +1,11 @@
 package at.ac.tuwien.dsg.emma.manager.service.sub;
 
+import static org.hamcrest.CoreMatchers.hasItem;
+import static org.hamcrest.CoreMatchers.hasItems;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.*;
+
+import java.util.Collection;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -76,13 +80,37 @@ public class SubscriptionTableTest {
     }
 
     @Test
+    public void remove_withBroker_removesAndReturnsCorrectEntries() throws Exception {
+        Subscription sub11 = table.getOrCreate(broker1, filter1);
+        Subscription sub12 = table.getOrCreate(broker1, filter2);
+        Subscription sub21 = table.getOrCreate(broker2, filter1);
+
+        Collection<Subscription> removed = table.remove(broker1);
+
+        assertThat(removed.size(), is(2));
+        assertThat(removed, hasItems(sub11, sub12));
+
+        assertThat(table.getSubscriptions().size(), is(1));
+        assertThat(table.getSubscriptions(), hasItem(sub21));
+    }
+
+    @Test
     public void remove_removesEntryAndUpdatesIndices() throws Exception {
         Subscription sub = table.getOrCreate(broker1, filter1);
 
-        table.remove(sub);
+        assertTrue(table.remove(sub));
 
         assertThat(table.getSubscriptions().size(), is(0));
         assertThat(table.getSubscriptions(broker1).size(), is(0));
         assertThat(table.getSubscriptions(filter1).size(), is(0));
+    }
+
+
+    @Test
+    public void remove_returnsFalseOnSubsequentCall() throws Exception {
+        Subscription sub = table.getOrCreate(broker1, filter1);
+
+        assertTrue(table.remove(sub));
+        assertFalse(table.remove(sub));
     }
 }

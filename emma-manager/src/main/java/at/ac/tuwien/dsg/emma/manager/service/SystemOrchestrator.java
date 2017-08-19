@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -66,28 +67,46 @@ public class SystemOrchestrator {
         LOG.info("Broker disconnected {}", event);
 
         networkManager.remove(event.getBroker());
+        subscriptionTable.remove(event.getBroker());
+        removeBridgeEntries(event.getBroker());
     }
 
     @EventListener
     void onEvent(SubscribeEvent event) {
+        LOG.debug("Broker subscribed {}", event);
+
         Subscription subscription = subscriptionTable.getOrCreate(event.getBroker(), event.getTopic());
-        updateRoutes(event.getBroker(), event.getTopic());
-        LOG.debug("Updated subscription {}", subscription);
+        addBridgeEntries(event.getBroker(), event.getTopic());
     }
 
     @EventListener
     void onEvent(UnsubscribeEvent event) {
+        LOG.debug("Broker unsubscribed {}", event);
+
         Subscription subscription = subscriptionTable.get(event.getBroker(), event.getTopic());
 
         if (subscription != null) {
             subscriptionTable.remove(subscription);
-            // TODO: update routes
+            removeBridgeEntries(event.getBroker(), event.getTopic());
         }
-
-        LOG.debug("Updated subscription {}", subscription);
     }
 
-    private void updateRoutes(Broker destination, String topic) {
+    private void removeBridgeEntries(Broker bridge) {
+        bridgingTable.deleteBridge(bridge.getId());
+        debugBridgingTable();
+    }
+
+    private void removeBridgeEntries(Broker destination, String topic) {
+        Collection<BridgingTableEntry> entries = bridgingTable.getAll().stream()
+                .filter(e -> Objects.equals(e.getSource(), destination.getId()))
+                .filter(e -> Objects.equals(e.getTopic(), topic))
+                .collect(Collectors.toList());
+
+        bridgingTable.delete(entries);
+        debugBridgingTable();
+    }
+
+    private void addBridgeEntries(Broker destination, String topic) {
         // connects all existing brokers to the one where a subscription occurred
         Collection<Broker> brokers = brokerRepository.getHosts().values();
         List<BridgingTableEntry> entries = new ArrayList<>(brokers.size());
@@ -101,10 +120,15 @@ public class SystemOrchestrator {
         }
 
         bridgingTable.insert(entries);
+        debugBridgingTable();
+    }
 
-        LOG.info("Updated bridging table:");
-        for (BridgingTableEntry entry : bridgingTable.getAll()) {
-            LOG.info("  {}", entry);
+    private void debugBridgingTable() {
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Updated bridging table:");
+            for (BridgingTableEntry entry : bridgingTable.getAll()) {
+                LOG.debug("  {}", entry);
+            }
         }
     }
 }

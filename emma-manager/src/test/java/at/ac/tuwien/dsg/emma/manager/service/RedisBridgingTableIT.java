@@ -81,6 +81,22 @@ public class RedisBridgingTableIT {
     }
 
     @Test
+    public void deleteBridge_removesCorrectEntries() throws Exception {
+        RedisBridgingTable table = new RedisBridgingTable(jedis);
+
+        table.insert(new BridgingTableEntry("t1", "b1", "b2")); // contains b2 as destination
+        table.insert(new BridgingTableEntry("t1", "b2", "b3")); // contains b2 as source
+        table.insert(new BridgingTableEntry("t2", "b1", "b3")); // does not contain b2
+
+        table.deleteBridge("b2");
+
+        Collection<BridgingTableEntry> entries = table.getAll();
+
+        assertThat(entries.size(), is(1));
+        assertThat(entries, hasItem(new BridgingTableEntry("t2", "b1", "b3")));
+    }
+
+    @Test
     public void getForSource_returnsCorrectEntries() throws Exception {
         RedisBridgingTable table = new RedisBridgingTable(jedis);
 
