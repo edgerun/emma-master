@@ -50,7 +50,11 @@ public class HttpResponse implements Closeable {
         }
 
         try {
-            content = IOUtils.read(getInputStream());
+            InputStream in = getInputStream();
+            if (in == null) {
+                throw new IOException("No InputStream for reading content");
+            }
+            content = IOUtils.read(in);
             return content;
         } catch (IOException e) {
             throw new UncheckedIOException(e);

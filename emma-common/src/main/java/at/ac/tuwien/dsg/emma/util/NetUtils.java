@@ -2,9 +2,11 @@ package at.ac.tuwien.dsg.emma.util;
 
 import java.io.IOException;
 import java.io.UncheckedIOException;
+import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.ServerSocket;
+import java.net.SocketException;
 import java.net.UnknownHostException;
 import java.nio.channels.SocketChannel;
 
@@ -43,6 +45,22 @@ public final class NetUtils {
         try (ServerSocket socket = new ServerSocket(0, 50, iface)) {
             return socket.getLocalPort();
         } catch (IOException e) {
+            throw new UncheckedIOException(e);
+        }
+    }
+
+    public static int getRandomUdpPort() throws UnknownHostException {
+        return getRandomUdpPort((InetAddress) null);
+    }
+
+    public static int getRandomUdpPort(String address) throws UnknownHostException {
+        return getRandomUdpPort(InetAddress.getByName(address));
+    }
+
+    public static int getRandomUdpPort(InetAddress iface) {
+        try (DatagramSocket socket = new DatagramSocket(0, iface)) {
+            return socket.getLocalPort();
+        } catch (SocketException e) {
             throw new UncheckedIOException(e);
         }
     }
