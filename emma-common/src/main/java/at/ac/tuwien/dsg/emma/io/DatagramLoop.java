@@ -41,6 +41,17 @@ public abstract class DatagramLoop implements Runnable, Closeable, ChannelHandle
         return bind;
     }
 
+    public InetSocketAddress getChannelAddress() {
+        if (channel == null) {
+            return null;
+        }
+        try {
+            return (InetSocketAddress) channel.getLocalAddress();
+        } catch (IOException e) {
+            return null;
+        }
+    }
+
     private void runChecked() throws IOException {
         loop = new SimpleCommandLoop();
 
