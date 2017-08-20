@@ -13,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
+import at.ac.tuwien.dsg.emma.manager.model.Broker;
 import at.ac.tuwien.dsg.emma.monitoring.MonitoringLoop;
 import at.ac.tuwien.dsg.emma.monitoring.MonitoringMessageHandlerAdapter;
 import at.ac.tuwien.dsg.emma.monitoring.msg.PingReqMessage;
@@ -50,14 +51,15 @@ public class MonitoringService implements InitializingBean, DisposableBean {
         this.monitoringLoop.setReadHandler(new ReadHandler());
     }
 
-    public void pingRequest(String sourceHost, String targetHost) {
+    public void pingRequest(Broker source, Broker target) {
+        // TODO properly implement QoS monitoring
         for (int i = 0; i < 10; i++) {
             PingReqMessage message = new PingReqMessage(messageIds.updateAndGet(messageIdUpdater));
 
             message.setSource(monitoringLoop.getBindAddress());
-            message.setDestination(new InetSocketAddress(sourceHost, 60043));
-            message.setTargetHost(targetHost);
-            message.setTargetPort(60043);
+            message.setDestination(new InetSocketAddress(source.getHost(), source.getMonitoringPort()));
+            message.setTargetHost(target.getHost());
+            message.setTargetPort(target.getMonitoringPort());
 
             if (LOG.isDebugEnabled()) {
                 LOG.debug("Sending ping request message {}", message);
