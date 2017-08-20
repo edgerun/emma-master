@@ -10,3 +10,6 @@ emma.manager:
     port: 60043
   shell:
     port: 50042
+  redis:
+    host: localhost
+    port: 6379

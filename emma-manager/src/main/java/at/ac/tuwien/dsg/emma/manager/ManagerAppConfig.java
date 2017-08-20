@@ -2,6 +2,9 @@ package at.ac.tuwien.dsg.emma.manager;
 
 import java.util.concurrent.Executor;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
@@ -18,6 +21,8 @@ import redis.clients.jedis.JedisPool;
  */
 @Configuration
 public class ManagerAppConfig {
+
+    private static final Logger LOG = LoggerFactory.getLogger(ManagerAppConfig.class);
 
     @Bean
     public Executor monitoringCommandExecutor() {
@@ -41,8 +46,11 @@ public class ManagerAppConfig {
     }
 
     @Bean(destroyMethod = "close")
-    public JedisPool jedis() {
-        return new JedisPool("localhost");
+    public JedisPool jedis(
+            @Value("${emma.manager.redis.host}") String host,
+            @Value("${emma.manager.redis.port}") Integer port) {
+        LOG.info("Initializing JedisPool on {}:{}", host, port);
+        return new JedisPool(host, port);
     }
 
     @Bean
