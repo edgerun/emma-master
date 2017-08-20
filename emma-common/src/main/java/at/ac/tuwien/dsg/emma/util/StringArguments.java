@@ -1,5 +1,7 @@
 package at.ac.tuwien.dsg.emma.util;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -47,5 +49,32 @@ public class StringArguments {
 
     public <T> Optional<T> get(int index, Function<String, T> mapper) {
         return get(index).map(mapper);
+    }
+
+    /**
+     * Parses long-opts arguments (i,e., "--option=value", or "--option") from this StringArguments returns them as a
+     * map. Flag-like options will be added to the map with the string value 'true'.
+     *
+     * @return an option map ({option = value})
+     */
+    public Map<String, String> parseOptions() {
+        Map<String, String> options = new HashMap<>(args.length);
+
+        for (String arg : getArgs()) {
+            if (!arg.startsWith("--")) {
+                continue;
+            }
+
+            String[] parts = arg.split("=");
+
+            String key = parts[0].substring(2);
+
+            String val;
+            val = parts.length > 1 ? parts[1] : "true";
+
+            options.put(key, val);
+        }
+
+        return options;
     }
 }
