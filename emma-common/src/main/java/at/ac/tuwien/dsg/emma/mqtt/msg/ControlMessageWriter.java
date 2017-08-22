@@ -13,6 +13,22 @@ import at.ac.tuwien.dsg.emma.io.Encode;
  */
 public class ControlMessageWriter {
 
+    private static ThreadLocal<ByteBuffer> smallBuffer = ThreadLocal.withInitial(() -> ByteBuffer.allocate(8));
+    private static ThreadLocal<ByteBuffer> dataBuffer = ThreadLocal.withInitial(() -> ByteBuffer.allocate(1024 * 6));
+
+    private ByteBuffer getSmallBuffer() {
+        ByteBuffer buf = smallBuffer.get();
+        buf.clear();
+        return buf;
+    }
+
+    private ByteBuffer getDataBuffer() {
+        // TODO: ensure appropriate data buffer size
+        ByteBuffer buf = dataBuffer.get();
+        buf.clear();
+        return buf;
+    }
+
     /**
      * Generic method that casts the message type mased on the {@code ControlPacketType}.
      *
@@ -58,8 +74,8 @@ public class ControlMessageWriter {
     }
 
     public void write(GatheringByteChannel channel, ConnectMessage msg) throws IOException {
-        ByteBuffer head = ByteBuffer.allocate(5);
-        ByteBuffer data = ByteBuffer.allocate(1024 * 6); // FIXME
+        ByteBuffer head = getSmallBuffer();
+        ByteBuffer data = getDataBuffer();
 
         put(head, data, msg);
 
@@ -67,8 +83,8 @@ public class ControlMessageWriter {
     }
 
     public void write(GatheringByteChannel channel, PublishMessage msg) throws IOException {
-        ByteBuffer header = ByteBuffer.allocate(5);
-        ByteBuffer data = ByteBuffer.allocate(msg.getPayload().length + msg.getTopic().length() + 4);
+        ByteBuffer header = getSmallBuffer();
+        ByteBuffer data = getDataBuffer(); // required len = msg.getPayload().length + msg.getTopic().length() + 4
 
         put(header, data, msg);
 
@@ -76,7 +92,7 @@ public class ControlMessageWriter {
     }
 
     public void write(WritableByteChannel channel, PacketIdentifierMessage msg) throws IOException {
-        ByteBuffer buf = ByteBuffer.allocate(4);
+        ByteBuffer buf = getSmallBuffer();
 
         put(buf, msg);
 
@@ -84,7 +100,7 @@ public class ControlMessageWriter {
     }
 
     public void write(WritableByteChannel channel, ConnackMessage msg) throws IOException {
-        ByteBuffer buf = ByteBuffer.allocate(4);
+        ByteBuffer buf = getSmallBuffer();
 
         buf.put(msg.getControlPacketType().toHeader());
         buf.put((byte) 2); // rem len
@@ -95,7 +111,7 @@ public class ControlMessageWriter {
     }
 
     public void write(WritableByteChannel channel, SimpleMessage msg) throws IOException {
-        ByteBuffer buf = ByteBuffer.allocate(2);
+        ByteBuffer buf = getSmallBuffer();
 
         buf.put(msg.getControlPacketType().toHeader());
         buf.put((byte) 0);
@@ -104,8 +120,8 @@ public class ControlMessageWriter {
     }
 
     public void write(GatheringByteChannel channel, SubscribeMessage msg) throws IOException {
-        ByteBuffer head = ByteBuffer.allocate(5);
-        ByteBuffer data = ByteBuffer.allocate(1024 * 6); // FIXME
+        ByteBuffer head = getSmallBuffer();
+        ByteBuffer data = getDataBuffer(); // FIXME
 
         put(head, data, msg);
 
@@ -113,8 +129,8 @@ public class ControlMessageWriter {
     }
 
     public void write(GatheringByteChannel channel, SubackMessage msg) throws IOException {
-        ByteBuffer head = ByteBuffer.allocate(5);
-        ByteBuffer data = ByteBuffer.allocate(2 + msg.getFilterQos().length); // packet id + return codes
+        ByteBuffer head = getSmallBuffer();
+        ByteBuffer data = getDataBuffer(); // packet id + return codes 2 + msg.getFilterQos().length
 
         put(head, data, msg);
 
@@ -122,8 +138,8 @@ public class ControlMessageWriter {
     }
 
     public void write(GatheringByteChannel channel, UnsubscribeMessage msg) throws IOException {
-        ByteBuffer head = ByteBuffer.allocate(5);
-        ByteBuffer data = ByteBuffer.allocate(1024 * 6); // FIXME
+        ByteBuffer head = getSmallBuffer();
+        ByteBuffer data = getDataBuffer(); // FIXME
 
         put(head, data, msg);
 
@@ -138,7 +154,14 @@ public class ControlMessageWriter {
     private void write(GatheringByteChannel channel, ByteBuffer head, ByteBuffer data) throws IOException {
         head.flip();
         data.flip();
-        channel.write(new ByteBuffer[]{head, data});
+
+        long expected = head.remaining() + data.remaining();
+        long actual = channel.write(new ByteBuffer[]{head, data});
+
+        if (expected != actual) {
+            throw new IOException("Did not write correct amount of bytes, expected: " + expected + ", actual: " + actual);
+        }
+
     }
 
     // TODO
