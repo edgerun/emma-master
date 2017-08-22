@@ -58,7 +58,7 @@ public class SystemOrchestrator {
                 continue;
             }
 
-            monitoringService.pingRequest(event.getBroker().getHost(), brokerInfo.getHost());
+            monitoringService.pingRequest(event.getBroker(), brokerInfo);
         }
     }
 

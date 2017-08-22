@@ -12,11 +12,13 @@ import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Component;
 
 import at.ac.tuwien.dsg.emma.io.Decode;
-import at.ac.tuwien.dsg.emma.manager.model.BrokerRepository;
+import at.ac.tuwien.dsg.emma.manager.event.BrokerConnectEvent;
 import at.ac.tuwien.dsg.emma.manager.model.Broker;
+import at.ac.tuwien.dsg.emma.manager.model.BrokerRepository;
 import at.ac.tuwien.dsg.emma.util.IOUtils;
 
 @Component
@@ -26,6 +28,9 @@ public class HeartbeatListener implements Runnable, InitializingBean, Disposable
 
     @Autowired
     private BrokerRepository brokers;
+
+    @Autowired
+    private ApplicationEventPublisher systemEvents;
 
     private InetSocketAddress bind;
 
@@ -46,7 +51,7 @@ public class HeartbeatListener implements Runnable, InitializingBean, Disposable
     @Override
     public void afterPropertiesSet() throws Exception {
         LOG.info("Opening socket for HeartbeatListener on {}", bind);
-        socket = new DatagramSocket(bind); // TODO parameterize
+        socket = new DatagramSocket(bind);
         thread = new Thread(this, "emma.HeartbeatListener");
         thread.start();
     }
@@ -70,9 +75,13 @@ public class HeartbeatListener implements Runnable, InitializingBean, Disposable
                 Broker brokerInfo = brokers.getById(id);
 
                 if (brokerInfo != null) {
-                    if (LOG.isDebugEnabled() && !brokerInfo.isAlive()) {
-                        LOG.debug("Updating alive status for broker {}", brokerInfo);
+                    if (!brokerInfo.isAlive()) {
+                        if (LOG.isDebugEnabled()) {
+                            LOG.debug("Updating alive status for broker {}", brokerInfo);
+                        }
+                        systemEvents.publishEvent(new BrokerConnectEvent(brokerInfo));
                     }
+
                     brokerInfo.setAlive(true);
                     brokerInfo.setLastSeen(System.currentTimeMillis());
                 }

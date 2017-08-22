@@ -3,7 +3,7 @@ logging.level:
   at.ac.tuwien.dsg.emma: DEBUG
 
 emma.manager:
-  address: 10.42.0.1
+  address: 0
   heartbeat:
     port: 60042
   monitoring:

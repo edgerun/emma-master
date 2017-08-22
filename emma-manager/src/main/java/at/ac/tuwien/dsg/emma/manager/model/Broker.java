@@ -5,9 +5,9 @@ package at.ac.tuwien.dsg.emma.manager.model;
  */
 public class Broker extends Host {
 
-    // TODO: keepalive
-    private long lastSeen;
+    private int monitoringPort;
 
+    private long lastSeen;
     private boolean isAlive;
 
     public Broker(String host, int port) {
@@ -30,11 +30,19 @@ public class Broker extends Host {
         isAlive = alive;
     }
 
+    public int getMonitoringPort() {
+        return monitoringPort;
+    }
+
+    public void setMonitoringPort(int monitoringPort) {
+        this.monitoringPort = monitoringPort;
+    }
 
     @Override
     public String toString() {
         return "Broker{" +
                 "id='" + getId() + '\'' +
+                ", monitoringPort=" + monitoringPort +
                 ", lastSeen=" + lastSeen +
                 ", isAlive=" + isAlive +
                 '}';

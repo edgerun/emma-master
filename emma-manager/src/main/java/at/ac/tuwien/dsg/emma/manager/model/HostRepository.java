@@ -3,6 +3,8 @@ package at.ac.tuwien.dsg.emma.manager.model;
 import java.util.HashMap;
 import java.util.Map;
 
+import at.ac.tuwien.dsg.emma.NodeInfo;
+
 /**
  * HostRepository.
  */
@@ -20,6 +22,10 @@ public abstract class HostRepository<H extends Host> {
 
     public H getHost(String host, int port) {
         return getById(id(host, port));
+    }
+
+    public H register(NodeInfo info) {
+        return register(info.getHost(), info.getPort());
     }
 
     public H register(String host, int port) {

@@ -25,4 +25,20 @@ public class NetUtilsTest {
         System.out.println("127.0.0.1: " + port2);
         System.out.println("localhost: " + port3);
     }
+
+    @Test
+    public void randomUdpPort() throws Exception {
+        int port1 = NetUtils.getRandomUdpPort();
+        int port2 = NetUtils.getRandomUdpPort("127.0.0.1");
+        int port3 = NetUtils.getRandomUdpPort(InetAddress.getLocalHost());
+
+        assertNotEquals(0, port1);
+        assertNotEquals(0, port2);
+        assertNotEquals(0, port3);
+
+        System.out.println("Random udp ports:");
+        System.out.println("*: " + port1);
+        System.out.println("127.0.0.1: " + port2);
+        System.out.println("localhost: " + port3);
+    }
 }

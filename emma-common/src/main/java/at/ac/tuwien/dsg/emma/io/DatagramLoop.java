@@ -7,12 +7,17 @@ import java.net.InetSocketAddress;
 import java.nio.channels.DatagramChannel;
 import java.nio.channels.SelectionKey;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import at.ac.tuwien.dsg.emma.util.IOUtils;
 
 /**
  * DatagramLoop.
  */
 public abstract class DatagramLoop implements Runnable, Closeable, ChannelHandler<DatagramChannel> {
+
+    private static final Logger LOG = LoggerFactory.getLogger(DatagramLoop.class);
 
     protected InetSocketAddress bind;
 
@@ -57,6 +62,7 @@ public abstract class DatagramLoop implements Runnable, Closeable, ChannelHandle
 
         channel = DatagramChannel.open();
         channel.configureBlocking(false);
+        LOG.info("Opening DatagramChannel on {}", bind);
         channel.bind(bind);
 
         key = loop.register(channel, SelectionKey.OP_READ, this);
