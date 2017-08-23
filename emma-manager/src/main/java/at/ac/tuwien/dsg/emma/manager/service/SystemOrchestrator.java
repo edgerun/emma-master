@@ -50,15 +50,15 @@ public class SystemOrchestrator {
     void onEvent(BrokerConnectEvent event) {
         LOG.info("Broker connected {}", event);
 
-        networkManager.add(event.getBroker());
+        networkManager.add(event.getHost());
 
         for (Broker brokerInfo : brokerRepository.getHosts().values()) {
             // TODO: this is questionable
-            if (brokerInfo == event.getBroker()) {
+            if (brokerInfo == event.getHost()) {
                 continue;
             }
 
-            monitoringService.pingRequest(event.getBroker(), brokerInfo);
+            monitoringService.pingRequest(event.getHost(), brokerInfo);
         }
     }
 
@@ -66,28 +66,28 @@ public class SystemOrchestrator {
     void onEvent(BrokerDisconnectEvent event) {
         LOG.info("Broker disconnected {}", event);
 
-        networkManager.remove(event.getBroker());
-        subscriptionTable.remove(event.getBroker());
-        removeBridgeEntries(event.getBroker());
+        networkManager.remove(event.getHost());
+        subscriptionTable.remove(event.getHost());
+        removeBridgeEntries(event.getHost());
     }
 
     @EventListener
     void onEvent(SubscribeEvent event) {
         LOG.debug("Broker subscribed {}", event);
 
-        Subscription subscription = subscriptionTable.getOrCreate(event.getBroker(), event.getTopic());
-        addBridgeEntries(event.getBroker(), event.getTopic());
+        Subscription subscription = subscriptionTable.getOrCreate(event.getHost(), event.getTopic());
+        addBridgeEntries(event.getHost(), event.getTopic());
     }
 
     @EventListener
     void onEvent(UnsubscribeEvent event) {
         LOG.debug("Broker unsubscribed {}", event);
 
-        Subscription subscription = subscriptionTable.get(event.getBroker(), event.getTopic());
+        Subscription subscription = subscriptionTable.get(event.getHost(), event.getTopic());
 
         if (subscription != null) {
             subscriptionTable.remove(subscription);
-            removeBridgeEntries(event.getBroker(), event.getTopic());
+            removeBridgeEntries(event.getHost(), event.getTopic());
         }
     }
 
