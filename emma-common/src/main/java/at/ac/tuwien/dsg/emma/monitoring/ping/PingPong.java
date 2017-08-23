@@ -1,4 +1,4 @@
-package at.ac.tuwien.dsg.emma.ec;
+package at.ac.tuwien.dsg.emma.monitoring.ping;
 
 import java.net.InetSocketAddress;
 import java.time.Instant;

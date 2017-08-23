@@ -12,8 +12,10 @@ import org.springframework.core.env.MapPropertySource;
 import org.springframework.core.env.PropertySource;
 import org.springframework.stereotype.Component;
 
+import at.ac.tuwien.dsg.emma.manager.service.MonitoringService;
 import at.ac.tuwien.dsg.emma.manager.service.sub.Subscription;
 import at.ac.tuwien.dsg.emma.manager.service.sub.SubscriptionTable;
+import at.ac.tuwien.dsg.emma.util.NetUtils;
 import at.ac.tuwien.dsg.orvell.Context;
 import at.ac.tuwien.dsg.orvell.annotation.Command;
 import at.ac.tuwien.dsg.orvell.annotation.CommandGroup;
@@ -27,6 +29,9 @@ public class ManagerShell {
 
     @Autowired
     private SubscriptionTable subscriptions;
+
+    @Autowired
+    private MonitoringService monitoringService;
 
     @Command
     public void status(Context ctx) {
@@ -52,6 +57,14 @@ public class ManagerShell {
             ctx.out().printf("%-30s %s%n", key, properties.get(key));
         }
         ctx.out().flush();
+    }
+
+    @Command
+    public void pingreq(Context ctx, String source, String target) {
+        monitoringService.pingRequest(
+                NetUtils.parseSocketAddress(source),
+                NetUtils.parseSocketAddress(target)
+        );
     }
 
     private Map<String, Object> getAllProperties() {

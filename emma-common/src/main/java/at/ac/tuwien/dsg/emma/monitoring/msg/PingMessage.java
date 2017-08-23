@@ -28,4 +28,12 @@ public class PingMessage extends AbstractMonitoringMessage {
     public MonitoringPacketType getMonitoringPacketType() {
         return MonitoringPacketType.PING;
     }
+
+    @Override
+    public String toString() {
+        return "PingMessage{" +
+                "id=" + id +
+                ", destination=" + getDestination() +
+                '}';
+    }
 }

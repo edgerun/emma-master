@@ -14,11 +14,11 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import at.ac.tuwien.dsg.emma.manager.model.Broker;
+import at.ac.tuwien.dsg.emma.manager.model.Host;
 import at.ac.tuwien.dsg.emma.monitoring.MonitoringLoop;
 import at.ac.tuwien.dsg.emma.monitoring.MonitoringMessageHandlerAdapter;
 import at.ac.tuwien.dsg.emma.monitoring.msg.PingReqMessage;
 import at.ac.tuwien.dsg.emma.monitoring.msg.PingRespMessage;
-import at.ac.tuwien.dsg.emma.util.Concurrent;
 import at.ac.tuwien.dsg.emma.util.IOUtils;
 
 /**
@@ -51,23 +51,26 @@ public class MonitoringService implements InitializingBean, DisposableBean {
         this.monitoringLoop.setReadHandler(new ReadHandler());
     }
 
-    public void pingRequest(Broker source, Broker target) {
-        // TODO properly implement QoS monitoring
-        for (int i = 0; i < 10; i++) {
-            PingReqMessage message = new PingReqMessage(messageIds.updateAndGet(messageIdUpdater));
+    public void pingRequest(Host source, Broker target) {
+        pingRequest(
+                new InetSocketAddress(source.getHost(), source.getMonitoringPort()),
+                new InetSocketAddress(target.getHost(), target.getMonitoringPort())
+        );
+    }
 
-            message.setSource(monitoringLoop.getBindAddress());
-            message.setDestination(new InetSocketAddress(source.getHost(), source.getMonitoringPort()));
-            message.setTargetHost(target.getHost());
-            message.setTargetPort(target.getMonitoringPort());
+    public void pingRequest(InetSocketAddress source, InetSocketAddress target) {
+        PingReqMessage message = new PingReqMessage(messageIds.updateAndGet(messageIdUpdater));
 
-            if (LOG.isDebugEnabled()) {
-                LOG.debug("Sending ping request message {}", message);
-            }
+        message.setSource(monitoringLoop.getBindAddress());
+        message.setDestination(source);
+        message.setTargetHost(target.getHostString());
+        message.setTargetPort(target.getPort());
 
-            monitoringLoop.send(message);
-            Concurrent.sleep(10);
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Sending ping request message {}", message);
         }
+
+        monitoringLoop.send(message);
     }
 
     @Override
