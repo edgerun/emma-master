@@ -12,6 +12,7 @@ import org.springframework.core.env.MapPropertySource;
 import org.springframework.core.env.PropertySource;
 import org.springframework.stereotype.Component;
 
+import at.ac.tuwien.dsg.emma.manager.network.NetworkManager;
 import at.ac.tuwien.dsg.emma.manager.service.MonitoringService;
 import at.ac.tuwien.dsg.emma.manager.service.sub.Subscription;
 import at.ac.tuwien.dsg.emma.manager.service.sub.SubscriptionTable;
@@ -33,16 +34,19 @@ public class ManagerShell {
     @Autowired
     private MonitoringService monitoringService;
 
-    @Command
-    public void status(Context ctx) {
-        ctx.out().println("status unknown");
-    }
+    @Autowired
+    private NetworkManager networkManager;
 
     @Command(name = "sub-list")
     public void listSubscriptions(Context ctx) {
         for (Subscription sub : subscriptions.getSubscriptions()) {
             ctx.out().printf("%-16s : %s%n", sub.getBroker().getId(), sub.getFilter());
         }
+    }
+
+    @Command(name = "network")
+    public void network(Context ctx) {
+        ctx.out().println(networkManager.getNetwork());
     }
 
     @Command

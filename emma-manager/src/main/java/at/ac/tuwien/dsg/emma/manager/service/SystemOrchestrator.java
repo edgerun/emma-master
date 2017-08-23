@@ -17,10 +17,12 @@ import at.ac.tuwien.dsg.emma.bridge.BridgingTable;
 import at.ac.tuwien.dsg.emma.bridge.BridgingTableEntry;
 import at.ac.tuwien.dsg.emma.manager.event.BrokerConnectEvent;
 import at.ac.tuwien.dsg.emma.manager.event.BrokerDisconnectEvent;
+import at.ac.tuwien.dsg.emma.manager.event.LatencyUpdateEvent;
 import at.ac.tuwien.dsg.emma.manager.event.SubscribeEvent;
 import at.ac.tuwien.dsg.emma.manager.event.UnsubscribeEvent;
 import at.ac.tuwien.dsg.emma.manager.model.Broker;
 import at.ac.tuwien.dsg.emma.manager.model.BrokerRepository;
+import at.ac.tuwien.dsg.emma.manager.network.Link;
 import at.ac.tuwien.dsg.emma.manager.network.NetworkManager;
 import at.ac.tuwien.dsg.emma.manager.service.sub.Subscription;
 import at.ac.tuwien.dsg.emma.manager.service.sub.SubscriptionTable;
@@ -89,6 +91,20 @@ public class SystemOrchestrator {
             subscriptionTable.remove(subscription);
             removeBridgeEntries(event.getHost(), event.getTopic());
         }
+    }
+
+    @EventListener
+    void onEvent(LatencyUpdateEvent event) {
+        LOG.debug("Latency update received, updating link information {}", event);
+
+        Link link = networkManager.getLink(event.getSource(), event.getTarget());
+
+        if (link == null) {
+            LOG.warn("No link found between {} and {}", event.getSource(), event.getTarget());
+            return;
+        }
+
+        link.setLatency(event.getLatency());
     }
 
     private void removeBridgeEntries(Broker bridge) {
