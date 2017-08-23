@@ -17,4 +17,11 @@ public class Link {
         this.latency = latency;
         return this;
     }
+
+    @Override
+    public String toString() {
+        return "Link{" +
+                "latency=" + latency +
+                '}';
+    }
 }

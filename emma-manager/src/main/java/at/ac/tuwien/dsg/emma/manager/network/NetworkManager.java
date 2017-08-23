@@ -62,6 +62,22 @@ public class NetworkManager {
         onUpdate();
     }
 
+    public Link getLink(Host source, Host target) {
+        Node sourceNode = network.getNode(source.getId());
+        Node targetNode = network.getNode(target.getId());
+
+        if (sourceNode == null || targetNode == null) {
+            return null;
+        }
+
+        Edge<Host, Link> edge = network.getEdge(sourceNode, targetNode);
+        if (edge == null) {
+            return null;
+        }
+
+        return edge.getValue();
+    }
+
     public void remove(Client info) {
         synchronized (network) {
             network.findNode(info.getId()).ifPresent(network::removeNode);

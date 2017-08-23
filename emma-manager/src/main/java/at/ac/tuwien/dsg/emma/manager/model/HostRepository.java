@@ -7,6 +7,8 @@ import at.ac.tuwien.dsg.emma.NodeInfo;
 
 /**
  * HostRepository.
+ *
+ * TODO: clean up this mess
  */
 public abstract class HostRepository<H extends Host> {
 
@@ -25,7 +27,9 @@ public abstract class HostRepository<H extends Host> {
     }
 
     public H register(NodeInfo info) {
-        return register(info.getHost(), info.getPort());
+        H host = register(info.getHost(), info.getPort());
+        host.setMonitoringPort(info.getMonitoringPort());
+        return host;
     }
 
     public H register(String host, int port) {

@@ -5,20 +5,22 @@ import at.ac.tuwien.dsg.emma.manager.model.Broker;
 /**
  * A SystemEvent involving a broker.
  */
-public class AbstractBrokerEvent implements SystemEvent {
+public class AbstractBrokerEvent extends AbstractHostEvent<Broker> {
 
-    private Broker broker;
-
-    public AbstractBrokerEvent(Broker broker) {
-        this.broker = broker;
+    public AbstractBrokerEvent(Broker host) {
+        super(host);
     }
 
+    /**
+     * Deprecated: use {@link #getHost()} instead.
+     */
+    @Deprecated
     public Broker getBroker() {
-        return broker;
+        return getHost();
     }
 
     @Override
     public String toString() {
-        return getClass().getSimpleName() + "{broker=" + broker + '}';
+        return getClass().getSimpleName() + "{broker=" + getHost() + '}';
     }
 }

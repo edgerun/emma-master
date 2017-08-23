@@ -17,10 +17,12 @@ import at.ac.tuwien.dsg.emma.bridge.BridgingTable;
 import at.ac.tuwien.dsg.emma.bridge.BridgingTableEntry;
 import at.ac.tuwien.dsg.emma.manager.event.BrokerConnectEvent;
 import at.ac.tuwien.dsg.emma.manager.event.BrokerDisconnectEvent;
+import at.ac.tuwien.dsg.emma.manager.event.LatencyUpdateEvent;
 import at.ac.tuwien.dsg.emma.manager.event.SubscribeEvent;
 import at.ac.tuwien.dsg.emma.manager.event.UnsubscribeEvent;
 import at.ac.tuwien.dsg.emma.manager.model.Broker;
 import at.ac.tuwien.dsg.emma.manager.model.BrokerRepository;
+import at.ac.tuwien.dsg.emma.manager.network.Link;
 import at.ac.tuwien.dsg.emma.manager.network.NetworkManager;
 import at.ac.tuwien.dsg.emma.manager.service.sub.Subscription;
 import at.ac.tuwien.dsg.emma.manager.service.sub.SubscriptionTable;
@@ -50,15 +52,15 @@ public class SystemOrchestrator {
     void onEvent(BrokerConnectEvent event) {
         LOG.info("Broker connected {}", event);
 
-        networkManager.add(event.getBroker());
+        networkManager.add(event.getHost());
 
         for (Broker brokerInfo : brokerRepository.getHosts().values()) {
             // TODO: this is questionable
-            if (brokerInfo == event.getBroker()) {
+            if (brokerInfo == event.getHost()) {
                 continue;
             }
 
-            monitoringService.pingRequest(event.getBroker(), brokerInfo);
+            monitoringService.pingRequest(event.getHost(), brokerInfo);
         }
     }
 
@@ -66,29 +68,43 @@ public class SystemOrchestrator {
     void onEvent(BrokerDisconnectEvent event) {
         LOG.info("Broker disconnected {}", event);
 
-        networkManager.remove(event.getBroker());
-        subscriptionTable.remove(event.getBroker());
-        removeBridgeEntries(event.getBroker());
+        networkManager.remove(event.getHost());
+        subscriptionTable.remove(event.getHost());
+        removeBridgeEntries(event.getHost());
     }
 
     @EventListener
     void onEvent(SubscribeEvent event) {
         LOG.debug("Broker subscribed {}", event);
 
-        Subscription subscription = subscriptionTable.getOrCreate(event.getBroker(), event.getTopic());
-        addBridgeEntries(event.getBroker(), event.getTopic());
+        Subscription subscription = subscriptionTable.getOrCreate(event.getHost(), event.getTopic());
+        addBridgeEntries(event.getHost(), event.getTopic());
     }
 
     @EventListener
     void onEvent(UnsubscribeEvent event) {
         LOG.debug("Broker unsubscribed {}", event);
 
-        Subscription subscription = subscriptionTable.get(event.getBroker(), event.getTopic());
+        Subscription subscription = subscriptionTable.get(event.getHost(), event.getTopic());
 
         if (subscription != null) {
             subscriptionTable.remove(subscription);
-            removeBridgeEntries(event.getBroker(), event.getTopic());
+            removeBridgeEntries(event.getHost(), event.getTopic());
         }
+    }
+
+    @EventListener
+    void onEvent(LatencyUpdateEvent event) {
+        LOG.debug("Latency update received, updating link information {}", event);
+
+        Link link = networkManager.getLink(event.getSource(), event.getTarget());
+
+        if (link == null) {
+            LOG.warn("No link found between {} and {}", event.getSource(), event.getTarget());
+            return;
+        }
+
+        link.setLatency(event.getLatency());
     }
 
     private void removeBridgeEntries(Broker bridge) {

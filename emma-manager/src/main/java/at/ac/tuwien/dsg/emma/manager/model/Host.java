@@ -11,6 +11,8 @@ public class Host {
 
     private final String host;
     private final int port;
+
+    private int monitoringPort;
     private Metrics metrics;
 
     public Host(String host, int port) {
@@ -54,6 +56,14 @@ public class Host {
     @Override
     public int hashCode() {
         return Objects.hash(host, port);
+    }
+
+    public int getMonitoringPort() {
+        return monitoringPort;
+    }
+
+    public void setMonitoringPort(int monitoringPort) {
+        this.monitoringPort = monitoringPort;
     }
 
     @Override
