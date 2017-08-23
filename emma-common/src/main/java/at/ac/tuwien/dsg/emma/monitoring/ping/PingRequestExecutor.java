@@ -149,6 +149,7 @@ public class PingRequestExecutor {
                 finished = true;
                 callback.accept(new PingPongResult(request, pingPongs.values()));
                 cancel();
+                runs.remove(runId);
             }
         }
 
