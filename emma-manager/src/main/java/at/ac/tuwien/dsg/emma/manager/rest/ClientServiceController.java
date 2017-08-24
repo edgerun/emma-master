@@ -91,23 +91,6 @@ public class ClientServiceController {
         }
     }
 
-    @RequestMapping(value = "/client/connect", method = RequestMethod.GET)
-    public @ResponseBody
-    void connect(String gatewayId, HttpServletResponse response) throws IOException {
-        LOG.debug("/client/connect({})", gatewayId);
-
-        Client client = clientRepository.getById(gatewayId);
-
-        if (client != null) {
-            response.sendError(409, "client connected");
-            return;
-        }
-
-        client = clientRepository.register(gatewayId);
-        networkManager.add(client);
-        LOG.info("Registered client {}", client);
-    }
-
     @RequestMapping(value = "/client/broker", method = RequestMethod.GET)
     public @ResponseBody
     String getBroker(String gatewayId, HttpServletResponse response) throws IOException {
@@ -133,22 +116,6 @@ public class ClientServiceController {
             response.setStatus(503);
             return "";
         }
-    }
-
-    @RequestMapping(value = "/client/disconnect", method = RequestMethod.GET)
-    public @ResponseBody
-    void disconnect(String gatewayId, HttpServletResponse response) {
-        LOG.debug("/client/disconnect({})", gatewayId);
-
-        Client client = clientRepository.getById(gatewayId);
-        if (client == null) {
-            return;
-        }
-
-        if (clientRepository.remove(client)) {
-            response.setStatus(201);
-        }
-        networkManager.remove(client);
     }
 
     private String uri(Broker brokerInfo) {

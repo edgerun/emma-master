@@ -118,6 +118,10 @@ public class MonitoringLoop extends DatagramLoop {
     private void doWrite(DatagramChannel channel) throws IOException {
         MonitoringMessage element = outQueue.poll();
 
+        if (element == null) {
+            return;
+        }
+
         onBeforeWrite(element);
         // write message into buffer
         writeBuffer.clear();
