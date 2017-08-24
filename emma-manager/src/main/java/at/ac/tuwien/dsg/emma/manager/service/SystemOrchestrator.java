@@ -17,6 +17,8 @@ import at.ac.tuwien.dsg.emma.bridge.BridgingTable;
 import at.ac.tuwien.dsg.emma.bridge.BridgingTableEntry;
 import at.ac.tuwien.dsg.emma.manager.event.BrokerConnectEvent;
 import at.ac.tuwien.dsg.emma.manager.event.BrokerDisconnectEvent;
+import at.ac.tuwien.dsg.emma.manager.event.ClientDeregisterEvent;
+import at.ac.tuwien.dsg.emma.manager.event.ClientRegisterEvent;
 import at.ac.tuwien.dsg.emma.manager.event.LatencyUpdateEvent;
 import at.ac.tuwien.dsg.emma.manager.event.SubscribeEvent;
 import at.ac.tuwien.dsg.emma.manager.event.UnsubscribeEvent;
@@ -105,6 +107,18 @@ public class SystemOrchestrator {
         }
 
         link.setLatency(event.getLatency());
+    }
+
+    @EventListener
+    void onEvent(ClientRegisterEvent event) {
+        LOG.info("Client registered {}", event.getHost());
+        networkManager.add(event.getHost());
+    }
+
+    @EventListener
+    void onEvent(ClientDeregisterEvent event) {
+        LOG.info("Client dergistered {}", event.getHost());
+        networkManager.remove(event.getHost());
     }
 
     private void removeBridgeEntries(Broker bridge) {

@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import at.ac.tuwien.dsg.emma.NodeInfo;
 import at.ac.tuwien.dsg.emma.manager.event.ClientDeregisterEvent;
+import at.ac.tuwien.dsg.emma.manager.event.ClientRegisterEvent;
 import at.ac.tuwien.dsg.emma.manager.model.Broker;
 import at.ac.tuwien.dsg.emma.manager.model.Client;
 import at.ac.tuwien.dsg.emma.manager.model.ClientRepository;
@@ -66,6 +67,7 @@ public class ClientServiceController {
 
         Client registered = clientRepository.register(info);
         response.setStatus(201);
+        systemEvents.publishEvent(new ClientRegisterEvent(registered));
         return registered.getId();
     }
 
