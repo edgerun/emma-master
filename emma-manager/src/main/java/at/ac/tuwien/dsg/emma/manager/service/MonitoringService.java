@@ -17,6 +17,8 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import at.ac.tuwien.dsg.emma.manager.event.LatencyUpdateEvent;
+import at.ac.tuwien.dsg.emma.manager.model.Broker;
+import at.ac.tuwien.dsg.emma.manager.model.BrokerRepository;
 import at.ac.tuwien.dsg.emma.manager.model.Client;
 import at.ac.tuwien.dsg.emma.manager.model.Host;
 import at.ac.tuwien.dsg.emma.manager.network.Link;
@@ -26,6 +28,8 @@ import at.ac.tuwien.dsg.emma.monitoring.MonitoringLoop;
 import at.ac.tuwien.dsg.emma.monitoring.MonitoringMessageHandlerAdapter;
 import at.ac.tuwien.dsg.emma.monitoring.msg.PingReqMessage;
 import at.ac.tuwien.dsg.emma.monitoring.msg.PingRespMessage;
+import at.ac.tuwien.dsg.emma.monitoring.msg.UsageRequest;
+import at.ac.tuwien.dsg.emma.monitoring.msg.UsageResponse;
 import at.ac.tuwien.dsg.emma.util.IOUtils;
 
 /**
@@ -41,6 +45,7 @@ public class MonitoringService implements InitializingBean, DisposableBean {
 
     private ApplicationEventPublisher systemEvents;
     private NetworkManager networkManager;
+    private BrokerRepository brokerRepository;
 
     private MonitoringLoop monitoringLoop;
     private Thread thread;
@@ -70,6 +75,11 @@ public class MonitoringService implements InitializingBean, DisposableBean {
         this.networkManager = networkManager;
     }
 
+    @Autowired
+    public void setBrokerRepository(BrokerRepository brokerRepository) {
+        this.brokerRepository = brokerRepository;
+    }
+
     @Scheduled(fixedDelay = 30000)
     public void update() {
         // TODO: issue requests in a way that distributes sources
@@ -89,11 +99,27 @@ public class MonitoringService implements InitializingBean, DisposableBean {
         }
     }
 
+    @Scheduled(fixedDelay = 5000)
+    public void updateUsage() {
+        for (Broker broker : brokerRepository.getHosts().values()) {
+            if (broker.isAlive()) {
+                usageRequest(broker);
+            }
+        }
+    }
+
+    public void usageRequest(Broker host) {
+        if (LOG.isTraceEnabled()) {
+            LOG.trace("Sending usage request to {}", host.getId());
+        }
+
+        UsageRequest request = new UsageRequest(host.getId());
+        request.setDestination(host.getMonitoringAddress());
+        monitoringLoop.send(request);
+    }
+
     public void pingRequest(Host source, Host target) {
-        PingReqMessage message = pingRequest(
-                new InetSocketAddress(source.getHost(), source.getMonitoringPort()),
-                new InetSocketAddress(target.getHost(), target.getMonitoringPort())
-        );
+        PingReqMessage message = pingRequest(source.getMonitoringAddress(), target.getMonitoringAddress());
         pingRequests.put(message.getRequestId(), new PingRequest(message, source, target));
     }
 
@@ -142,6 +168,15 @@ public class MonitoringService implements InitializingBean, DisposableBean {
             }
 
             systemEvents.publishEvent(new LatencyUpdateEvent(req.getSource(), req.getTarget(), resp.getLatency()));
+        }
+
+        @Override
+        public void onMessage(MonitoringLoop loop, UsageResponse message) {
+            if (LOG.isTraceEnabled()) {
+                LOG.trace("Received usage response {}", message);
+            }
+
+            brokerRepository.getById(message.getHostId()).getMetrics();
         }
     }
 

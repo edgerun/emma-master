@@ -1,5 +1,6 @@
 package at.ac.tuwien.dsg.emma.manager.model;
 
+import java.net.InetSocketAddress;
 import java.util.Objects;
 
 import at.ac.tuwien.dsg.emma.manager.network.Metrics;
@@ -14,6 +15,8 @@ public class Host {
 
     private int monitoringPort;
     private Metrics metrics;
+
+    private InetSocketAddress monitoringAddress;
 
     public Host(String host, int port) {
         this.host = host;
@@ -40,6 +43,23 @@ public class Host {
         return metrics;
     }
 
+    public int getMonitoringPort() {
+        return monitoringPort;
+    }
+
+    public void setMonitoringPort(int monitoringPort) {
+        this.monitoringPort = monitoringPort;
+        this.monitoringAddress = null;
+    }
+
+    public InetSocketAddress getMonitoringAddress() {
+        if (monitoringAddress == null) {
+            monitoringAddress = new InetSocketAddress(host, monitoringPort);
+        }
+
+        return monitoringAddress;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) {
@@ -56,14 +76,6 @@ public class Host {
     @Override
     public int hashCode() {
         return Objects.hash(host, port);
-    }
-
-    public int getMonitoringPort() {
-        return monitoringPort;
-    }
-
-    public void setMonitoringPort(int monitoringPort) {
-        this.monitoringPort = monitoringPort;
     }
 
     @Override

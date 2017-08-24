@@ -29,6 +29,12 @@ public class MonitoringMessageWriter {
             case RECONNECT:
                 write(buf, (ReconnectMessage) message);
                 return;
+            case USAGEREQ:
+                write(buf, (UsageRequest) message);
+                return;
+            case USAGERESP:
+                write(buf, (UsageResponse) message);
+                return;
             default:
                 throw new UnsupportedOperationException("Unhandled message type: " + type);
         }
@@ -60,5 +66,20 @@ public class MonitoringMessageWriter {
 
     public void write(ByteBuffer buf, ReconnectMessage message) {
         buf.put(message.getMonitoringPacketType().toHeader());
+    }
+
+    public void write(ByteBuffer buf, UsageRequest message) {
+        buf.put(message.getMonitoringPacketType().toHeader());
+        Encode.writeLengthEncodedString(buf, message.getHostId());
+    }
+
+    public void write(ByteBuffer buf, UsageResponse message) {
+        buf.put(message.getMonitoringPacketType().toHeader());
+        Encode.writeLengthEncodedString(buf, message.getHostId());
+
+        buf.putShort((short) message.getProcessors());
+        buf.putFloat(message.getLoad());
+        buf.putInt(message.getThroughputIn());
+        buf.putInt(message.getThroughputOut());
     }
 }

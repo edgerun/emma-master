@@ -22,11 +22,32 @@ public class MonitoringMessageReader {
                 return readPingReqMessage(buffer);
             case PINGRESP:
                 return readPingRespMessage(buffer);
+            case USAGEREQ:
+                return readUsageRequest(buffer);
+            case USAGERESP:
+                return readUsageResponse(buffer);
             case RECONNECT:
                 return readReconnectMessage(buffer);
             default:
                 throw new UnsupportedOperationException("Unhandled message type: " + type);
         }
+    }
+
+    private MonitoringMessage readUsageResponse(ByteBuffer buffer) {
+        UsageResponse message = new UsageResponse();
+
+        message.setHostId(Decode.readLengthEncodedString(buffer));
+        message.setProcessors(buffer.getShort());
+        message.setLoad(buffer.getFloat());
+        message.setThroughputIn(buffer.getInt());
+        message.setThroughputOut(buffer.getInt());
+
+        return message;
+    }
+
+    private MonitoringMessage readUsageRequest(ByteBuffer buffer) {
+        String hostId = Decode.readLengthEncodedString(buffer);
+        return new UsageRequest(hostId);
     }
 
     private MonitoringMessage readPingRespMessage(ByteBuffer buffer) {

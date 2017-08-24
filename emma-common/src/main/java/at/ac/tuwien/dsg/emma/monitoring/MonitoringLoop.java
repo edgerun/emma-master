@@ -17,6 +17,8 @@ import at.ac.tuwien.dsg.emma.monitoring.msg.PingReqMessage;
 import at.ac.tuwien.dsg.emma.monitoring.msg.PingRespMessage;
 import at.ac.tuwien.dsg.emma.monitoring.msg.PongMessage;
 import at.ac.tuwien.dsg.emma.monitoring.msg.ReconnectMessage;
+import at.ac.tuwien.dsg.emma.monitoring.msg.UsageRequest;
+import at.ac.tuwien.dsg.emma.monitoring.msg.UsageResponse;
 
 /**
  * MonitoringLoop.
@@ -42,8 +44,8 @@ public class MonitoringLoop extends DatagramLoop {
         this.reader = new MonitoringMessageReader();
         this.writer = new MonitoringMessageWriter();
 
-        this.readBuffer = ByteBuffer.allocate(512);
-        this.writeBuffer = ByteBuffer.allocate(512);
+        this.readBuffer = ByteBuffer.allocate(64);
+        this.writeBuffer = ByteBuffer.allocate(64);
     }
 
     public MonitoringMessageHandler getReadHandler() {
@@ -150,6 +152,12 @@ public class MonitoringLoop extends DatagramLoop {
             case PINGRESP:
                 handler.onMessage(this, (PingRespMessage) message);
                 return;
+            case USAGEREQ:
+                handler.onMessage(this, (UsageRequest) message);
+                break;
+            case USAGERESP:
+                handler.onMessage(this, (UsageResponse) message);
+                break;
             case RECONNECT:
                 handler.onMessage(this, (ReconnectMessage) message);
                 return;
