@@ -1,20 +1,45 @@
 package at.ac.tuwien.dsg.emma.manager.network;
 
+import at.ac.tuwien.dsg.emma.util.LongWindow;
+
 /**
  * Link.
  */
 public class Link {
 
-    private Double latency;
+    private LongWindow latency;
 
-    // TODO: hops?
+    private boolean connected;
 
-    public Double getLatency() {
+    public Link() {
+        this(new LongWindow(4));
+    }
+
+    public Link(LongWindow latency) {
+        this.latency = latency;
+    }
+
+    public LongWindow getLatency() {
         return latency;
     }
 
-    public Link setLatency(double latency) {
+    public void setLatency(LongWindow latency) {
         this.latency = latency;
+    }
+
+    public boolean isConnected() {
+        return connected;
+    }
+
+    public void setConnected(boolean connected) {
+        this.connected = connected;
+    }
+
+    /*
+     * used for tests
+     */
+    public Link addLatency(long latency) {
+        this.latency.add(latency);
         return this;
     }
 

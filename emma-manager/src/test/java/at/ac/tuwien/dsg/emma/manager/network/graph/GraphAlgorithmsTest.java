@@ -44,21 +44,20 @@ public class GraphAlgorithmsTest {
         graph.addNode(c1);
         graph.addNode(c2);
 
-        graph.addEdge(b1, b2).setValue(new Link().setLatency(100));
-        graph.addEdge(b1, b3).setValue(new Link().setLatency(150));
-        graph.addEdge(b1, b4).setValue(new Link().setLatency(150));
-        graph.addEdge(b2, b3).setValue(new Link().setLatency(10));
-        graph.addEdge(b2, b4).setValue(new Link().setLatency(20));
-        graph.addEdge(b3, b4).setValue(new Link().setLatency(5));
-
-        graph.addEdge(c1, b1).setValue(new Link().setLatency(10));
-        graph.addEdge(c1, b2).setValue(new Link().setLatency(150));
-        graph.addEdge(c1, b3).setValue(new Link().setLatency(200));
-        graph.addEdge(c1, b4).setValue(new Link().setLatency(200));
-        graph.addEdge(c2, b1).setValue(new Link().setLatency(160));
-        graph.addEdge(c2, b2).setValue(new Link().setLatency(50));
-        graph.addEdge(c2, b3).setValue(new Link().setLatency(5));
-        graph.addEdge(c2, b4).setValue(new Link().setLatency(5));
+        graph.addEdge(b1, b2).setValue(new Link().addLatency(100));
+        graph.addEdge(b1, b3).setValue(new Link().addLatency(150));
+        graph.addEdge(b1, b4).setValue(new Link().addLatency(150));
+        graph.addEdge(b2, b3).setValue(new Link().addLatency(10));
+        graph.addEdge(b2, b4).setValue(new Link().addLatency(20));
+        graph.addEdge(b3, b4).setValue(new Link().addLatency(5));
+        graph.addEdge(c1, b1).setValue(new Link().addLatency(10));
+        graph.addEdge(c1, b2).setValue(new Link().addLatency(150));
+        graph.addEdge(c1, b3).setValue(new Link().addLatency(200));
+        graph.addEdge(c1, b4).setValue(new Link().addLatency(200));
+        graph.addEdge(c2, b1).setValue(new Link().addLatency(160));
+        graph.addEdge(c2, b2).setValue(new Link().addLatency(50));
+        graph.addEdge(c2, b3).setValue(new Link().addLatency(5));
+        graph.addEdge(c2, b4).setValue(new Link().addLatency(5));
     }
 
     @Test

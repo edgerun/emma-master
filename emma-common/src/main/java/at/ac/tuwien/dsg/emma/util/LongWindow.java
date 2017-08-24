@@ -11,6 +11,7 @@ public class LongWindow {
 
     private int capacity;
     private int head;
+    private int count;
 
     public LongWindow(int window) {
         this.values = new long[window];
@@ -20,13 +21,26 @@ public class LongWindow {
     public void add(long value) {
         values[head] = value;
         head = (head + 1) % capacity;
+
+        if (count < capacity) {
+            count++;
+        }
+    }
+
+    public int size() {
+        return capacity;
+    }
+
+    public int count() {
+        return count;
     }
 
     public double average() {
         double d = 0;
 
-        for (long value : values) {
-            d += (value / (double) capacity);
+        for (int i = 0; i < count; i++) {
+            long value = values[i];
+            d += value / (double) count;
         }
 
         return d;

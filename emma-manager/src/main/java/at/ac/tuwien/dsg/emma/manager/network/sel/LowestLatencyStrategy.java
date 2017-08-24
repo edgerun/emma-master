@@ -10,6 +10,7 @@ import at.ac.tuwien.dsg.emma.manager.network.Link;
 import at.ac.tuwien.dsg.emma.manager.network.Network;
 import at.ac.tuwien.dsg.emma.manager.network.graph.Edge;
 import at.ac.tuwien.dsg.emma.manager.network.graph.Node;
+import at.ac.tuwien.dsg.emma.util.LongWindow;
 
 /**
  * LowestLatencyStrategy.
@@ -44,8 +45,9 @@ public class LowestLatencyStrategy implements BrokerSelectionStrategy {
         }
 
         private double getLatency(Edge<Host, Link> node) {
-            Double latency = node.getValue().getLatency();
-            return latency != null ? latency : Double.MAX_VALUE;
+            LongWindow latency = node.getValue().getLatency();
+
+            return (latency == null || latency.count() < 1) ? Double.MAX_VALUE : latency.average();
         }
     }
 }

@@ -106,7 +106,8 @@ public class SystemOrchestrator {
             return;
         }
 
-        link.setLatency(event.getLatency());
+        link.getLatency().add(event.getLatency());
+        LOG.debug("Latency is now {}", link.getLatency());
     }
 
     @EventListener
