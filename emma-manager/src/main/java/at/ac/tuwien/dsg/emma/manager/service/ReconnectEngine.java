@@ -31,7 +31,9 @@ public class ReconnectEngine {
 
     @Scheduled(fixedDelay = 30000)
     public void scheduled() {
-        LOG.info("Determining reconnect for clients");
+        if (LOG.isTraceEnabled()) {
+            LOG.trace("Scheduled reconnect run");
+        }
 
         Instant now = Instant.now();
 
@@ -49,7 +51,9 @@ public class ReconnectEngine {
                 continue;
             }
 
-            LOG.info("Instructing {} to reconnect to {}", client, broker);
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("Instructing {} to reconnect to {}", client, broker);
+            }
             monitoringService.reconnect(client, broker);
         }
     }
