@@ -11,7 +11,8 @@ public enum MonitoringPacketType {
     PONG,
     USAGEREQ,
     USAGERESP,
-    RECONNECT;
+    RECONNREQ,
+    RECONNACK;
 
     private static final MonitoringPacketType[] values = values();
 

@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import at.ac.tuwien.dsg.emma.NodeInfo;
+import at.ac.tuwien.dsg.emma.manager.event.ClientConnectEvent;
 import at.ac.tuwien.dsg.emma.manager.event.ClientDeregisterEvent;
 import at.ac.tuwien.dsg.emma.manager.event.ClientRegisterEvent;
 import at.ac.tuwien.dsg.emma.manager.model.Broker;
@@ -102,6 +103,7 @@ public class ClientServiceController {
             return null;
         }
 
+        // TODO: bootstrap to root broker instead
         try {
             Broker broker = brokerSelectionStrategy.select(client, networkManager.getNetwork());
 
@@ -110,6 +112,7 @@ public class ClientServiceController {
             }
 
             LOG.info("Selected broker for client {}: {}", client, broker);
+            systemEvents.publishEvent(new ClientConnectEvent(client, broker));
             return uri(broker);
         } catch (IllegalStateException e) {
             LOG.info("No broker connected {}", e.getMessage());

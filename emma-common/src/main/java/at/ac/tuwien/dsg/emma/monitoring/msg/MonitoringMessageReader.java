@@ -26,8 +26,10 @@ public class MonitoringMessageReader {
                 return readUsageRequest(buffer);
             case USAGERESP:
                 return readUsageResponse(buffer);
-            case RECONNECT:
-                return readReconnectMessage(buffer);
+            case RECONNREQ:
+                return readReconnectRequest(buffer);
+            case RECONNACK:
+                return readReconnectAck(buffer);
             default:
                 throw new UnsupportedOperationException("Unhandled message type: " + type);
         }
@@ -79,7 +81,15 @@ public class MonitoringMessageReader {
         return new PingMessage(id);
     }
 
-    private MonitoringMessage readReconnectMessage(ByteBuffer buffer) {
-        return new ReconnectMessage();
+    private MonitoringMessage readReconnectRequest(ByteBuffer buffer) {
+        String clientId = Decode.readLengthEncodedString(buffer);
+        String brokerHost = Decode.readLengthEncodedString(buffer);
+        return new ReconnectRequest(clientId, brokerHost);
+    }
+
+    private MonitoringMessage readReconnectAck(ByteBuffer buffer) {
+        String clientId = Decode.readLengthEncodedString(buffer);
+        String brokerHost = Decode.readLengthEncodedString(buffer);
+        return new ReconnectAck(clientId, brokerHost);
     }
 }

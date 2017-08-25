@@ -16,10 +16,12 @@ import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
+import at.ac.tuwien.dsg.emma.manager.event.ClientConnectEvent;
 import at.ac.tuwien.dsg.emma.manager.event.LatencyUpdateEvent;
 import at.ac.tuwien.dsg.emma.manager.model.Broker;
 import at.ac.tuwien.dsg.emma.manager.model.BrokerRepository;
 import at.ac.tuwien.dsg.emma.manager.model.Client;
+import at.ac.tuwien.dsg.emma.manager.model.ClientRepository;
 import at.ac.tuwien.dsg.emma.manager.model.Host;
 import at.ac.tuwien.dsg.emma.manager.network.Link;
 import at.ac.tuwien.dsg.emma.manager.network.NetworkManager;
@@ -28,6 +30,8 @@ import at.ac.tuwien.dsg.emma.monitoring.MonitoringLoop;
 import at.ac.tuwien.dsg.emma.monitoring.MonitoringMessageHandlerAdapter;
 import at.ac.tuwien.dsg.emma.monitoring.msg.PingReqMessage;
 import at.ac.tuwien.dsg.emma.monitoring.msg.PingRespMessage;
+import at.ac.tuwien.dsg.emma.monitoring.msg.ReconnectAck;
+import at.ac.tuwien.dsg.emma.monitoring.msg.ReconnectRequest;
 import at.ac.tuwien.dsg.emma.monitoring.msg.UsageRequest;
 import at.ac.tuwien.dsg.emma.monitoring.msg.UsageResponse;
 import at.ac.tuwien.dsg.emma.util.IOUtils;
@@ -46,6 +50,7 @@ public class MonitoringService implements InitializingBean, DisposableBean {
     private ApplicationEventPublisher systemEvents;
     private NetworkManager networkManager;
     private BrokerRepository brokerRepository;
+    private ClientRepository clientRepository;
 
     private MonitoringLoop monitoringLoop;
     private Thread thread;
@@ -78,6 +83,11 @@ public class MonitoringService implements InitializingBean, DisposableBean {
     @Autowired
     public void setBrokerRepository(BrokerRepository brokerRepository) {
         this.brokerRepository = brokerRepository;
+    }
+
+    @Autowired
+    public void setClientRepository(ClientRepository clientRepository) {
+        this.clientRepository = clientRepository;
     }
 
     @Scheduled(fixedDelay = 30000)
@@ -121,6 +131,15 @@ public class MonitoringService implements InitializingBean, DisposableBean {
     public void pingRequest(Host source, Host target) {
         PingReqMessage message = pingRequest(source.getMonitoringAddress(), target.getMonitoringAddress());
         pingRequests.put(message.getRequestId(), new PingRequest(message, source, target));
+    }
+
+    public void reconnect(Client client, Broker broker) {
+        ReconnectRequest reconnect = new ReconnectRequest(client.getId(), broker.getId());
+        reconnect.setDestination(client.getMonitoringAddress());
+
+        LOG.debug("Sending reconnect message {}", reconnect);
+
+        monitoringLoop.send(reconnect);
     }
 
     public PingReqMessage pingRequest(InetSocketAddress source, InetSocketAddress target) {
@@ -177,6 +196,18 @@ public class MonitoringService implements InitializingBean, DisposableBean {
             }
 
             brokerRepository.getById(message.getHostId()).getMetrics();
+        }
+
+        @Override
+        public void onMessage(MonitoringLoop loop, ReconnectAck message) {
+            if (LOG.isTraceEnabled()) {
+                LOG.trace("Received reconnect ack {}", message);
+            }
+
+            Client client = clientRepository.getById(message.getClientId());
+            Broker broker = brokerRepository.getById(message.getBrokerHost());
+
+            systemEvents.publishEvent(new ClientConnectEvent(client, broker));
         }
     }
 

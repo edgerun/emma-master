@@ -4,7 +4,8 @@ import at.ac.tuwien.dsg.emma.monitoring.msg.PingMessage;
 import at.ac.tuwien.dsg.emma.monitoring.msg.PingReqMessage;
 import at.ac.tuwien.dsg.emma.monitoring.msg.PingRespMessage;
 import at.ac.tuwien.dsg.emma.monitoring.msg.PongMessage;
-import at.ac.tuwien.dsg.emma.monitoring.msg.ReconnectMessage;
+import at.ac.tuwien.dsg.emma.monitoring.msg.ReconnectAck;
+import at.ac.tuwien.dsg.emma.monitoring.msg.ReconnectRequest;
 import at.ac.tuwien.dsg.emma.monitoring.msg.UsageRequest;
 import at.ac.tuwien.dsg.emma.monitoring.msg.UsageResponse;
 
@@ -34,7 +35,12 @@ public class MonitoringMessageHandlerAdapter implements MonitoringMessageHandler
     }
 
     @Override
-    public void onMessage(MonitoringLoop loop, ReconnectMessage message) {
+    public void onMessage(MonitoringLoop loop, ReconnectRequest message) {
+
+    }
+
+    @Override
+    public void onMessage(MonitoringLoop loop, ReconnectAck message) {
 
     }
 

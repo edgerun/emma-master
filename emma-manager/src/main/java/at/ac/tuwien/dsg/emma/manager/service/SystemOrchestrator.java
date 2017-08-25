@@ -1,5 +1,6 @@
 package at.ac.tuwien.dsg.emma.manager.service;
 
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -17,6 +18,7 @@ import at.ac.tuwien.dsg.emma.bridge.BridgingTable;
 import at.ac.tuwien.dsg.emma.bridge.BridgingTableEntry;
 import at.ac.tuwien.dsg.emma.manager.event.BrokerConnectEvent;
 import at.ac.tuwien.dsg.emma.manager.event.BrokerDisconnectEvent;
+import at.ac.tuwien.dsg.emma.manager.event.ClientConnectEvent;
 import at.ac.tuwien.dsg.emma.manager.event.ClientDeregisterEvent;
 import at.ac.tuwien.dsg.emma.manager.event.ClientRegisterEvent;
 import at.ac.tuwien.dsg.emma.manager.event.LatencyUpdateEvent;
@@ -24,6 +26,8 @@ import at.ac.tuwien.dsg.emma.manager.event.SubscribeEvent;
 import at.ac.tuwien.dsg.emma.manager.event.UnsubscribeEvent;
 import at.ac.tuwien.dsg.emma.manager.model.Broker;
 import at.ac.tuwien.dsg.emma.manager.model.BrokerRepository;
+import at.ac.tuwien.dsg.emma.manager.model.Client;
+import at.ac.tuwien.dsg.emma.manager.model.ClientRepository;
 import at.ac.tuwien.dsg.emma.manager.network.Link;
 import at.ac.tuwien.dsg.emma.manager.network.NetworkManager;
 import at.ac.tuwien.dsg.emma.manager.service.sub.Subscription;
@@ -37,6 +41,9 @@ public class SystemOrchestrator {
 
     @Autowired
     private BrokerRepository brokerRepository;
+
+    @Autowired
+    private ClientRepository clientRepository;
 
     @Autowired
     private NetworkManager networkManager;
@@ -120,6 +127,30 @@ public class SystemOrchestrator {
     void onEvent(ClientDeregisterEvent event) {
         LOG.info("Client dergistered {}", event.getHost());
         networkManager.remove(event.getHost());
+    }
+
+    @EventListener
+    void onEvent(ClientConnectEvent event) {
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Updating client connection {} -> {}", event.getClient(), event.getBroker());
+        }
+
+        Client client = event.getClient();
+        client.setLastReconnect(Instant.now());
+
+        // find old
+        Broker old = client.getConnectedTo();
+        if (old != null) {
+            // TODO: remove all subscriptions
+            Link link = networkManager.getLink(client, old);
+            if (link != null) { // may be null if previous disconnected
+                link.setConnected(false);
+            }
+        }
+        Broker current = event.getBroker();
+
+        networkManager.getLink(client, current).setConnected(true);
+        client.setConnectedTo(current);
     }
 
     private void removeBridgeEntries(Broker bridge) {

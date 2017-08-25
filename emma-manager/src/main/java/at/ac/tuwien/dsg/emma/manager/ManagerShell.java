@@ -12,6 +12,10 @@ import org.springframework.core.env.MapPropertySource;
 import org.springframework.core.env.PropertySource;
 import org.springframework.stereotype.Component;
 
+import at.ac.tuwien.dsg.emma.manager.model.Broker;
+import at.ac.tuwien.dsg.emma.manager.model.BrokerRepository;
+import at.ac.tuwien.dsg.emma.manager.model.Client;
+import at.ac.tuwien.dsg.emma.manager.model.ClientRepository;
 import at.ac.tuwien.dsg.emma.manager.network.NetworkManager;
 import at.ac.tuwien.dsg.emma.manager.service.MonitoringService;
 import at.ac.tuwien.dsg.emma.manager.service.sub.Subscription;
@@ -37,6 +41,12 @@ public class ManagerShell {
     @Autowired
     private NetworkManager networkManager;
 
+    @Autowired
+    private ClientRepository clientRepository;
+
+    @Autowired
+    private BrokerRepository brokerRepository;
+
     @Command(name = "sub-list")
     public void listSubscriptions(Context ctx) {
         for (Subscription sub : subscriptions.getSubscriptions()) {
@@ -47,6 +57,21 @@ public class ManagerShell {
     @Command(name = "network")
     public void network(Context ctx) {
         ctx.out().println(networkManager.getNetwork());
+    }
+
+    @Command
+    public void reconnect(String clientId, String brokerId) {
+        Client client = clientRepository.getById(clientId);
+        if (client == null) {
+            throw new IllegalArgumentException("No such client " + clientId);
+        }
+
+        Broker broker = brokerRepository.getById(brokerId);
+        if (broker == null) {
+            throw new IllegalArgumentException("No such broker " + brokerId);
+        }
+
+        monitoringService.reconnect(client, broker);
     }
 
     @Command

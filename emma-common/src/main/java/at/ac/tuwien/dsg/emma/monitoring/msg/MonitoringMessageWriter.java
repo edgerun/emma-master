@@ -26,8 +26,11 @@ public class MonitoringMessageWriter {
             case PINGRESP:
                 write(buf, (PingRespMessage) message);
                 return;
-            case RECONNECT:
-                write(buf, (ReconnectMessage) message);
+            case RECONNREQ:
+                write(buf, (ReconnectRequest) message);
+                return;
+            case RECONNACK:
+                write(buf, (ReconnectAck) message);
                 return;
             case USAGEREQ:
                 write(buf, (UsageRequest) message);
@@ -64,8 +67,16 @@ public class MonitoringMessageWriter {
         buf.putInt(message.getLatency());
     }
 
-    public void write(ByteBuffer buf, ReconnectMessage message) {
+    public void write(ByteBuffer buf, ReconnectRequest message) {
         buf.put(message.getMonitoringPacketType().toHeader());
+        Encode.writeLengthEncodedString(buf, message.getClientId());
+        Encode.writeLengthEncodedString(buf, message.getBrokerHost());
+    }
+
+    public void write(ByteBuffer buf, ReconnectAck message) {
+        buf.put(message.getMonitoringPacketType().toHeader());
+        Encode.writeLengthEncodedString(buf, message.getClientId());
+        Encode.writeLengthEncodedString(buf, message.getBrokerHost());
     }
 
     public void write(ByteBuffer buf, UsageRequest message) {

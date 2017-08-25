@@ -63,6 +63,18 @@ public class NetworkManager {
     }
 
     public Link getLink(Host source, Host target) {
+        return getEdge(source, target).getValue();
+    }
+
+    public void remove(Client info) {
+        synchronized (network) {
+            network.findNode(info.getId()).ifPresent(network::removeNode);
+        }
+
+        onUpdate();
+    }
+
+    public Edge<Host, Link> getEdge(Host source, Host target) {
         Node sourceNode = network.getNode(source.getId());
         Node targetNode = network.getNode(target.getId());
 
@@ -75,15 +87,7 @@ public class NetworkManager {
             return null;
         }
 
-        return edge.getValue();
-    }
-
-    public void remove(Client info) {
-        synchronized (network) {
-            network.findNode(info.getId()).ifPresent(network::removeNode);
-        }
-
-        onUpdate();
+        return edge;
     }
 
     public void remove(Broker info) {
