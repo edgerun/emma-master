@@ -7,27 +7,15 @@ import java.nio.channels.WritableByteChannel;
 import java.util.List;
 
 import at.ac.tuwien.dsg.emma.io.Encode;
+import at.ac.tuwien.dsg.emma.io.ThreadLocalBuffer;
 
 /**
  * ControlMessageWriter.
  */
 public class ControlMessageWriter {
 
-    private static ThreadLocal<ByteBuffer> smallBuffer = ThreadLocal.withInitial(() -> ByteBuffer.allocate(8));
-    private static ThreadLocal<ByteBuffer> dataBuffer = ThreadLocal.withInitial(() -> ByteBuffer.allocate(1024 * 6));
-
-    private ByteBuffer getSmallBuffer() {
-        ByteBuffer buf = smallBuffer.get();
-        buf.clear();
-        return buf;
-    }
-
-    private ByteBuffer getDataBuffer() {
-        // TODO: ensure appropriate data buffer size
-        ByteBuffer buf = dataBuffer.get();
-        buf.clear();
-        return buf;
-    }
+    private static ThreadLocalBuffer smallBuffer = ThreadLocalBuffer.create(8);
+    private static ThreadLocalBuffer dataBuffer = ThreadLocalBuffer.create(1024 * 10); // FIXME
 
     /**
      * Generic method that casts the message type mased on the {@code ControlPacketType}.
@@ -74,8 +62,8 @@ public class ControlMessageWriter {
     }
 
     public void write(GatheringByteChannel channel, ConnectMessage msg) throws IOException {
-        ByteBuffer head = getSmallBuffer();
-        ByteBuffer data = getDataBuffer();
+        ByteBuffer head = smallBuffer.getClean();
+        ByteBuffer data = dataBuffer.getClean();
 
         put(head, data, msg);
 
@@ -83,8 +71,8 @@ public class ControlMessageWriter {
     }
 
     public void write(GatheringByteChannel channel, PublishMessage msg) throws IOException {
-        ByteBuffer header = getSmallBuffer();
-        ByteBuffer data = getDataBuffer(); // required len = msg.getPayload().length + msg.getTopic().length() + 4
+        ByteBuffer header = smallBuffer.getClean();
+        ByteBuffer data = dataBuffer.getClean(); // required len = msg.getPayload().length + msg.getTopic().length() + 4
 
         put(header, data, msg);
 
@@ -92,7 +80,7 @@ public class ControlMessageWriter {
     }
 
     public void write(WritableByteChannel channel, PacketIdentifierMessage msg) throws IOException {
-        ByteBuffer buf = getSmallBuffer();
+        ByteBuffer buf = smallBuffer.getClean();
 
         put(buf, msg);
 
@@ -100,7 +88,7 @@ public class ControlMessageWriter {
     }
 
     public void write(WritableByteChannel channel, ConnackMessage msg) throws IOException {
-        ByteBuffer buf = getSmallBuffer();
+        ByteBuffer buf = smallBuffer.getClean();
 
         buf.put(msg.getControlPacketType().toHeader());
         buf.put((byte) 2); // rem len
@@ -111,7 +99,7 @@ public class ControlMessageWriter {
     }
 
     public void write(WritableByteChannel channel, SimpleMessage msg) throws IOException {
-        ByteBuffer buf = getSmallBuffer();
+        ByteBuffer buf = smallBuffer.getClean();
 
         buf.put(msg.getControlPacketType().toHeader());
         buf.put((byte) 0);
@@ -120,8 +108,8 @@ public class ControlMessageWriter {
     }
 
     public void write(GatheringByteChannel channel, SubscribeMessage msg) throws IOException {
-        ByteBuffer head = getSmallBuffer();
-        ByteBuffer data = getDataBuffer(); // FIXME
+        ByteBuffer head = smallBuffer.getClean();
+        ByteBuffer data = dataBuffer.getClean(); // FIXME
 
         put(head, data, msg);
 
@@ -129,8 +117,8 @@ public class ControlMessageWriter {
     }
 
     public void write(GatheringByteChannel channel, SubackMessage msg) throws IOException {
-        ByteBuffer head = getSmallBuffer();
-        ByteBuffer data = getDataBuffer(); // packet id + return codes 2 + msg.getFilterQos().length
+        ByteBuffer head = smallBuffer.getClean();
+        ByteBuffer data = dataBuffer.getClean(); // packet id + return codes 2 + msg.getFilterQos().length
 
         put(head, data, msg);
 
@@ -138,8 +126,8 @@ public class ControlMessageWriter {
     }
 
     public void write(GatheringByteChannel channel, UnsubscribeMessage msg) throws IOException {
-        ByteBuffer head = getSmallBuffer();
-        ByteBuffer data = getDataBuffer(); // FIXME
+        ByteBuffer head = smallBuffer.getClean();
+        ByteBuffer data = dataBuffer.getClean(); // FIXME
 
         put(head, data, msg);
 
