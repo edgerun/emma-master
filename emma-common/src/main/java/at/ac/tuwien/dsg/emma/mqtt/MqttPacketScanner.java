@@ -47,7 +47,7 @@ public class MqttPacketScanner {
                     onPacketReceive();
                     continue;
                 } else {
-                    bData = ByteBuffer.allocate(remLen);
+                    bData = ByteBuffer.allocate(remLen); // FIXME avoid allocation on each message
                 }
             }
 

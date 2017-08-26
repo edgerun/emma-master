@@ -10,6 +10,11 @@ public class ReconnectAck extends AbstractMonitoringMessage {
     private String clientId;
     private String brokerHost;
 
+    public ReconnectAck(ReconnectRequest request) {
+        this(request.getClientId(), request.getBrokerHost());
+        setDestination(request.getSource());
+    }
+
     public ReconnectAck(String clientId, String brokerHost) {
         this.clientId = clientId;
         this.brokerHost = brokerHost;
