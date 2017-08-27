@@ -10,6 +10,7 @@ import at.ac.tuwien.dsg.emma.manager.model.Client;
 import at.ac.tuwien.dsg.emma.manager.model.Host;
 import at.ac.tuwien.dsg.emma.manager.network.Link;
 import at.ac.tuwien.dsg.emma.manager.network.Network;
+import at.ac.tuwien.dsg.emma.manager.network.sel.LowLoadAndLatencyStrategy;
 import at.ac.tuwien.dsg.emma.manager.network.sel.LowestLatencyStrategy;
 
 /**
@@ -56,8 +57,8 @@ public class GraphAlgorithmsTest {
         graph.addEdge(c1, b4).setValue(new Link().addLatency(200));
         graph.addEdge(c2, b1).setValue(new Link().addLatency(160));
         graph.addEdge(c2, b2).setValue(new Link().addLatency(50));
-        graph.addEdge(c2, b3).setValue(new Link().addLatency(5));
-        graph.addEdge(c2, b4).setValue(new Link().addLatency(5));
+        graph.addEdge(c2, b3).setValue(new Link().addLatency(2));
+        graph.addEdge(c2, b4).setValue(new Link().addLatency(1));
     }
 
     @Test
@@ -67,6 +68,34 @@ public class GraphAlgorithmsTest {
         Broker broker = strategy.select((Client) c1.getValue(), graph);
 
         assertEquals(broker, b1.getValue());
+    }
+
+    @Test
+    public void testLowLoadAndLatencyStrategy() throws Exception {
+        LowLoadAndLatencyStrategy strategy = new LowLoadAndLatencyStrategy();
+
+        // b3 and b4 are are in the same bucket
+
+        // latency = 160
+        b1.getValue().getMetrics().set("processors", 4);
+        b1.getValue().getMetrics().set("load", 1);
+
+        // latecny = 50
+        b2.getValue().getMetrics().set("processors", 4);
+        b2.getValue().getMetrics().set("load", 1);
+
+        // latency = 2
+        b3.getValue().getMetrics().set("processors", 2);
+        b3.getValue().getMetrics().set("load", 1); // effective load will be 0.5
+
+        // latency = 1
+        b4.getValue().getMetrics().set("processors", 1);
+        b4.getValue().getMetrics().set("load", 1); // effective load will be 1
+
+
+        Broker broker = strategy.select((Client) c2.getValue(), graph);
+
+        assertEquals(broker, b3.getValue());
     }
 
 }

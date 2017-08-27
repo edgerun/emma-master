@@ -24,6 +24,7 @@ import at.ac.tuwien.dsg.emma.manager.model.Client;
 import at.ac.tuwien.dsg.emma.manager.model.ClientRepository;
 import at.ac.tuwien.dsg.emma.manager.model.Host;
 import at.ac.tuwien.dsg.emma.manager.network.Link;
+import at.ac.tuwien.dsg.emma.manager.network.Metrics;
 import at.ac.tuwien.dsg.emma.manager.network.NetworkManager;
 import at.ac.tuwien.dsg.emma.manager.network.graph.Edge;
 import at.ac.tuwien.dsg.emma.monitoring.MonitoringLoop;
@@ -195,7 +196,10 @@ public class MonitoringService implements InitializingBean, DisposableBean {
                 LOG.trace("Received usage response {}", message);
             }
 
-            brokerRepository.getById(message.getHostId()).getMetrics();
+            Metrics metrics = brokerRepository.getById(message.getHostId()).getMetrics();
+
+            metrics.set("load", message.getLoad());
+            metrics.set("processors", message.getProcessors());
         }
 
         @Override
