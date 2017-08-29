@@ -1,9 +1,13 @@
 package at.ac.tuwien.dsg.emma.manager.ec;
 
+import static org.hamcrest.CoreMatchers.hasItem;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertThat;
 
 import java.util.Collection;
+import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.stream.Collectors;
 
 import org.junit.Test;
 
@@ -72,5 +76,26 @@ public class NetworkManagerTest {
         manager.remove(new Broker("10.0.0.1", 1001));
 
         assertEquals(1, manager.getNetwork().getEdges().size());
+    }
+
+
+    @Test
+    public void getClientNodes_returnsOnlyClientNodes() throws Exception {
+        NetworkManager manager = new NetworkManager();
+
+        Client c1 = new Client("10.0.0.4", 1004);
+        Client c2 = new Client("10.0.0.5", 1005);
+
+        manager.add(new Broker("10.0.0.1", 1001));
+        manager.add(new Broker("10.0.0.3", 1003));
+        manager.add(c1);
+        manager.add(c2);
+
+
+        Collection<Node<Client>> clientNodes = manager.getNetwork().getClientNodes();
+        assertEquals(2, clientNodes.size());
+        List<Client> clients = clientNodes.stream().map(n -> n.getValue()).collect(Collectors.toList());
+        assertThat(clients, hasItem(c1));
+        assertThat(clients, hasItem(c2));
     }
 }
