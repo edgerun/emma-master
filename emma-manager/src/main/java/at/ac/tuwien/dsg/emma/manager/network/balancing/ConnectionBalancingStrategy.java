@@ -87,7 +87,7 @@ public class ConnectionBalancingStrategy implements BalancingStrategy {
             }
 
             ops.add(new BalancingOperation(client, candidate));
-            connectionCount.compute(current, (b, i) -> i - 1);
+            connectionCount.compute(current, (b, i) -> i == null ? 0 : i - 1);
             connectionCount.compute(candidate, (b, i) -> i + 1);
         }
 
