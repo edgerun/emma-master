@@ -138,7 +138,9 @@ public class MonitoringService implements InitializingBean, DisposableBean {
         ReconnectRequest reconnect = new ReconnectRequest(client.getId(), broker.getId());
         reconnect.setDestination(client.getMonitoringAddress());
 
-        LOG.debug("Sending reconnect message {}", reconnect);
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Sending reconnect message {}", reconnect);
+        }
 
         monitoringLoop.send(reconnect);
     }
