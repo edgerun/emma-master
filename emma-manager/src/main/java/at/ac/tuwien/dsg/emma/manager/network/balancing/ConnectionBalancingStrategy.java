@@ -1,10 +1,16 @@
 package at.ac.tuwien.dsg.emma.manager.network.balancing;
 
-import java.time.Instant;
-import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.stream.Collectors;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import at.ac.tuwien.dsg.emma.manager.model.Broker;
 import at.ac.tuwien.dsg.emma.manager.model.Client;
@@ -13,24 +19,23 @@ import at.ac.tuwien.dsg.emma.manager.network.Link;
 import at.ac.tuwien.dsg.emma.manager.network.Network;
 import at.ac.tuwien.dsg.emma.manager.network.graph.Edge;
 import at.ac.tuwien.dsg.emma.manager.network.graph.Node;
-import at.ac.tuwien.dsg.emma.manager.network.sel.LoadComparator;
-import at.ac.tuwien.dsg.emma.util.LongWindow;
 
 /**
  * ConnectionBalancingStrategy.
  */
 public class ConnectionBalancingStrategy implements BalancingStrategy {
+    private static final Logger LOG = LoggerFactory.getLogger(ConnectionBalancingStrategy.class);
 
-    private static final int[] DEFAULT_BUCKETS = {2, 5, 10, 20, 50, 100, 200, 500, 1000};
+    private float migrationThreshold = 0.1f;
 
-    private int[] buckets;
+    private LatencyGrouping grouping;
 
     public ConnectionBalancingStrategy() {
-        this(DEFAULT_BUCKETS);
+        this(new LatencyGrouping());
     }
 
-    public ConnectionBalancingStrategy(int[] buckets) {
-        this.buckets = buckets;
+    public ConnectionBalancingStrategy(LatencyGrouping grouping) {
+        this.grouping = grouping;
     }
 
     @Override
@@ -38,76 +43,80 @@ public class ConnectionBalancingStrategy implements BalancingStrategy {
         Collection<Node<Client>> clientNodes = network.getClientNodes();
         List<BalancingOperation> ops = new ArrayList<>(clientNodes.size());
 
-        Instant now = Instant.now();
-
-        int reconnectThreshold = 10;
+        Map<Broker, Integer> connectionCount = getConnectionMap(network);
 
         for (Node<Client> clientNode : clientNodes) {
+            Collection<Edge<Host, Link>> groups = getCandidates(clientNode, network);
+
+            if (groups.isEmpty()) {
+                LOG.warn("No alive candidates in lowest latency group for {}", clientNode);
+                continue;
+            }
+
             Client client = clientNode.getValue();
-            if (client.getLastReconnect() != null) {
-                if (client.getLastReconnect().until(now, ChronoUnit.MILLIS) < reconnectThreshold) {
+            Broker current = client.getConnectedTo();
+
+            List<Broker> candidates = groups.stream()
+                    .map(e -> e.opposite(clientNode))
+                    .map(e -> (Broker) e.getValue())
+                    .sorted(Comparator.comparingInt(connectionCount::get))
+                    .collect(Collectors.toList());
+
+            if (Objects.equals(current, candidates.get(0))) {
+                // already connected to the broker with the lowest latency and lowest connect count
+                continue;
+            }
+
+            Broker candidate = candidates.get(0);
+
+            if (candidates.size() > 1 && candidates.contains(current)) {
+                // we know that the client is currently not connected to the best broker
+
+                // first, calculate the threshold
+                long totalConnections = 0;
+                for (Broker b : candidates) {
+                    totalConnections += connectionCount.get(b);
+                }
+                long minDiff = (long) (totalConnections * migrationThreshold);
+
+                if ((connectionCount.get(candidate) + minDiff) >= connectionCount.get(current)) {
+                    // this avoid reconnect a client to a broker that would not balance the network within the
+                    // migrationThreshold
                     continue;
                 }
             }
 
-            ops.add(new BalancingOperation(client, select(client, network)));
+            ops.add(new BalancingOperation(client, candidate));
+            connectionCount.compute(current, (b, i) -> i - 1);
+            connectionCount.compute(candidate, (b, i) -> i + 1);
         }
 
         return ops;
     }
 
-    public Broker select(Client client, Network network) {
-        Node<Host> clientNode = network.getNode(client.getId());
+    public Map<Broker, Integer> getConnectionMap(Network network) {
+        Collection<Node<Broker>> brokers = network.getBrokerNodes();
+        Map<Broker, Integer> connectionsMap = new HashMap<>(brokers.size());
 
-        Collection<Edge<Host, Link>> edges = network.getEdges(clientNode);
-
-        edges = filterLowestLatencyBucket(edges);
-
-        return getLowestLoad(clientNode, edges);
-    }
-
-    private Collection<Edge<Host, Link>> filterLowestLatencyBucket(Collection<Edge<Host, Link>> edges) {
-        int lowestBucket = buckets.length - 1;
-        List<Edge<Host, Link>> lowest = new ArrayList<>();
-
-        for (Edge<Host, Link> edge : edges) {
-            int latencyGroup = getLatencyGroup(getLatency(edge));
-
-            if (latencyGroup > lowestBucket) {
-                continue;
-            }
-            if (latencyGroup < lowestBucket) {
-                lowestBucket = latencyGroup;
-                lowest.clear();
-            }
-
-            lowest.add(edge);
+        for (Node<Broker> brokerNode : brokers) {
+            connectionsMap.put(brokerNode.getValue(), 0);
         }
 
-        return lowest;
-    }
-
-    private double getLatency(Edge<Host, Link> edge) {
-        LongWindow latency = edge.getValue().getLatency();
-        return (latency == null || latency.count() < 1) ? Double.MAX_VALUE : latency.average();
-    }
-
-    private Broker getLowestLoad(Node<Host> clientNode, Collection<Edge<Host, Link>> edges) {
-        // TODO this calls for a threshold or a way for the ReconnectEngine to decide whether
-
-        return (Broker) edges.stream()
-                .map(e -> e.opposite(clientNode))
-                .map(n -> n.getValue())
-                .min(new LoadComparator())
-                .orElseThrow(() -> new IllegalStateException("Should have at least one broker"));
-    }
-
-    public int getLatencyGroup(double value) {
-        for (int i = 0; i < buckets.length; i++) {
-            if (value <= buckets[i]) {
-                return i;
+        for (Node<Client> clientNode : network.getClientNodes()) {
+            Broker broker = clientNode.getValue().getConnectedTo();
+            if (broker != null) {
+                connectionsMap.compute(broker, (b, i) -> i + 1);
             }
         }
-        return buckets.length - 1;
+
+        return connectionsMap;
     }
+
+    public Collection<Edge<Host, Link>> getCandidates(Node<Client> clientNode, Network network) {
+        return grouping.getLowestLatencyGroup(clientNode, network)
+                .stream()
+                .filter(e -> (((Broker) e.opposite(clientNode).getValue()).isAlive()))
+                .collect(Collectors.toSet());
+    }
+
 }
