@@ -12,8 +12,10 @@ import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
 
 import at.ac.tuwien.dsg.emma.bridge.BridgingTable;
+import at.ac.tuwien.dsg.emma.manager.network.balancing.BalancingStrategy;
+import at.ac.tuwien.dsg.emma.manager.network.balancing.ConnectionBalancingStrategy;
 import at.ac.tuwien.dsg.emma.manager.network.sel.BrokerSelectionStrategy;
-import at.ac.tuwien.dsg.emma.manager.network.sel.LowLoadAndLatencyStrategy;
+import at.ac.tuwien.dsg.emma.manager.network.sel.LowestLatencyStrategy;
 import at.ac.tuwien.dsg.emma.manager.service.RedisBridgingTable;
 import at.ac.tuwien.dsg.emma.manager.service.sub.SubscriptionTable;
 import redis.clients.jedis.JedisPool;
@@ -53,8 +55,13 @@ public class ManagerAppConfig {
 
     @Bean
     public BrokerSelectionStrategy brokerSelectionStrategy() {
-        return new LowLoadAndLatencyStrategy();
-        // return new LowestLatencyStrategy();
+        //        return new LowLoadAndLatencyStrategy();
+        return new LowestLatencyStrategy();
+    }
+
+    @Bean
+    public BalancingStrategy balancingStrategy() {
+        return new ConnectionBalancingStrategy();
     }
 
     @Bean(destroyMethod = "close")

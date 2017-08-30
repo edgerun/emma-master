@@ -1,6 +1,12 @@
 package at.ac.tuwien.dsg.emma.manager.network.graph;
 
+import static org.hamcrest.CoreMatchers.hasItems;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertThat;
+
+import java.util.Collection;
+import java.util.List;
+import java.util.stream.Collectors;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -10,6 +16,7 @@ import at.ac.tuwien.dsg.emma.manager.model.Client;
 import at.ac.tuwien.dsg.emma.manager.model.Host;
 import at.ac.tuwien.dsg.emma.manager.network.Link;
 import at.ac.tuwien.dsg.emma.manager.network.Network;
+import at.ac.tuwien.dsg.emma.manager.network.balancing.LatencyGrouping;
 import at.ac.tuwien.dsg.emma.manager.network.sel.LowLoadAndLatencyStrategy;
 import at.ac.tuwien.dsg.emma.manager.network.sel.LowestLatencyStrategy;
 
@@ -96,6 +103,17 @@ public class GraphAlgorithmsTest {
         Broker broker = strategy.select((Client) c2.getValue(), graph);
 
         assertEquals(broker, b3.getValue());
+    }
+
+    @Test
+    public void latencyGrouping() throws Exception {
+        LatencyGrouping lg = new LatencyGrouping();
+
+        Collection<Edge<Host, Link>> group = lg.getLowestLatencyGroup(c2, graph);
+        List<Node<Host>> collect = group.stream().map(e -> e.opposite(c2)).collect(Collectors.toList());
+
+        assertEquals(2, group.size());
+        assertThat(collect, hasItems(b3, b4));
     }
 
 }
