@@ -6,12 +6,17 @@ import java.nio.channels.ClosedChannelException;
 import java.nio.channels.SelectionKey;
 import java.nio.channels.SocketChannel;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import at.ac.tuwien.dsg.emma.util.IOUtils;
 
 /**
  * AbstractSocketHandler.
  */
 public abstract class AbstractSocketHandler implements ChannelHandler<SocketChannel> {
+
+    private static final Logger LOG = LoggerFactory.getLogger(AbstractSocketHandler.class);
 
     @Override
     public void handle(SocketChannel channel, SelectionKey key) throws IOException {
@@ -32,6 +37,13 @@ public abstract class AbstractSocketHandler implements ChannelHandler<SocketChan
             }
         } catch (ClosedChannelException | EOFException e) {
             doClose(channel, key);
+        } catch (IOException e) {
+            String message = e.getMessage();
+            if (message != null && message.contains("Connection reset by peer")) {
+                doClose(channel, key);
+            } else {
+                throw e;
+            }
         }
     }
 
@@ -58,6 +70,10 @@ public abstract class AbstractSocketHandler implements ChannelHandler<SocketChan
 
     @Override
     public void onException(IOException exception) {
-        exception.printStackTrace(System.err);
+        if (LOG.isDebugEnabled()) {
+            LOG.warn("IO exception during key handling", exception);
+        } else {
+            LOG.warn("IO exception during key handling: {}", exception.getMessage());
+        }
     }
 }
