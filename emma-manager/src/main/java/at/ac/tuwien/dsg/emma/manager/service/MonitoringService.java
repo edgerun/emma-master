@@ -91,7 +91,7 @@ public class MonitoringService implements InitializingBean, DisposableBean {
         this.clientRepository = clientRepository;
     }
 
-    @Scheduled(fixedDelay = 30000)
+    @Scheduled(fixedDelay = 15000)
     public void update() {
         // TODO: issue requests in a way that distributes sources
         for (Edge<Host, Link> edge : networkManager.getNetwork().getEdges()) {
