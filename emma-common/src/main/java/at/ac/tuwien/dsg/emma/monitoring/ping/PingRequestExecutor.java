@@ -46,16 +46,16 @@ public class PingRequestExecutor {
         this.monitoringLoop = monitoringLoop;
     }
 
-    public void start() {
+    public synchronized void start() {
         if (scheduler != null) {
-            throw new IllegalStateException();
+            return;
         }
         scheduler = Executors.newScheduledThreadPool(2);
     }
 
-    public void stop() {
+    public synchronized void stop() {
         if (scheduler == null) {
-            throw new IllegalStateException();
+            return;
         }
         LOG.debug("Terminating PingRequestExecutor scheduler");
         Concurrent.shutdownAndAwaitTermination(scheduler);
