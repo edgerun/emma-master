@@ -15,10 +15,12 @@ public class SimpleCommandLoop extends AbstractCommandLoop {
     @Override
     protected final void processKey(SelectionKey key) {
         ChannelHandler handler = (ChannelHandler) key.attachment();
-        try {
-            handler.handle(key.channel(), key);
-        } catch (IOException e) {
-            handler.onException(e);
+        if (handler != null) {
+            try {
+                handler.handle(key.channel(), key);
+            } catch (IOException e) {
+                handler.onException(e);
+            }
         }
     }
 
