@@ -160,7 +160,7 @@ public class SystemOrchestrator {
 
     private void removeBridgeEntries(Broker destination, String topic) {
         Collection<BridgingTableEntry> entries = bridgingTable.getAll().stream()
-                .filter(e -> Objects.equals(e.getSource(), destination.getId()))
+                .filter(e -> Objects.equals(e.getDestination(), destination.getId()))
                 .filter(e -> Objects.equals(e.getTopic(), topic))
                 .collect(Collectors.toList());
 
