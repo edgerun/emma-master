@@ -49,8 +49,10 @@ public abstract class AbstractSocketHandler implements ChannelHandler<SocketChan
     }
 
     protected void doClose(SocketChannel channel, SelectionKey key) {
-        key.attach(null);
-        key.cancel();
+        if (key != null) {
+            key.attach(null);
+            key.cancel();
+        }
         IOUtils.close(channel);
     }
 
