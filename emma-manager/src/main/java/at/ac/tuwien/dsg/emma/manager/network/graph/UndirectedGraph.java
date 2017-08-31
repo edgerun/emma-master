@@ -1,10 +1,10 @@
 package at.ac.tuwien.dsg.emma.manager.network.graph;
 
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
 /**
@@ -15,7 +15,7 @@ public class UndirectedGraph<V, E> extends AbstractGraph<V, E> {
     private Map<AscendingPair<Node<V>>, Edge<V, E>> edges;
 
     public UndirectedGraph() {
-        this.edges = new HashMap<>();
+        this.edges = new ConcurrentHashMap<>();
     }
 
     @Override

@@ -63,8 +63,10 @@ public class NetworkManager {
     }
 
     public Link getLink(Host source, Host target) {
-        Edge<Host, Link> edge = getEdge(source, target);
-        return edge != null ? edge.getValue() : null;
+        synchronized (network) {
+            Edge<Host, Link> edge = getEdge(source, target);
+            return edge != null ? edge.getValue() : null;
+        }
     }
 
     public void remove(Client info) {
@@ -100,7 +102,9 @@ public class NetworkManager {
     }
 
     public Network getNetwork() {
-        return network;
+        synchronized (network) {
+            return network;
+        }
     }
 
     private void onUpdate() {

@@ -1,19 +1,20 @@
 package at.ac.tuwien.dsg.emma.manager.network.graph;
 
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.Iterator;
+import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * AbstractGraph.
  */
 public abstract class AbstractGraph<V, E> implements Graph<V, E> {
 
-    protected HashMap<String, Node<V>> nodes;
+    protected Map<String, Node<V>> nodes;
 
     public AbstractGraph() {
-        this.nodes = new HashMap<>();
+        this.nodes = new ConcurrentHashMap<>();
     }
 
     @Override
