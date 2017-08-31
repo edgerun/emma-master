@@ -24,70 +24,62 @@ public class ControlMessageWriter {
      * @param msg the message to write
      * @throws IOException if an IO error occurs
      */
-    public void writeControlMessage(GatheringByteChannel channel, ControlMessage msg) throws IOException {
+    public long writeControlMessage(GatheringByteChannel channel, ControlMessage msg) throws IOException {
         switch (msg.getControlPacketType()) {
             case CONNECT:
-                write(channel, (ConnectMessage) msg);
-                return;
+                return write(channel, (ConnectMessage) msg);
             case CONNACK:
-                write(channel, (ConnackMessage) msg);
-                return;
+                return write(channel, (ConnackMessage) msg);
             case PUBLISH:
-                write(channel, (PublishMessage) msg);
-                return;
+                return write(channel, (PublishMessage) msg);
             case SUBSCRIBE:
-                write(channel, (SubscribeMessage) msg);
-                return;
+                return write(channel, (SubscribeMessage) msg);
             case UNSUBSCRIBE:
-                write(channel, (UnsubscribeMessage) msg);
-                return;
+                return write(channel, (UnsubscribeMessage) msg);
             case SUBACK:
-                write(channel, (SubackMessage) msg);
-                return;
+                return write(channel, (SubackMessage) msg);
             case PINGREQ:
             case PINGRESP:
             case DISCONNECT:
-                write(channel, (SimpleMessage) msg);
-                return;
+                return write(channel, (SimpleMessage) msg);
             case PUBACK:
             case PUBREC:
             case PUBREL:
             case PUBCOMP:
             case UNSUBACK:
-                write(channel, (PacketIdentifierMessage) msg);
-                return;
+                return write(channel, (PacketIdentifierMessage) msg);
             default:
                 throw new IllegalArgumentException("Unhandled packet type " + msg.getControlPacketType());
         }
     }
 
-    public void write(GatheringByteChannel channel, ConnectMessage msg) throws IOException {
+    public long write(GatheringByteChannel channel, ConnectMessage msg) throws IOException {
         ByteBuffer head = smallBuffer.getClean();
         ByteBuffer data = dataBuffer.getClean();
 
         put(head, data, msg);
 
-        write(channel, head, data);
+        return write(channel, head, data);
     }
 
-    public void write(GatheringByteChannel channel, PublishMessage msg) throws IOException {
+    public long write(GatheringByteChannel channel, PublishMessage msg) throws IOException {
         ByteBuffer header = smallBuffer.getClean();
         ByteBuffer data = dataBuffer.getClean(); // required len = msg.getPayload().length + msg.getTopic().length() + 4
 
         put(header, data, msg);
 
-        write(channel, header, data);
+        return write(channel, header, data);
     }
 
-    public void write(WritableByteChannel channel, PacketIdentifierMessage msg) throws IOException {
+    public long write(WritableByteChannel channel, PacketIdentifierMessage msg) throws IOException {
         ByteBuffer buf = smallBuffer.getClean();
 
         put(buf, msg);
 
-        write(channel, buf);
+        return write(channel, buf);
     }
 
-    public void write(WritableByteChannel channel, ConnackMessage msg) throws IOException {
+    public long write(WritableByteChannel channel, ConnackMessage msg) throws IOException {
         ByteBuffer buf = smallBuffer.getClean();
 
         buf.put(msg.getControlPacketType().toHeader());
@@ -95,61 +87,55 @@ public class ControlMessageWriter {
         buf.put((byte) (msg.isSessionPresent() ? 1 : 0));
         buf.put((byte) msg.getReturnCode().ordinal());
 
-        write(channel, buf);
+        return write(channel, buf);
     }
 
-    public void write(WritableByteChannel channel, SimpleMessage msg) throws IOException {
+    public long write(WritableByteChannel channel, SimpleMessage msg) throws IOException {
         ByteBuffer buf = smallBuffer.getClean();
 
         buf.put(msg.getControlPacketType().toHeader());
         buf.put((byte) 0);
 
-        write(channel, buf);
+        return write(channel, buf);
     }
 
-    public void write(GatheringByteChannel channel, SubscribeMessage msg) throws IOException {
+    public long write(GatheringByteChannel channel, SubscribeMessage msg) throws IOException {
         ByteBuffer head = smallBuffer.getClean();
         ByteBuffer data = dataBuffer.getClean(); // FIXME
 
         put(head, data, msg);
 
-        write(channel, head, data);
+        return write(channel, head, data);
     }
 
-    public void write(GatheringByteChannel channel, SubackMessage msg) throws IOException {
+    public long write(GatheringByteChannel channel, SubackMessage msg) throws IOException {
         ByteBuffer head = smallBuffer.getClean();
         ByteBuffer data = dataBuffer.getClean(); // packet id + return codes 2 + msg.getFilterQos().length
 
         put(head, data, msg);
 
-        write(channel, head, data);
+        return write(channel, head, data);
     }
 
-    public void write(GatheringByteChannel channel, UnsubscribeMessage msg) throws IOException {
+    public long write(GatheringByteChannel channel, UnsubscribeMessage msg) throws IOException {
         ByteBuffer head = smallBuffer.getClean();
         ByteBuffer data = dataBuffer.getClean(); // FIXME
 
         put(head, data, msg);
 
-        write(channel, head, data);
+        return write(channel, head, data);
     }
 
-    private void write(WritableByteChannel channel, ByteBuffer buf) throws IOException {
+    private long write(WritableByteChannel channel, ByteBuffer buf) throws IOException {
         buf.flip();
-        channel.write(buf);
+        return channel.write(buf);
     }
 
-    private void write(GatheringByteChannel channel, ByteBuffer head, ByteBuffer data) throws IOException {
+    private long write(GatheringByteChannel channel, ByteBuffer head, ByteBuffer data) throws IOException {
         head.flip();
         data.flip();
 
-        long expected = head.remaining() + data.remaining();
-        long actual = channel.write(new ByteBuffer[]{head, data});
-
-        if (expected != actual) {
-            throw new IOException("Did not write correct amount of bytes, expected: " + expected + ", actual: " + actual);
-        }
-
+        return channel.write(new ByteBuffer[]{head, data});
     }
 
     // TODO
