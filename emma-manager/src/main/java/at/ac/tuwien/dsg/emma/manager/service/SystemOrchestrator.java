@@ -34,16 +34,12 @@ import at.ac.tuwien.dsg.emma.manager.service.sub.Subscription;
 import at.ac.tuwien.dsg.emma.manager.service.sub.SubscriptionTable;
 
 @Component
-@Async
 public class SystemOrchestrator {
 
     private static final Logger LOG = LoggerFactory.getLogger(SystemOrchestrator.class);
 
     @Autowired
     private BrokerRepository brokerRepository;
-
-    @Autowired
-    private ClientRepository clientRepository;
 
     @Autowired
     private NetworkManager networkManager;
@@ -103,6 +99,7 @@ public class SystemOrchestrator {
     }
 
     @EventListener
+    @Async
     void onEvent(LatencyUpdateEvent event) {
         LOG.debug("Latency update received, updating link information {}", event);
 
@@ -118,18 +115,21 @@ public class SystemOrchestrator {
     }
 
     @EventListener
+    @Async
     void onEvent(ClientRegisterEvent event) {
         LOG.info("Client registered {}", event.getHost());
         networkManager.add(event.getHost());
     }
 
     @EventListener
+    @Async
     void onEvent(ClientDeregisterEvent event) {
         LOG.info("Client dergistered {}", event.getHost());
         networkManager.remove(event.getHost());
     }
 
     @EventListener
+    @Async
     void onEvent(ClientConnectEvent event) {
         if (LOG.isDebugEnabled()) {
             LOG.debug("Updating client connection {} -> {}", event.getClient(), event.getBroker());
