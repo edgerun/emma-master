@@ -8,6 +8,7 @@ import java.io.UnsupportedEncodingException;
 import java.net.URL;
 import java.nio.ByteBuffer;
 import java.nio.channels.SelectionKey;
+import java.nio.channels.SocketChannel;
 import java.util.Scanner;
 
 /**
@@ -21,6 +22,24 @@ public final class IOUtils {
         // util class
     }
 
+    public static boolean isConnectionReset(IOException e) {
+        String message = e.getMessage();
+        return message != null && message.equals("Connection reset by peer");
+    }
+
+    public static boolean isConnectionReset(UncheckedIOException e) {
+        return isConnectionReset(e.getCause());
+    }
+
+    public static boolean isBrokenPipe(IOException e) {
+        String message = e.getMessage();
+        return message != null && message.equals("Broken pipe");
+    }
+
+    public static boolean isBrokenPipe(UncheckedIOException e) {
+        return isBrokenPipe(e.getCause());
+    }
+
     public static String read(URL url) throws IOException {
         try (InputStream in = url.openStream()) {
             return read(in);
@@ -29,6 +48,29 @@ public final class IOUtils {
 
     public static String read(InputStream stream) {
         return new Scanner(stream, "UTF-8").useDelimiter("\\A").next();
+    }
+
+    public static void cancel(SelectionKey key) {
+        if (key != null) {
+            key.cancel();
+            key.attach(null);
+        }
+    }
+
+    public static void shutdown(SocketChannel channel) {
+        if (channel == null) {
+            return;
+        }
+        if (!channel.isOpen()) {
+            return;
+        }
+
+        try {
+            channel.shutdownInput();
+            channel.shutdownOutput();
+        } catch (IOException e) {
+            // swallow
+        }
     }
 
     public static void close(Closeable closeable) {

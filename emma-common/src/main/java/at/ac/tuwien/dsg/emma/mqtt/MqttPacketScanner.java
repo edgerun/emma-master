@@ -26,6 +26,15 @@ public class MqttPacketScanner {
         reset();
     }
 
+    public void copyState(MqttPacketScanner scanner) {
+        bHeader = scanner.bHeader;
+        remLen = scanner.remLen;
+        bData = scanner.bData;
+        hasHeader = scanner.hasHeader;
+        hasRemLen = scanner.hasRemLen;
+        varReadPos = scanner.varReadPos;
+    }
+
     public void read(ByteBuffer buffer) {
         while (buffer.hasRemaining()) { // make sure to fully drain the buffer
             if (!hasHeader) {
@@ -47,7 +56,7 @@ public class MqttPacketScanner {
                     onPacketReceive();
                     continue;
                 } else {
-                    bData = ByteBuffer.allocate(remLen); // FIXME avoid allocation on each message
+                    bData = ByteBuffer.allocate(remLen);
                 }
             }
 

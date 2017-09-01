@@ -3,6 +3,8 @@ package at.ac.tuwien.dsg.emma.io;
 import java.nio.channels.SelectionKey;
 import java.nio.channels.SocketChannel;
 
+import at.ac.tuwien.dsg.emma.util.IOUtils;
+
 /**
  * StatefulSocketHandler.
  */
@@ -27,9 +29,12 @@ public abstract class StatefulSocketHandler extends AbstractSocketHandler {
         return key;
     }
 
+    public void shutdown() {
+        IOUtils.shutdown(channel);
+    }
+
     @Override
-    protected void doClose(SocketChannel channel, SelectionKey key) {
-        super.doClose(channel, key);
+    protected void cleanup(SocketChannel channel, SelectionKey key) {
         this.channel = null;
         this.key = null;
     }

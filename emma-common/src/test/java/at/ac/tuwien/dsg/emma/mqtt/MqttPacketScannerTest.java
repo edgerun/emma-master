@@ -80,4 +80,47 @@ public class MqttPacketScannerTest {
         scanner.read(p1);
         scanner.read(p2);
     }
+
+    @Test
+    public void copyFragmentedState() throws Exception {
+        byte[] packet = new byte[]{
+                16, 29, 0, 6, 77, 81, 73, 115, 100, 112, 3, 2, 0, 60, 0, 15, 112, 114, 111, 120, 121, 95, 99, 108, 105, 101, 110, 116, 95, 48, 50
+        };
+
+        byte[] frag1 = new byte[]{16, 29, 0, 6, 77, 81, 73, 115};
+        byte[] frag2 = new byte[]{100, 112, 3, 2, 0, 60, 0, 15, 112, 114, 111, 120};
+        byte[] frag3 = new byte[]{121, 95, 99, 108, 105, 101, 110, 116, 95, 48, 50, /* next packet */
+                ControlPacketType.DISCONNECT.toHeader(),
+                0
+        };
+
+        ByteBuffer buf1 = ByteBuffer.wrap(frag1);
+        ByteBuffer buf2 = ByteBuffer.wrap(frag2);
+        ByteBuffer buf3 = ByteBuffer.wrap(frag3);
+
+        List<MqttPacket> packets = new ArrayList<>();
+
+        MqttPacketScanner scanner = new MqttPacketScanner(p -> {
+            System.out.println("Got packet " + p);
+            packets.add(p);
+        });
+
+        MqttPacketScanner nextScanner = new MqttPacketScanner(p -> {
+            System.out.println("Got packet in next " + p);
+            packets.add(p);
+        });
+
+        scanner.read(buf1);
+        scanner.read(buf2);
+
+        nextScanner.copyState(scanner);
+
+        nextScanner.read(buf3);
+
+        assertEquals(2, packets.size());
+
+        assertArrayEquals(packet, packets.get(0).asBuffer().array());
+        assertArrayEquals(new byte[]{ControlPacketType.DISCONNECT.toHeader(), 0}, packets.get(1).asBuffer().array());
+
+    }
 }

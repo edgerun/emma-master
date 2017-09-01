@@ -18,7 +18,7 @@ public class ControlMessageWriter {
     private static ThreadLocalBuffer dataBuffer = ThreadLocalBuffer.create(1024 * 10); // FIXME
 
     /**
-     * Generic method that casts the message type mased on the {@code ControlPacketType}.
+     * Generic method that casts the message type based on the {@code ControlPacketType}.
      *
      * @param channel the channel to write into
      * @param msg the message to write
@@ -135,7 +135,14 @@ public class ControlMessageWriter {
         head.flip();
         data.flip();
 
-        return channel.write(new ByteBuffer[]{head, data});
+        long expected = head.remaining() + data.remaining();
+        long actual = channel.write(new ByteBuffer[]{head, data});
+
+        if(expected != actual) {
+            System.err.printf("Error writing packet to %s: expected = %d, actual = %d", channel, expected, actual);
+        }
+
+        return actual;
     }
 
     // TODO

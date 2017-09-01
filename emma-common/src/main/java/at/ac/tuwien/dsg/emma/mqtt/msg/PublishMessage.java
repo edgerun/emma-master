@@ -19,6 +19,15 @@ public class PublishMessage implements ControlMessage {
     // payload
     private byte[] payload;
 
+    public PublishMessage() {
+
+    }
+
+    public PublishMessage(String topic, byte[] payload) {
+        this.topic = topic;
+        this.payload = payload;
+    }
+
     public boolean isRetain() {
         return retain;
     }

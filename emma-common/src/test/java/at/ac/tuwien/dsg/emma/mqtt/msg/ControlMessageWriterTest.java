@@ -12,9 +12,9 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 
+import at.ac.tuwien.dsg.emma.io.Decode;
 import at.ac.tuwien.dsg.emma.mqtt.ConnectFlags;
 import at.ac.tuwien.dsg.emma.mqtt.ControlPacketType;
-import at.ac.tuwien.dsg.emma.io.Decode;
 
 /**
  * ControlMessageWriterTest.
@@ -101,7 +101,7 @@ public class ControlMessageWriterTest {
         assertEquals(false, actual.hasRemaining());
     }
 
-//    @Test
+    //    @Test
     //    public void connectIntegrationTest() throws Exception {
     //        MqttPacketScanner scanner = new MqttPacketScanner(packet -> {
     //            System.out.println("Received packet " + packet);
