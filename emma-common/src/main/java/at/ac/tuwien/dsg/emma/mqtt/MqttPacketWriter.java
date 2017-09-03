@@ -7,6 +7,7 @@ import java.util.Objects;
 
 import at.ac.tuwien.dsg.emma.io.Encode;
 import at.ac.tuwien.dsg.emma.io.ThreadLocalBuffer;
+import at.ac.tuwien.dsg.emma.util.IOUtils;
 
 /**
  * MqttPacketWriter.
@@ -14,8 +15,9 @@ import at.ac.tuwien.dsg.emma.io.ThreadLocalBuffer;
 public class MqttPacketWriter {
 
     private static ThreadLocalBuffer header = ThreadLocalBuffer.create(8);
+    private static ThreadLocal<ByteBuffer> remaining = new ThreadLocal<>();
 
-    public long write(GatheringByteChannel channel, MqttPacket packet) throws IOException {
+    public boolean write(GatheringByteChannel channel, MqttPacket packet) throws IOException {
         Objects.requireNonNull(channel);
 
         ByteBuffer hBuf = header.getClean();
@@ -25,11 +27,29 @@ public class MqttPacketWriter {
 
         byte[] data = packet.getData();
 
+        long expected = hBuf.remaining();
+        long actual = 0;
+        ByteBuffer remBuf = null;
+
         if (data != null && data.length > 0) {
-            return channel.write(new ByteBuffer[]{hBuf, ByteBuffer.wrap(data)});
+            expected += data.length;
+            ByteBuffer[] buffers = {hBuf, ByteBuffer.wrap(data)};
+            actual = channel.write(buffers);
+            remBuf = IOUtils.copyRemaining(buffers);
         } else {
-            return channel.write(hBuf);
+            actual = channel.write(hBuf);
+            remBuf = IOUtils.copyRemaining(hBuf);
         }
 
+        if (expected != actual) {
+            remaining.set(remBuf);
+            return false;
+        } else {
+            return true;
+        }
+    }
+
+    public ByteBuffer getRemaining() {
+        return remaining.get();
     }
 }

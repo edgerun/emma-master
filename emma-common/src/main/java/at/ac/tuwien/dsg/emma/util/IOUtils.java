@@ -89,6 +89,32 @@ public final class IOUtils {
         }
     }
 
+    public static ByteBuffer copyRemaining(ByteBuffer original) {
+        ByteBuffer buf = ByteBuffer.allocate(original.remaining());
+        original.mark();
+        buf.put(original);
+        original.reset();
+        buf.flip();
+        return buf;
+    }
+
+    public static ByteBuffer copyRemaining(ByteBuffer[] originals) {
+        int remaining = 0;
+        for (ByteBuffer original : originals) {
+            remaining += original.remaining();
+        }
+        ByteBuffer copy = ByteBuffer.allocate(remaining);
+
+        for (ByteBuffer original : originals) {
+            original.mark();
+            copy.put(original);
+            original.reset();
+        }
+
+        copy.flip();
+        return copy;
+    }
+
     public static String toString(ByteBuffer buf) {
         byte[] bytes = new byte[buf.remaining()];
 

@@ -8,6 +8,7 @@ import java.util.List;
 
 import at.ac.tuwien.dsg.emma.io.Encode;
 import at.ac.tuwien.dsg.emma.io.ThreadLocalBuffer;
+import at.ac.tuwien.dsg.emma.util.IOUtils;
 
 /**
  * ControlMessageWriter.
@@ -18,13 +19,21 @@ public class ControlMessageWriter {
     private static ThreadLocalBuffer dataBuffer = ThreadLocalBuffer.create(1024 * 10); // FIXME
 
     /**
-     * Generic method that casts the message type based on the {@code ControlPacketType}.
+     * Holds a copy of the remaining bytes of the last partial write. The idea is that most of the time, packets will be
+     * completely written to the buffer, and we only need this in special cases.
+     */
+    private static ThreadLocal<ByteBuffer> remaining = new ThreadLocal<>();
+
+    /**
+     * Generic method that casts the message type based on the {@code ControlPacketType}. The remainder of partial
+     * writes is stored in a thread local and can be accessed via {@link #getRemaining()}}.
      *
      * @param channel the channel to write into
      * @param msg the message to write
+     * @return whether or not the message was fully written
      * @throws IOException if an IO error occurs
      */
-    public long writeControlMessage(GatheringByteChannel channel, ControlMessage msg) throws IOException {
+    public boolean writeControlMessage(GatheringByteChannel channel, ControlMessage msg) throws IOException {
         switch (msg.getControlPacketType()) {
             case CONNECT:
                 return write(channel, (ConnectMessage) msg);
@@ -53,7 +62,7 @@ public class ControlMessageWriter {
         }
     }
 
-    public long write(GatheringByteChannel channel, ConnectMessage msg) throws IOException {
+    public boolean write(GatheringByteChannel channel, ConnectMessage msg) throws IOException {
         ByteBuffer head = smallBuffer.getClean();
         ByteBuffer data = dataBuffer.getClean();
 
@@ -62,7 +71,7 @@ public class ControlMessageWriter {
         return write(channel, head, data);
     }
 
-    public long write(GatheringByteChannel channel, PublishMessage msg) throws IOException {
+    public boolean write(GatheringByteChannel channel, PublishMessage msg) throws IOException {
         ByteBuffer header = smallBuffer.getClean();
         ByteBuffer data = dataBuffer.getClean(); // required len = msg.getPayload().length + msg.getTopic().length() + 4
 
@@ -71,7 +80,7 @@ public class ControlMessageWriter {
         return write(channel, header, data);
     }
 
-    public long write(WritableByteChannel channel, PacketIdentifierMessage msg) throws IOException {
+    public boolean write(WritableByteChannel channel, PacketIdentifierMessage msg) throws IOException {
         ByteBuffer buf = smallBuffer.getClean();
 
         put(buf, msg);
@@ -79,7 +88,7 @@ public class ControlMessageWriter {
         return write(channel, buf);
     }
 
-    public long write(WritableByteChannel channel, ConnackMessage msg) throws IOException {
+    public boolean write(WritableByteChannel channel, ConnackMessage msg) throws IOException {
         ByteBuffer buf = smallBuffer.getClean();
 
         buf.put(msg.getControlPacketType().toHeader());
@@ -90,7 +99,7 @@ public class ControlMessageWriter {
         return write(channel, buf);
     }
 
-    public long write(WritableByteChannel channel, SimpleMessage msg) throws IOException {
+    public boolean write(WritableByteChannel channel, SimpleMessage msg) throws IOException {
         ByteBuffer buf = smallBuffer.getClean();
 
         buf.put(msg.getControlPacketType().toHeader());
@@ -99,7 +108,7 @@ public class ControlMessageWriter {
         return write(channel, buf);
     }
 
-    public long write(GatheringByteChannel channel, SubscribeMessage msg) throws IOException {
+    public boolean write(GatheringByteChannel channel, SubscribeMessage msg) throws IOException {
         ByteBuffer head = smallBuffer.getClean();
         ByteBuffer data = dataBuffer.getClean(); // FIXME
 
@@ -108,7 +117,7 @@ public class ControlMessageWriter {
         return write(channel, head, data);
     }
 
-    public long write(GatheringByteChannel channel, SubackMessage msg) throws IOException {
+    public boolean write(GatheringByteChannel channel, SubackMessage msg) throws IOException {
         ByteBuffer head = smallBuffer.getClean();
         ByteBuffer data = dataBuffer.getClean(); // packet id + return codes 2 + msg.getFilterQos().length
 
@@ -117,7 +126,7 @@ public class ControlMessageWriter {
         return write(channel, head, data);
     }
 
-    public long write(GatheringByteChannel channel, UnsubscribeMessage msg) throws IOException {
+    public boolean write(GatheringByteChannel channel, UnsubscribeMessage msg) throws IOException {
         ByteBuffer head = smallBuffer.getClean();
         ByteBuffer data = dataBuffer.getClean(); // FIXME
 
@@ -126,23 +135,38 @@ public class ControlMessageWriter {
         return write(channel, head, data);
     }
 
-    private long write(WritableByteChannel channel, ByteBuffer buf) throws IOException {
+    private boolean write(WritableByteChannel channel, ByteBuffer buf) throws IOException {
         buf.flip();
-        return channel.write(buf);
+        long expected = buf.remaining();
+        long actual = channel.write(buf);
+
+        if (expected != actual) {
+            remaining.set(IOUtils.copyRemaining(buf));
+            return false;
+        }
+
+        return true;
     }
 
-    private long write(GatheringByteChannel channel, ByteBuffer head, ByteBuffer data) throws IOException {
+    private boolean write(GatheringByteChannel channel, ByteBuffer head, ByteBuffer data) throws IOException {
         head.flip();
         data.flip();
 
         long expected = head.remaining() + data.remaining();
-        long actual = channel.write(new ByteBuffer[]{head, data});
+        ByteBuffer[] srcs = {head, data};
+        long actual = channel.write(srcs);
 
-        if(expected != actual) {
+        if (expected != actual) {
             System.err.printf("Error writing packet to %s: expected = %d, actual = %d", channel, expected, actual);
+            remaining.set(IOUtils.copyRemaining(srcs));
+            return false;
         }
 
-        return actual;
+        return true;
+    }
+
+    public ByteBuffer getRemaining() {
+        return remaining.get();
     }
 
     // TODO
