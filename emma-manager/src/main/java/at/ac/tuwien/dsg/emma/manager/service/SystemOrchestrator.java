@@ -27,7 +27,6 @@ import at.ac.tuwien.dsg.emma.manager.event.UnsubscribeEvent;
 import at.ac.tuwien.dsg.emma.manager.model.Broker;
 import at.ac.tuwien.dsg.emma.manager.model.BrokerRepository;
 import at.ac.tuwien.dsg.emma.manager.model.Client;
-import at.ac.tuwien.dsg.emma.manager.model.ClientRepository;
 import at.ac.tuwien.dsg.emma.manager.network.Link;
 import at.ac.tuwien.dsg.emma.manager.network.NetworkManager;
 import at.ac.tuwien.dsg.emma.manager.service.sub.Subscription;
@@ -57,16 +56,20 @@ public class SystemOrchestrator {
     void onEvent(BrokerConnectEvent event) {
         LOG.info("Broker connected {}", event);
 
-        networkManager.add(event.getHost());
+        Broker broker = event.getHost();
+        networkManager.add(broker);
 
         for (Broker brokerInfo : brokerRepository.getHosts().values()) {
             // TODO: this is questionable
-            if (brokerInfo == event.getHost()) {
+            if (brokerInfo == broker) {
                 continue;
             }
 
-            monitoringService.pingRequest(event.getHost(), brokerInfo);
+            monitoringService.pingRequest(broker, brokerInfo);
         }
+        addBridgingEntries(broker);
+
+
     }
 
     @EventListener
@@ -182,6 +185,16 @@ public class SystemOrchestrator {
         }
 
         bridgingTable.insert(entries);
+        debugBridgingTable();
+    }
+
+    private void addBridgingEntries(Broker source) {
+        // connect the newly connected broker as a source for all existing subscriptions
+        List<BridgingTableEntry> collect = subscriptionTable.getSubscriptions()
+                .stream()
+                .map(sub -> new BridgingTableEntry(sub.getFilter(), source.getId(), sub.getBroker().getId()))
+                .collect(Collectors.toList());
+        bridgingTable.insert(collect);
         debugBridgingTable();
     }
 
