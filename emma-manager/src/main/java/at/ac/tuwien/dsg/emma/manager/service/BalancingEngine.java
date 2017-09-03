@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 import at.ac.tuwien.dsg.emma.manager.network.NetworkManager;
 import at.ac.tuwien.dsg.emma.manager.network.balancing.BalancingOperation;
 import at.ac.tuwien.dsg.emma.manager.network.balancing.BalancingStrategy;
+import at.ac.tuwien.dsg.emma.util.Concurrent;
 
 @Service
 public class BalancingEngine {
@@ -21,7 +22,7 @@ public class BalancingEngine {
     private MonitoringService monitoringService;
     private BalancingStrategy balancingStrategy;
 
-    @Scheduled(fixedDelay = 30000) // will never be executed in parallel
+    @Scheduled(fixedDelay = 15000) // will never be executed in parallel
     public void scheduled() {
         if (LOG.isTraceEnabled()) {
             LOG.trace("Scheduled reconnect run");
@@ -31,6 +32,7 @@ public class BalancingEngine {
 
         for (BalancingOperation operation : operations) {
             monitoringService.reconnect(operation.getClient(), operation.getTarget());
+            Concurrent.sleep(5); // FIXME hacky
         }
     }
 
