@@ -1,5 +1,7 @@
 package at.ac.tuwien.dsg.emma.monitoring.msg;
 
+import java.net.InetAddress;
+
 import at.ac.tuwien.dsg.emma.monitoring.MonitoringPacketType;
 
 /**
@@ -9,7 +11,7 @@ public class PingReqMessage extends AbstractMonitoringMessage {
 
     private int requestId;
 
-    private String targetHost;
+    private InetAddress targetHost;
     private int targetPort;
 
     public PingReqMessage() {
@@ -28,11 +30,11 @@ public class PingReqMessage extends AbstractMonitoringMessage {
         this.requestId = requestId;
     }
 
-    public String getTargetHost() {
+    public InetAddress getTargetHost() {
         return targetHost;
     }
 
-    public void setTargetHost(String targetHost) {
+    public void setTargetHost(InetAddress targetHost) {
         this.targetHost = targetHost;
     }
 

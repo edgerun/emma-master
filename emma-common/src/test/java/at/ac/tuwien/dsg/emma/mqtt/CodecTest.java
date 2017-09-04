@@ -6,11 +6,15 @@ import static at.ac.tuwien.dsg.emma.io.Encode.writeLengthEncodedString;
 import static at.ac.tuwien.dsg.emma.io.Encode.writeVariableInt;
 import static org.junit.Assert.assertEquals;
 
+import java.net.InetAddress;
 import java.nio.ByteBuffer;
 import java.nio.channels.ByteChannel;
 import java.util.Arrays;
 
 import org.junit.Test;
+
+import at.ac.tuwien.dsg.emma.io.Decode;
+import at.ac.tuwien.dsg.emma.io.Encode;
 
 /**
  * CodecTest.
@@ -83,6 +87,24 @@ public class CodecTest {
 
         System.out.println(Arrays.toString(trans.array()));
 
+    }
+
+    @Test
+    public void readInetAddress() throws Exception {
+
+        InetAddress address = InetAddress.getByAddress(new byte[]{127, 0, 0, 1});
+
+        ByteBuffer buf = ByteBuffer.allocate(64);
+
+        Encode.writeInetAddress(buf, address);
+
+        buf.flip();
+        assertEquals(4, buf.remaining());
+
+
+        InetAddress actual = Decode.readInetAddress(buf);
+
+        assertEquals("127.0.0.1", actual.getHostAddress());
     }
 
 }

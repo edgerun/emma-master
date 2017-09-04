@@ -1,5 +1,6 @@
 package at.ac.tuwien.dsg.emma.io;
 
+import java.net.InetAddress;
 import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
 
@@ -53,6 +54,10 @@ public final class Encode {
 
         } while (i > 0);
 
+    }
+
+    public static void writeInetAddress(ByteBuffer buf, InetAddress address) {
+        buf.put(address.getAddress());
     }
 
     private Encode() {

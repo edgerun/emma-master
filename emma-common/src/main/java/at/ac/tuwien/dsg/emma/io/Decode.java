@@ -1,5 +1,7 @@
 package at.ac.tuwien.dsg.emma.io;
 
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
 
@@ -42,6 +44,18 @@ public final class Decode {
         buf.get(str);
 
         return new String(str, UTF8);
+    }
+
+    public static InetAddress readInetAddress(ByteBuffer buf) {
+        byte[] addr = new byte[4];
+
+        buf.get(addr);
+
+        try {
+            return InetAddress.getByAddress(addr);
+        } catch (UnknownHostException e) {
+            throw new IllegalArgumentException(e);
+        }
     }
 
     private Decode() {

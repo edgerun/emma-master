@@ -150,7 +150,7 @@ public class MonitoringService implements InitializingBean, DisposableBean {
 
         message.setSource(monitoringLoop.getBindAddress());
         message.setDestination(source);
-        message.setTargetHost(target.getHostString());
+        message.setTargetHost(target.getAddress());
         message.setTargetPort(target.getPort());
 
         if (LOG.isTraceEnabled()) {

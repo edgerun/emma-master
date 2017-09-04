@@ -51,7 +51,7 @@ public class MonitoringMessageWriter {
     public void write(ByteBuffer buf, PingReqMessage message) {
         buf.put(message.getMonitoringPacketType().toHeader());
         buf.putInt(message.getRequestId());
-        Encode.writeLengthEncodedString(buf, message.getTargetHost());
+        Encode.writeInetAddress(buf, message.getTargetHost());
         buf.putInt(message.getTargetPort());
     }
 

@@ -1,5 +1,6 @@
 package at.ac.tuwien.dsg.emma.monitoring.msg;
 
+import java.net.InetAddress;
 import java.nio.ByteBuffer;
 
 import at.ac.tuwien.dsg.emma.io.Decode;
@@ -61,7 +62,8 @@ public class MonitoringMessageReader {
 
     private PingReqMessage readPingReqMessage(ByteBuffer buffer) {
         int id = buffer.getInt();
-        String targetHost = Decode.readLengthEncodedString(buffer);
+
+        InetAddress targetHost = Decode.readInetAddress(buffer);
         int targetPort = buffer.getInt();
 
         PingReqMessage msg = new PingReqMessage(id);
