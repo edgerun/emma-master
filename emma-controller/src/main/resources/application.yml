@@ -1,0 +1,15 @@
+logging.level:
+  org.springframework: INFO
+  at.ac.tuwien.dsg.emma: DEBUG
+
+emma.controller:
+  address: 0
+  heartbeat:
+    port: 60042
+  monitoring:
+    port: 60043
+  shell:
+    port: 50042
+  redis:
+    host: localhost
+    port: 6379
