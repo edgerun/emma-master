@@ -4,17 +4,22 @@ import at.ac.tuwien.dsg.emma.control.ControlPacketType;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 
+import java.nio.charset.Charset;
+
 public class RegisterResponseMessage implements ControlMessage {
     public enum RegisterError {
         ALREADY_REGISTERED
     }
 
-    public static final RegisterResponseMessage SUCCESS = new RegisterResponseMessage(null);
     public static final RegisterResponseMessage ERROR_ALREADY_REGISTERED = new RegisterResponseMessage(RegisterError.ALREADY_REGISTERED);
     private RegisterError error;
+    private String id;
 
     private RegisterResponseMessage(RegisterError error) {
         this.error = error;
+    }
+    public RegisterResponseMessage(String id) {
+        this.id = id;
     }
 
     @Override
@@ -25,7 +30,10 @@ public class RegisterResponseMessage implements ControlMessage {
     @Override
     public void writeToBuffer(ByteBuf buffer) {
         buffer.writeByte(isSuccess() ? 1 : 0);
-        if (error != null) {
+        if (error == null) {
+            buffer.writeInt(id.length());
+            buffer.writeCharSequence(id, Charset.forName("UTF-8"));
+        } else {
             buffer.writeByte(error.ordinal());
         }
     }
@@ -36,6 +44,10 @@ public class RegisterResponseMessage implements ControlMessage {
 
     public RegisterError getError() {
         return error;
+    }
+
+    public String getId() {
+        return id;
     }
 
     @Override
@@ -49,6 +61,8 @@ public class RegisterResponseMessage implements ControlMessage {
             int ordinal = buffer.readByte();
             return new RegisterResponseMessage(RegisterError.values()[ordinal]);
         }
-        return RegisterResponseMessage.SUCCESS;
+        int idLength = buffer.readInt();
+        String id = buffer.readCharSequence(idLength, Charset.forName("UTF-8")).toString();
+        return new RegisterResponseMessage(id);
     }
 }

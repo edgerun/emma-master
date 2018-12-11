@@ -8,6 +8,8 @@ emma.controller:
     port: 60042
   monitoring:
     port: 60043
+  control:
+    port: 60044
   shell:
     port: 50042
   redis:

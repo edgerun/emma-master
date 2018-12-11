@@ -104,20 +104,26 @@ public class ControlPacketCodecTest {
 
     @Test
     public void encodes_register_response_success_packet() {
-        channel.writeOutbound(RegisterResponseMessage.SUCCESS);
+        String id = "id";
+        channel.writeOutbound(new RegisterResponseMessage(id));
         ByteBuf buffer = channel.readOutbound();
 
         assertThat("packet type", buffer.readByte(), is(equalTo((byte) ControlPacketType.REGISTER_RESPONSE.getId())));
-        assertThat("packet size", buffer.readInt(), is(equalTo(6)));
+        assertThat("packet size", buffer.readInt(), is(equalTo(12)));
         assertThat("success flag", buffer.readByte(), is(equalTo((byte) 1)));
+        assertThat("id length", buffer.readInt(), is(equalTo(2)));
+        assertThat("id", buffer.readCharSequence(id.length(), Charset.forName("UTF-8")), is(equalTo(id)));
         assertThat(buffer.isReadable(), is(false));
     }
 
     @Test
     public void decodes_register_response_success_packet() {
         // prepare payload
+        String id = "id";
         ByteBuf payload = channel.alloc().buffer(1);
         payload.writeByte(1);
+        payload.writeInt(2);
+        payload.writeCharSequence(id, Charset.forName("UTF-8"));
 
         // write packet and read object
         channel.writeInbound(assemblePacket(ControlPacketType.REGISTER_RESPONSE, payload));
@@ -125,6 +131,7 @@ public class ControlPacketCodecTest {
 
         // verify
         assertThat(message.isSuccess(), is(true));
+        assertThat(message.getId(), is(equalTo(id)));
     }
 
     @Test
