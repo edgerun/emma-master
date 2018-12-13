@@ -3,9 +3,11 @@ package at.ac.tuwien.dsg.emma.control;
 public enum ControlPacketType {
     RESERVED_0,
     REGISTER,
-    UNREGISTER,
     REGISTER_RESPONSE,
-    UNREGISTER_RESPONSE;
+    UNREGISTER,
+    UNREGISTER_RESPONSE,
+    GET_BROKER,
+    GET_BROKER_RESPONSE;
 
     public int getId() {
         return ordinal();

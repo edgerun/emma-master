@@ -21,6 +21,16 @@ public class RegisterResponseMessage implements ControlMessage {
     public RegisterResponseMessage(String id) {
         this.id = id;
     }
+    RegisterResponseMessage(ByteBuf byteBuf) {
+        boolean success = byteBuf.readByte() == 1;
+        if (success) {
+            int idLength = byteBuf.readInt();
+            this.id = byteBuf.readCharSequence(idLength, Charset.forName("UTF-8")).toString();
+        } else {
+            int ordinal = byteBuf.readByte();
+            this.error = RegisterError.values()[ordinal];
+        }
+    }
 
     @Override
     public ControlPacketType getPacketType() {
@@ -53,16 +63,5 @@ public class RegisterResponseMessage implements ControlMessage {
     @Override
     public void callHandler(ControlMessageHandler handler, ChannelHandlerContext ctx) {
         handler.handleMessage(this, ctx);
-    }
-
-    static RegisterResponseMessage readFromBuffer(ByteBuf buffer) {
-        boolean success = buffer.readByte() == 1;
-        if (!success) {
-            int ordinal = buffer.readByte();
-            return new RegisterResponseMessage(RegisterError.values()[ordinal]);
-        }
-        int idLength = buffer.readInt();
-        String id = buffer.readCharSequence(idLength, Charset.forName("UTF-8")).toString();
-        return new RegisterResponseMessage(id);
     }
 }

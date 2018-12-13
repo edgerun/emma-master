@@ -22,6 +22,13 @@ public class RegisterMessage implements ControlMessage {
         this(nodeInfo.getHost(), nodeInfo.getPort(), nodeInfo.getMonitoringPort());
     }
 
+    RegisterMessage(ByteBuf byteBuf) {
+        int hostLength = byteBuf.readInt();
+        this.host = byteBuf.readCharSequence(hostLength, Charset.forName("UTF-8")).toString();
+        this.port = byteBuf.readInt();
+        this.monitoringPort = byteBuf.readInt();
+    }
+
     @Override
     public ControlPacketType getPacketType() {
         return ControlPacketType.REGISTER;
@@ -42,13 +49,5 @@ public class RegisterMessage implements ControlMessage {
 
     public NodeInfo toNodeInfo() {
         return new NodeInfo(host, port, monitoringPort);
-    }
-
-    static RegisterMessage readFromBuffer(ByteBuf byteBuf) {
-        int hostLength = byteBuf.readInt();
-        String host = byteBuf.readCharSequence(hostLength, Charset.forName("UTF-8")).toString();
-        int port = byteBuf.readInt();
-        int monitoringPort = byteBuf.readInt();
-        return new RegisterMessage(host, port, monitoringPort);
     }
 }

@@ -9,12 +9,23 @@ public class UnregisterResponseMessage implements ControlMessage {
         NO_REGISTRATION
     }
 
-    public static final UnregisterResponseMessage SUCCESS = new UnregisterResponseMessage(null);
+    public static final UnregisterResponseMessage SUCCESS = new UnregisterResponseMessage();
     public static final UnregisterResponseMessage ERROR_NO_REGISTRATION = new UnregisterResponseMessage(UnregisterError.NO_REGISTRATION);
     private UnregisterError error;
 
+    public UnregisterResponseMessage() {
+    }
+
     private UnregisterResponseMessage(UnregisterError error) {
         this.error = error;
+    }
+
+    UnregisterResponseMessage(ByteBuf byteBuf) {
+        boolean success = byteBuf.readByte() == 1;
+        if (!success) {
+            int ordinal = byteBuf.readByte();
+            this.error = UnregisterError.values()[ordinal];
+        }
     }
 
     @Override
@@ -41,14 +52,5 @@ public class UnregisterResponseMessage implements ControlMessage {
     @Override
     public void callHandler(ControlMessageHandler handler, ChannelHandlerContext ctx) {
         handler.handleMessage(this, ctx);
-    }
-
-    static UnregisterResponseMessage readFromBuffer(ByteBuf buffer) {
-        boolean success = buffer.readByte() == 1;
-        if (!success) {
-            int ordinal = buffer.readByte();
-            return new UnregisterResponseMessage(UnregisterError.values()[ordinal]);
-        }
-        return UnregisterResponseMessage.SUCCESS;
     }
 }

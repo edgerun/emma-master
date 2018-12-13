@@ -31,17 +31,25 @@ public class ControlPacketCodec extends ByteToMessageCodec<ControlMessage> {
             case RESERVED_0:
                 throw new CodecException("Cannot decode packet of type 0");
             case REGISTER:
-                list.add(RegisterMessage.readFromBuffer(byteBuf));
-                break;
-            case UNREGISTER:
-                list.add(UnregisterMessage.readFromBuffer(byteBuf));
+                list.add(new RegisterMessage(byteBuf));
                 break;
             case REGISTER_RESPONSE:
-                list.add(RegisterResponseMessage.readFromBuffer(byteBuf));
+                list.add(new RegisterResponseMessage(byteBuf));
+                break;
+            case UNREGISTER:
+                list.add(new UnregisterMessage(byteBuf));
                 break;
             case UNREGISTER_RESPONSE:
-                list.add(UnregisterResponseMessage.readFromBuffer(byteBuf));
+                list.add(new UnregisterResponseMessage(byteBuf));
                 break;
+            case GET_BROKER:
+                list.add(new GetBrokerMessage(byteBuf));
+                break;
+            case GET_BROKER_RESPONSE:
+                list.add(new GetBrokerResponseMessage(byteBuf));
+                break;
+            default:
+                throw new CodecException("Invalid packet type");
         }
     }
 }

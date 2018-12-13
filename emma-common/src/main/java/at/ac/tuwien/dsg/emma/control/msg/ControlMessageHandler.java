@@ -14,4 +14,10 @@ public interface ControlMessageHandler {
 
     default void handleMessage(UnregisterResponseMessage unregisterResponseMessage, ChannelHandlerContext ctx) {
     }
+
+    default void handleMessage(GetBrokerMessage getBrokerMessage, ChannelHandlerContext ctx) {
+    }
+
+    default void handleMessage(GetBrokerResponseMessage getBrokerMessage, ChannelHandlerContext ctx) {
+    }
 }

@@ -13,6 +13,11 @@ public class UnregisterMessage implements ControlMessage {
         this.id = id;
     }
 
+    UnregisterMessage(ByteBuf byteBuf) {
+        int idLength = byteBuf.readInt();
+        this.id = byteBuf.readCharSequence(idLength, Charset.forName("UTF-8")).toString();
+    }
+
     @Override
     public ControlPacketType getPacketType() {
         return ControlPacketType.UNREGISTER;
@@ -31,11 +36,5 @@ public class UnregisterMessage implements ControlMessage {
 
     public String getId() {
         return id;
-    }
-
-    static UnregisterMessage readFromBuffer(ByteBuf buffer) {
-        int idLength = buffer.readInt();
-        String id = buffer.readCharSequence(idLength, Charset.forName("UTF-8")).toString();
-        return new UnregisterMessage(id);
     }
 }
