@@ -1,14 +1,14 @@
 package at.ac.tuwien.dsg.emma.controller.control;
 
 import at.ac.tuwien.dsg.emma.NodeInfo;
-import at.ac.tuwien.dsg.emma.control.msg.RegisterMessage;
-import at.ac.tuwien.dsg.emma.control.msg.RegisterResponseMessage;
-import at.ac.tuwien.dsg.emma.control.msg.UnregisterMessage;
-import at.ac.tuwien.dsg.emma.control.msg.UnregisterResponseMessage;
+import at.ac.tuwien.dsg.emma.control.msg.*;
 import at.ac.tuwien.dsg.emma.controller.event.ClientDeregisterEvent;
 import at.ac.tuwien.dsg.emma.controller.event.ClientRegisterEvent;
+import at.ac.tuwien.dsg.emma.controller.model.Broker;
 import at.ac.tuwien.dsg.emma.controller.model.Client;
 import at.ac.tuwien.dsg.emma.controller.model.ClientRepository;
+import at.ac.tuwien.dsg.emma.controller.network.NetworkManager;
+import at.ac.tuwien.dsg.emma.controller.network.sel.BrokerSelectionStrategy;
 import io.netty.channel.embedded.EmbeddedChannel;
 import org.junit.Before;
 import org.junit.Test;
@@ -29,11 +29,16 @@ public class ControlServerHandlerTest {
     private ApplicationEventPublisher systemEvents;
     @MockBean
     private ClientRepository clientRepository;
+    @MockBean
+    private BrokerSelectionStrategy brokerSelectionStrategy;
+    @MockBean
+    private NetworkManager networkManager;
     private EmbeddedChannel channel;
 
     @Before
     public void setup() {
-        ControlServerHandler handler = new ControlServerHandler(systemEvents, clientRepository);
+        ControlServerHandler handler = new ControlServerHandler(systemEvents, clientRepository, brokerSelectionStrategy,
+                networkManager);
         channel = new EmbeddedChannel(new ControlServerInboundAdapter(handler));
     }
 
@@ -128,5 +133,55 @@ public class ControlServerHandlerTest {
         assertThat(responseMessage.getError(), is(equalTo(UnregisterResponseMessage.UnregisterError.NO_REGISTRATION)));
         verify(clientRepository).getById(id);
         verify(clientRepository, never()).remove(client);
+    }
+
+    @Test
+    public void handles_GetBrokerMessage_successfully() {
+        // setup
+        String id = "id";
+        Client client = new Client("client", 1234);
+        when(clientRepository.getById(id)).thenReturn(client);
+        Broker broker = new Broker("broker", 2345);
+        String brokerUri = "tcp://" + broker.getHost() + ":" + broker.getPort();
+        when(brokerSelectionStrategy.select(eq(client), any())).thenReturn(broker);
+
+        // exercise
+        channel.writeInbound(new GetBrokerMessage(id));
+        GetBrokerResponseMessage responseMessage = channel.readOutbound();
+
+        // verify
+        assertThat(responseMessage.isSuccess(), is(true));
+        assertThat(responseMessage.getBrokerUri(), is(equalTo(brokerUri)));
+    }
+
+    @Test
+    public void handles_GetBrokerMessage_error_unknown_gateway_id() {
+        // setup
+        String id = "id";
+
+        // exercise
+        channel.writeInbound(new GetBrokerMessage(id));
+        GetBrokerResponseMessage responseMessage = channel.readOutbound();
+
+        // verify
+        assertThat(responseMessage.getError(), is(equalTo(GetBrokerResponseMessage.GetBrokerError.UNKNOWN_GATEWAY_ID)));
+        assertThat(responseMessage.getBrokerUri(), is(nullValue()));
+    }
+
+    @Test
+    public void handles_GetBroker_Message_error_no_broker() {
+        // setup
+        String id = "id";
+        Client client = new Client("client", 1234);
+        when(clientRepository.getById(id)).thenReturn(client);
+        when(brokerSelectionStrategy.select(eq(client), any())).thenThrow(new IllegalStateException("No broker connected"));
+
+        // exercise
+        channel.writeInbound(new GetBrokerMessage(id));
+        GetBrokerResponseMessage responseMessage = channel.readOutbound();
+
+        // verify
+        assertThat(responseMessage.getError(), is(equalTo(GetBrokerResponseMessage.GetBrokerError.NO_BROKER_AVAILABLE)));
+        assertThat(responseMessage.getBrokerUri(), is(nullValue()));
     }
 }

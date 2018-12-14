@@ -2,10 +2,14 @@ package at.ac.tuwien.dsg.emma.controller.control;
 
 import at.ac.tuwien.dsg.emma.NodeInfo;
 import at.ac.tuwien.dsg.emma.control.msg.*;
+import at.ac.tuwien.dsg.emma.controller.event.ClientConnectEvent;
 import at.ac.tuwien.dsg.emma.controller.event.ClientDeregisterEvent;
 import at.ac.tuwien.dsg.emma.controller.event.ClientRegisterEvent;
+import at.ac.tuwien.dsg.emma.controller.model.Broker;
 import at.ac.tuwien.dsg.emma.controller.model.Client;
 import at.ac.tuwien.dsg.emma.controller.model.ClientRepository;
+import at.ac.tuwien.dsg.emma.controller.network.NetworkManager;
+import at.ac.tuwien.dsg.emma.controller.network.sel.BrokerSelectionStrategy;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
 import org.slf4j.Logger;
@@ -17,13 +21,18 @@ import org.springframework.stereotype.Component;
 @Component
 public class ControlServerHandler implements ControlMessageHandler {
     private static final Logger LOG = LoggerFactory.getLogger(ControlServerHandler.class);
-    private ApplicationEventPublisher systemEvents;
-    private ClientRepository clientRepository;
+    private final ApplicationEventPublisher systemEvents;
+    private final ClientRepository clientRepository;
+    private final BrokerSelectionStrategy brokerSelectionStrategy;
+    private final NetworkManager networkManager;
 
     @Autowired
-    public ControlServerHandler(ApplicationEventPublisher systemEvents, ClientRepository clientRepository) {
+    public ControlServerHandler(ApplicationEventPublisher systemEvents, ClientRepository clientRepository,
+                                BrokerSelectionStrategy brokerSelectionStrategy, NetworkManager networkManager) {
         this.systemEvents = systemEvents;
         this.clientRepository = clientRepository;
+        this.brokerSelectionStrategy = brokerSelectionStrategy;
+        this.networkManager = networkManager;
     }
 
     @Override
@@ -62,6 +71,35 @@ public class ControlServerHandler implements ControlMessageHandler {
         if (removed) {
             ctx.writeAndFlush(UnregisterResponseMessage.SUCCESS);
             systemEvents.publishEvent(new ClientDeregisterEvent(host));
+        }
+    }
+
+    @Override
+    public void handleMessage(GetBrokerMessage getBrokerMessage, ChannelHandlerContext ctx) {
+        String gatewayId = getBrokerMessage.getGatewayId();
+        LOG.debug("Client {} requests broker URI", gatewayId);
+
+        Client client = clientRepository.getById(gatewayId);
+        if (client == null) {
+            ctx.writeAndFlush(GetBrokerResponseMessage.ERROR_UNKNOWN_GATEWAY_ID);
+            return;
+        }
+
+        // TODO: bootstrap to root broker instead
+        try {
+            Broker broker = brokerSelectionStrategy.select(client, networkManager.getNetwork());
+
+            if (broker == null) {
+                throw new IllegalStateException("No broker in networks");
+            }
+
+            LOG.info("Selected broker for client {}: {}", client, broker);
+            systemEvents.publishEvent(new ClientConnectEvent(client, broker));
+            String brokerUri = "tcp://" + broker.getHost() + ":" + broker.getPort();
+            ctx.writeAndFlush(new GetBrokerResponseMessage(brokerUri));
+        } catch (IllegalStateException e) {
+            LOG.info("No broker connected {}", e.getMessage());
+            ctx.writeAndFlush(GetBrokerResponseMessage.ERROR_NO_BROKER_AVAILABLE);
         }
     }
 }
