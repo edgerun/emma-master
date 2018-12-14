@@ -1,6 +1,7 @@
 package at.ac.tuwien.dsg.emma.controller.control;
 
 import at.ac.tuwien.dsg.emma.control.msg.ControlMessage;
+import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
 import org.slf4j.Logger;
@@ -9,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 @Component
+@ChannelHandler.Sharable
 public class ControlServerInboundAdapter extends ChannelInboundHandlerAdapter {
     private static final Logger LOG = LoggerFactory.getLogger(ControlServerInboundAdapter.class);
     private ControlServerHandler handler;
