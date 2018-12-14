@@ -44,7 +44,7 @@ public class ControlPacketCodecTest {
         ByteBuf buffer = channel.readOutbound();
 
         assertPacketType(buffer, ControlPacketType.REGISTER);
-        assertPacketSize(buffer, 21);
+        assertPayloadLength(buffer, 16);
         int hostLength = buffer.readInt();
         assertThat("host length", hostLength, is(equalTo(nodeInfo.getHost().length())));
         assertThat("host", buffer.readCharSequence(hostLength, Charset.forName("UTF-8")), is(equalTo(nodeInfo.getHost())));
@@ -79,7 +79,7 @@ public class ControlPacketCodecTest {
         ByteBuf buffer = channel.readOutbound();
 
         assertPacketType(buffer, ControlPacketType.UNREGISTER);
-        assertPacketSize(buffer, 11);
+        assertPayloadLength(buffer, 6);
         int idLength = buffer.readInt();
         assertThat("id length", idLength, is(equalTo(id.length())));
         assertThat("id", buffer.readCharSequence(idLength, Charset.forName("UTF-8")), is(equalTo(id)));
@@ -110,7 +110,7 @@ public class ControlPacketCodecTest {
         ByteBuf buffer = channel.readOutbound();
 
         assertPacketType(buffer, ControlPacketType.REGISTER_RESPONSE);
-        assertPacketSize(buffer, 12);
+        assertPayloadLength(buffer, 7);
         assertByte(buffer, "success flag", 1);
         assertThat("id length", buffer.readInt(), is(equalTo(2)));
         assertThat("id", buffer.readCharSequence(id.length(), Charset.forName("UTF-8")), is(equalTo(id)));
@@ -141,7 +141,7 @@ public class ControlPacketCodecTest {
         ByteBuf buffer = channel.readOutbound();
 
         assertPacketType(buffer, ControlPacketType.UNREGISTER_RESPONSE);
-        assertPacketSize(buffer, 6);
+        assertPayloadLength(buffer, 1);
         assertByte(buffer, "success flag", 1);
         assertEndOfBuffer(buffer);
     }
@@ -166,7 +166,7 @@ public class ControlPacketCodecTest {
         ByteBuf buffer = channel.readOutbound();
 
         assertPacketType(buffer, ControlPacketType.REGISTER_RESPONSE);
-        assertPacketSize(buffer, 7);
+        assertPayloadLength(buffer, 2);
         assertByte(buffer, "success flag", 0);
         assertByte(buffer, "error code", RegisterResponseMessage.RegisterError.ALREADY_REGISTERED.ordinal());
         assertEndOfBuffer(buffer);
@@ -194,7 +194,7 @@ public class ControlPacketCodecTest {
         ByteBuf buffer = channel.readOutbound();
 
         assertPacketType(buffer, ControlPacketType.UNREGISTER_RESPONSE);
-        assertPacketSize(buffer, 7);
+        assertPayloadLength(buffer, 2);
         assertByte(buffer, "success flag", 0);
         assertByte(buffer, "error code", UnregisterResponseMessage.UnregisterError.NO_REGISTRATION.ordinal());
         assertEndOfBuffer(buffer);
@@ -223,7 +223,7 @@ public class ControlPacketCodecTest {
         ByteBuf buffer = channel.readOutbound();
 
         assertPacketType(buffer, ControlPacketType.GET_BROKER);
-        assertPacketSize(buffer, 11);
+        assertPayloadLength(buffer, 6);
         assertThat("gatewayId length", buffer.readInt(), is(equalTo(gatewayId.length())));
         assertThat("gatewayId", buffer.readCharSequence(gatewayId.length(), Charset.forName("UTF-8")).toString(),
                 is(equalTo(gatewayId)));
@@ -253,7 +253,7 @@ public class ControlPacketCodecTest {
         ByteBuf buffer = channel.readOutbound();
 
         assertPacketType(buffer, ControlPacketType.GET_BROKER_RESPONSE);
-        assertPacketSize(buffer, 13);
+        assertPayloadLength(buffer, 8);
         assertByte(buffer, "success flag", 1);
         assertThat("brokerUri length", buffer.readInt(), is(equalTo(brokerUri.length())));
         assertThat("brokerUri", buffer.readCharSequence(brokerUri.length(), Charset.forName("UTF-8")).toString(),
@@ -285,7 +285,7 @@ public class ControlPacketCodecTest {
         ByteBuf buffer = channel.readOutbound();
 
         assertPacketType(buffer, ControlPacketType.GET_BROKER_RESPONSE);
-        assertPacketSize(buffer, 7);
+        assertPayloadLength(buffer, 2);
         assertByte(buffer, "success flag", 0);
         assertByte(buffer, "error code", GetBrokerResponseMessage.GetBrokerError.UNKNOWN_GATEWAY_ID.ordinal());
         assertEndOfBuffer(buffer);
@@ -313,7 +313,7 @@ public class ControlPacketCodecTest {
         ByteBuf buffer = channel.readOutbound();
 
         assertPacketType(buffer, ControlPacketType.GET_BROKER_RESPONSE);
-        assertPacketSize(buffer, 7);
+        assertPayloadLength(buffer, 2);
         assertByte(buffer, "success flag", 0);
         assertByte(buffer, "error code", GetBrokerResponseMessage.GetBrokerError.NO_BROKER_AVAILABLE.ordinal());
         assertEndOfBuffer(buffer);
@@ -351,8 +351,8 @@ public class ControlPacketCodecTest {
         assertThat("end of buffer", buffer.isReadable(), is(false));
     }
 
-    private static void assertPacketSize(ByteBuf buffer, int size) {
-        assertThat("packet size", buffer.readInt(), is(equalTo(size)));
+    private static void assertPayloadLength(ByteBuf buffer, int length) {
+        assertThat("payload length", buffer.readInt(), is(equalTo(length)));
     }
 
     private static void assertPacketType(ByteBuf buffer, ControlPacketType packetType) {

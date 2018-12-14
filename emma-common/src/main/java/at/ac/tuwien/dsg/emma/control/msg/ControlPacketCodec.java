@@ -18,8 +18,8 @@ public class ControlPacketCodec extends ByteToMessageCodec<ControlMessage> {
         ByteBuf buffer = context.alloc().buffer();
         controlMessage.writeToBuffer(buffer);
 
-        // write length and data
-        byteBuf.writeInt(buffer.readableBytes() + 5);
+        // write payload length and payload data
+        byteBuf.writeInt(buffer.readableBytes());
         byteBuf.writeBytes(buffer);
     }
 
