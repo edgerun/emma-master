@@ -44,7 +44,7 @@ public class ControlServerHandler implements ControlMessageHandler {
         LOG.info("Registering new client {}", info);
 
         Client registered = clientRepository.register(info);
-        ctx.writeAndFlush(RegisterResponseMessage.SUCCESS);
+        ctx.writeAndFlush(new RegisterResponseMessage(registered.getId()));
         systemEvents.publishEvent(new ClientRegisterEvent(registered));
     }
 
