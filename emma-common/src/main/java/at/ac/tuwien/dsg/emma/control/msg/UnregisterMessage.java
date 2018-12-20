@@ -7,15 +7,22 @@ import io.netty.channel.ChannelHandlerContext;
 import java.nio.charset.Charset;
 
 public class UnregisterMessage implements ControlMessage {
-    private String id;
+    private final NodeType nodeType;
+    private final String id;
 
-    public UnregisterMessage(String id) {
+    public UnregisterMessage(NodeType nodeType, String id) {
+        this.nodeType = nodeType;
         this.id = id;
     }
 
     UnregisterMessage(ByteBuf byteBuf) {
+        this.nodeType = NodeType.values()[byteBuf.readByte()];
         int idLength = byteBuf.readInt();
         this.id = byteBuf.readCharSequence(idLength, Charset.forName("UTF-8")).toString();
+    }
+
+    public NodeType getNodeType() {
+        return nodeType;
     }
 
     @Override
@@ -30,6 +37,7 @@ public class UnregisterMessage implements ControlMessage {
 
     @Override
     public void writeToBuffer(ByteBuf buffer) {
+        buffer.writeByte(nodeType.ordinal());
         buffer.writeInt(id.length());
         buffer.writeCharSequence(id, Charset.forName("UTF-8"));
     }

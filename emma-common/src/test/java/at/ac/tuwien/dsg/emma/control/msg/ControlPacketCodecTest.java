@@ -38,7 +38,7 @@ public class ControlPacketCodecTest {
 
     @Test
     public void encodes_register_packet() {
-        RegisterMessage message = new RegisterMessage(nodeInfo);
+        RegisterMessage message = new RegisterMessage(NodeType.CLIENT_GATEWAY, nodeInfo);
 
         channel.writeOutbound(message);
         ByteBuf buffer = channel.readOutbound();
@@ -73,7 +73,7 @@ public class ControlPacketCodecTest {
     @Test
     public void encodes_unregister_packet() {
         String id = "id";
-        UnregisterMessage message = new UnregisterMessage(id);
+        UnregisterMessage message = new UnregisterMessage(NodeType.CLIENT_GATEWAY, id);
 
         channel.writeOutbound(message);
         ByteBuf buffer = channel.readOutbound();

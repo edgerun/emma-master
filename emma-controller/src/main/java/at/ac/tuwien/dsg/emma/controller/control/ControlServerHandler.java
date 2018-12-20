@@ -6,12 +6,12 @@ import at.ac.tuwien.dsg.emma.controller.event.ClientConnectEvent;
 import at.ac.tuwien.dsg.emma.controller.event.ClientDeregisterEvent;
 import at.ac.tuwien.dsg.emma.controller.event.ClientRegisterEvent;
 import at.ac.tuwien.dsg.emma.controller.model.Broker;
+import at.ac.tuwien.dsg.emma.controller.model.BrokerRepository;
 import at.ac.tuwien.dsg.emma.controller.model.Client;
 import at.ac.tuwien.dsg.emma.controller.model.ClientRepository;
 import at.ac.tuwien.dsg.emma.controller.network.NetworkManager;
 import at.ac.tuwien.dsg.emma.controller.network.sel.BrokerSelectionStrategy;
 import io.netty.channel.ChannelHandlerContext;
-import io.netty.channel.ChannelInboundHandlerAdapter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,19 +19,26 @@ import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Component;
 
 import java.net.InetSocketAddress;
+import java.net.SocketAddress;
+
+import static at.ac.tuwien.dsg.emma.control.msg.NodeType.BROKER;
+import static at.ac.tuwien.dsg.emma.control.msg.NodeType.CLIENT_GATEWAY;
 
 @Component
 public class ControlServerHandler implements ControlMessageHandler {
     private static final Logger LOG = LoggerFactory.getLogger(ControlServerHandler.class);
     private final ApplicationEventPublisher systemEvents;
+    private final BrokerRepository brokerRepository;
     private final ClientRepository clientRepository;
     private final BrokerSelectionStrategy brokerSelectionStrategy;
     private final NetworkManager networkManager;
 
     @Autowired
-    public ControlServerHandler(ApplicationEventPublisher systemEvents, ClientRepository clientRepository,
-                                BrokerSelectionStrategy brokerSelectionStrategy, NetworkManager networkManager) {
+    public ControlServerHandler(ApplicationEventPublisher systemEvents, BrokerRepository brokerRepository,
+                                ClientRepository clientRepository, BrokerSelectionStrategy brokerSelectionStrategy,
+                                NetworkManager networkManager) {
         this.systemEvents = systemEvents;
+        this.brokerRepository = brokerRepository;
         this.clientRepository = clientRepository;
         this.brokerSelectionStrategy = brokerSelectionStrategy;
         this.networkManager = networkManager;
@@ -41,11 +48,28 @@ public class ControlServerHandler implements ControlMessageHandler {
     public void handleMessage(RegisterMessage registerMessage, ChannelHandlerContext ctx) {
         NodeInfo info = registerMessage.toNodeInfo();
         if (info.isHostWildcard()) {
-            String remoteAddress = ((InetSocketAddress) ctx.channel().remoteAddress()).getHostString();
-            LOG.debug("Host is a wildcard, using remote address of request {}", remoteAddress);
-            info.setHost(remoteAddress);
+            SocketAddress remoteAddress = ctx.channel().remoteAddress();
+            String remoteHost;
+            if (remoteAddress instanceof InetSocketAddress) {
+                remoteHost = ((InetSocketAddress) remoteAddress).getHostString();
+            } else {
+                remoteHost = remoteAddress.toString();
+            }
+            LOG.debug("Host is a wildcard, using remote address of request {}", remoteHost);
+            info.setHost(remoteHost);
         }
 
+        switch (registerMessage.getNodeType()) {
+            case CLIENT_GATEWAY:
+                registerClient(ctx, info);
+                break;
+            case BROKER:
+                registerBroker(ctx, info);
+                break;
+        }
+    }
+
+    private void registerClient(ChannelHandlerContext ctx, NodeInfo info) {
         if (clientRepository.getHost(info.getHost(), info.getPort()) != null) {
             LOG.debug("Host already registered");
             ctx.writeAndFlush(RegisterResponseMessage.ERROR_ALREADY_REGISTERED);
@@ -59,9 +83,34 @@ public class ControlServerHandler implements ControlMessageHandler {
         systemEvents.publishEvent(new ClientRegisterEvent(registered));
     }
 
+    private void registerBroker(ChannelHandlerContext ctx, NodeInfo info) {
+        if (brokerRepository.getHost(info.getHost(), info.getPort()) != null) {
+            LOG.debug("Broker already registered");
+            ctx.writeAndFlush(RegisterResponseMessage.ERROR_ALREADY_REGISTERED);
+            return;
+        }
+
+        LOG.info("Registering new broker {}", info);
+
+        Broker registered = brokerRepository.register(info);
+        ctx.writeAndFlush(new RegisterResponseMessage(registered.getId()));
+    }
+
     @Override
     public void handleMessage(UnregisterMessage unregisterMessage, ChannelHandlerContext ctx) {
         String id = unregisterMessage.getId();
+
+        switch (unregisterMessage.getNodeType()) {
+            case CLIENT_GATEWAY:
+                unregisterClient(ctx, id);
+                break;
+            case BROKER:
+                unregisterBroker(ctx, id);
+                break;
+        }
+    }
+
+    private void unregisterClient(ChannelHandlerContext ctx, String id) {
         Client host = clientRepository.getById(id);
 
         if (host == null) {
@@ -73,6 +122,20 @@ public class ControlServerHandler implements ControlMessageHandler {
         if (removed) {
             ctx.writeAndFlush(UnregisterResponseMessage.SUCCESS);
             systemEvents.publishEvent(new ClientDeregisterEvent(host));
+        }
+    }
+
+    private void unregisterBroker(ChannelHandlerContext ctx, String id) {
+        Broker broker = brokerRepository.getById(id);
+
+        if (broker == null) {
+            ctx.writeAndFlush(UnregisterResponseMessage.ERROR_NO_REGISTRATION);
+            return;
+        }
+
+        boolean removed = brokerRepository.remove(broker);
+        if (removed) {
+            ctx.writeAndFlush(UnregisterResponseMessage.SUCCESS);
         }
     }
 

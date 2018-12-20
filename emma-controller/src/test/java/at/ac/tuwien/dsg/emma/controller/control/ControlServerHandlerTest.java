@@ -5,10 +5,12 @@ import at.ac.tuwien.dsg.emma.control.msg.*;
 import at.ac.tuwien.dsg.emma.controller.event.ClientDeregisterEvent;
 import at.ac.tuwien.dsg.emma.controller.event.ClientRegisterEvent;
 import at.ac.tuwien.dsg.emma.controller.model.Broker;
+import at.ac.tuwien.dsg.emma.controller.model.BrokerRepository;
 import at.ac.tuwien.dsg.emma.controller.model.Client;
 import at.ac.tuwien.dsg.emma.controller.model.ClientRepository;
 import at.ac.tuwien.dsg.emma.controller.network.NetworkManager;
 import at.ac.tuwien.dsg.emma.controller.network.sel.BrokerSelectionStrategy;
+import com.sun.org.apache.bcel.internal.generic.BREAKPOINT;
 import io.netty.channel.embedded.EmbeddedChannel;
 import org.junit.Before;
 import org.junit.Test;
@@ -28,6 +30,8 @@ public class ControlServerHandlerTest {
     @MockBean
     private ApplicationEventPublisher systemEvents;
     @MockBean
+    private BrokerRepository brokerRepository;
+    @MockBean
     private ClientRepository clientRepository;
     @MockBean
     private BrokerSelectionStrategy brokerSelectionStrategy;
@@ -37,17 +41,17 @@ public class ControlServerHandlerTest {
 
     @Before
     public void setup() {
-        ControlServerHandler handler = new ControlServerHandler(systemEvents, clientRepository, brokerSelectionStrategy,
-                networkManager);
+        ControlServerHandler handler = new ControlServerHandler(systemEvents, brokerRepository, clientRepository,
+                brokerSelectionStrategy, networkManager);
         channel = new EmbeddedChannel(new ControlServerInboundAdapter(handler));
     }
 
     @Test
-    public void handles_RegisterMessage_successful_registration() {
+    public void handles_RegisterMessage_successful_gateway_registration() {
         // setup
         NodeInfo nodeInfo = new NodeInfo("host", 1234, 2345);
         Client client = new Client(nodeInfo.getHost(), nodeInfo.getPort());
-        RegisterMessage registerMessage = new RegisterMessage(nodeInfo);
+        RegisterMessage registerMessage = new RegisterMessage(NodeType.CLIENT_GATEWAY, nodeInfo);
         ArgumentCaptor<ClientRegisterEvent> publishedEventCaptor = ArgumentCaptor.forClass(ClientRegisterEvent.class);
         when(clientRepository.register(nodeInfo)).thenReturn(client);
 
@@ -65,10 +69,29 @@ public class ControlServerHandlerTest {
     }
 
     @Test
+    public void handles_RegisterMessage_successful_broker_registration() {
+        // setup
+        NodeInfo nodeInfo = new NodeInfo("host", 1234, 2345);
+        Broker broker = new Broker(nodeInfo.getHost(), nodeInfo.getPort());
+        RegisterMessage registerMessage = new RegisterMessage(NodeType.BROKER, nodeInfo);
+        when(brokerRepository.register(nodeInfo)).thenReturn(broker);
+
+        // exercise
+        channel.writeInbound(registerMessage);
+        RegisterResponseMessage response = channel.readOutbound();
+
+        // verify
+        assertThat(response, is(notNullValue()));
+        assertThat(response.isSuccess(), is(true));
+        verify(brokerRepository).getHost(nodeInfo.getHost(), nodeInfo.getPort());
+        verify(brokerRepository).register(nodeInfo);
+    }
+
+    @Test
     public void handles_RegisterMessage_with_wildcard_uses_remote_address() {
         // setup
         NodeInfo nodeInfo = new NodeInfo("0.0.0.0", 1234, 2345);
-        RegisterMessage registerMessage = new RegisterMessage(nodeInfo);
+        RegisterMessage registerMessage = new RegisterMessage(NodeType.CLIENT_GATEWAY, nodeInfo);
 
         // exercise
         channel.writeInbound(registerMessage);
@@ -79,10 +102,10 @@ public class ControlServerHandlerTest {
     }
 
     @Test
-    public void handles_RegisterMessage_error_already_registered() {
+    public void handles_RegisterMessage_gateway_error_already_registered() {
         // setup
         NodeInfo nodeInfo = new NodeInfo("host", 1234, 2345);
-        RegisterMessage registerMessage = new RegisterMessage(nodeInfo);
+        RegisterMessage registerMessage = new RegisterMessage(NodeType.CLIENT_GATEWAY, nodeInfo);
         when(clientRepository.getHost(nodeInfo.getHost(), nodeInfo.getPort()))
                 .thenReturn(new Client(nodeInfo.getHost(), nodeInfo.getPort()));
 
@@ -99,7 +122,26 @@ public class ControlServerHandlerTest {
     }
 
     @Test
-    public void handles_UnregisterMesesage_successfully() {
+    public void handles_RegisterMessage_broker_error_already_registered() {
+        // setup
+        NodeInfo nodeInfo = new NodeInfo("host", 1234, 2345);
+        RegisterMessage registerMessage = new RegisterMessage(NodeType.BROKER, nodeInfo);
+        when(brokerRepository.getHost(nodeInfo.getHost(), nodeInfo.getPort()))
+                .thenReturn(new Broker(nodeInfo.getHost(), nodeInfo.getPort()));
+
+        // exercise
+        channel.writeInbound(registerMessage);
+        RegisterResponseMessage response = channel.readOutbound();
+
+        // verify
+        assertThat(response, is(notNullValue()));
+        assertThat(response.isSuccess(), is(false));
+        assertThat(response.getError(), is(equalTo(RegisterResponseMessage.RegisterError.ALREADY_REGISTERED)));
+        verify(brokerRepository, never()).register((NodeInfo) any());
+    }
+
+    @Test
+    public void handles_UnregisterMesesage_successfully_gateway() {
         // setup
         String id = "id";
         Client client = new Client("host", 1234);
@@ -108,7 +150,7 @@ public class ControlServerHandlerTest {
         ArgumentCaptor<ClientDeregisterEvent> publishedEventCaptor = ArgumentCaptor.forClass(ClientDeregisterEvent.class);
 
         // exercise
-        channel.writeInbound(new UnregisterMessage(id));
+        channel.writeInbound(new UnregisterMessage(NodeType.CLIENT_GATEWAY, id));
         UnregisterResponseMessage responseMessage = channel.readOutbound();
 
         // verify
@@ -119,6 +161,23 @@ public class ControlServerHandlerTest {
     }
 
     @Test
+    public void handles_UnregisterMesesage_successfully_broker() {
+        // setup
+        String id = "id";
+        Broker broker = new Broker("host", 1234);
+        when(brokerRepository.getById(id)).thenReturn(broker);
+        when(brokerRepository.remove(broker)).thenReturn(true);
+
+        // exercise
+        channel.writeInbound(new UnregisterMessage(NodeType.BROKER, id));
+        UnregisterResponseMessage responseMessage = channel.readOutbound();
+
+        // verify
+        assertThat(responseMessage.isSuccess(), is(true));
+        verify(brokerRepository).remove(broker);
+    }
+
+    @Test
     public void handles_UnregisterMessage_error_if_no_client() {
         // setup
         String id = "id";
@@ -126,13 +185,30 @@ public class ControlServerHandlerTest {
         when(clientRepository.getById(id)).thenReturn(null);
 
         // exercise
-        channel.writeInbound(new UnregisterMessage(id));
+        channel.writeInbound(new UnregisterMessage(NodeType.CLIENT_GATEWAY, id));
         UnregisterResponseMessage responseMessage = channel.readOutbound();
 
         // verify
         assertThat(responseMessage.getError(), is(equalTo(UnregisterResponseMessage.UnregisterError.NO_REGISTRATION)));
         verify(clientRepository).getById(id);
         verify(clientRepository, never()).remove(client);
+    }
+
+    @Test
+    public void handles_UnregisterMessage_error_if_no_broker() {
+        // setup
+        String id = "id";
+        Broker broker = new Broker("host", 1234);
+        when(brokerRepository.getById(id)).thenReturn(null);
+
+        // exercise
+        channel.writeInbound(new UnregisterMessage(NodeType.BROKER, id));
+        UnregisterResponseMessage responseMessage = channel.readOutbound();
+
+        // verify
+        assertThat(responseMessage.getError(), is(equalTo(UnregisterResponseMessage.UnregisterError.NO_REGISTRATION)));
+        verify(brokerRepository).getById(id);
+        verify(brokerRepository, never()).remove(broker);
     }
 
     @Test

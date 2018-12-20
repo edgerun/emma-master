@@ -8,25 +8,32 @@ import io.netty.channel.ChannelHandlerContext;
 import java.nio.charset.Charset;
 
 public class RegisterMessage implements ControlMessage {
-    private String host;
-    private int port;
-    private int monitoringPort;
+    private final NodeType nodeType;
+    private final String host;
+    private final int port;
+    private final int monitoringPort;
 
-    public RegisterMessage(String host, int port, int monitoringPort) {
+    public RegisterMessage(NodeType nodeType, String host, int port, int monitoringPort) {
+        this.nodeType = nodeType;
         this.host = host;
         this.port = port;
         this.monitoringPort = monitoringPort;
     }
 
-    public RegisterMessage(NodeInfo nodeInfo) {
-        this(nodeInfo.getHost(), nodeInfo.getPort(), nodeInfo.getMonitoringPort());
+    public RegisterMessage(NodeType nodeType, NodeInfo nodeInfo) {
+        this(nodeType, nodeInfo.getHost(), nodeInfo.getPort(), nodeInfo.getMonitoringPort());
     }
 
     RegisterMessage(ByteBuf byteBuf) {
+        this.nodeType = NodeType.values()[byteBuf.readByte()];
         int hostLength = byteBuf.readInt();
         this.host = byteBuf.readCharSequence(hostLength, Charset.forName("UTF-8")).toString();
         this.port = byteBuf.readInt();
         this.monitoringPort = byteBuf.readInt();
+    }
+
+    public NodeType getNodeType() {
+        return nodeType;
     }
 
     @Override
@@ -41,6 +48,7 @@ public class RegisterMessage implements ControlMessage {
 
     @Override
     public void writeToBuffer(ByteBuf buffer) {
+        buffer.writeByte(nodeType.ordinal());
         buffer.writeInt(host.length());
         buffer.writeCharSequence(host, Charset.forName("UTF-8"));
         buffer.writeInt(port);
