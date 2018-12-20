@@ -18,6 +18,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Component;
 
+import java.net.InetSocketAddress;
+
 @Component
 public class ControlServerHandler implements ControlMessageHandler {
     private static final Logger LOG = LoggerFactory.getLogger(ControlServerHandler.class);
@@ -39,7 +41,7 @@ public class ControlServerHandler implements ControlMessageHandler {
     public void handleMessage(RegisterMessage registerMessage, ChannelHandlerContext ctx) {
         NodeInfo info = registerMessage.toNodeInfo();
         if (info.isHostWildcard()) {
-            String remoteAddress = ctx.channel().remoteAddress().toString();
+            String remoteAddress = ((InetSocketAddress) ctx.channel().remoteAddress()).getHostString();
             LOG.debug("Host is a wildcard, using remote address of request {}", remoteAddress);
             info.setHost(remoteAddress);
         }
