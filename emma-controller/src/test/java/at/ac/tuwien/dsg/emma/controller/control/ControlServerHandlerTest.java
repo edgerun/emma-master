@@ -4,6 +4,8 @@ import at.ac.tuwien.dsg.emma.NodeInfo;
 import at.ac.tuwien.dsg.emma.control.msg.*;
 import at.ac.tuwien.dsg.emma.controller.event.ClientDeregisterEvent;
 import at.ac.tuwien.dsg.emma.controller.event.ClientRegisterEvent;
+import at.ac.tuwien.dsg.emma.controller.event.SubscribeEvent;
+import at.ac.tuwien.dsg.emma.controller.event.UnsubscribeEvent;
 import at.ac.tuwien.dsg.emma.controller.model.Broker;
 import at.ac.tuwien.dsg.emma.controller.model.BrokerRepository;
 import at.ac.tuwien.dsg.emma.controller.model.Client;
@@ -259,5 +261,69 @@ public class ControlServerHandlerTest {
         // verify
         assertThat(responseMessage.getError(), is(equalTo(GetBrokerResponseMessage.GetBrokerError.NO_BROKER_AVAILABLE)));
         assertThat(responseMessage.getBrokerUri(), is(nullValue()));
+    }
+
+    @Test
+    public void handles_OnSubscribeMessage() {
+        // setup
+        String brokerId = "brokerId";
+        String topic = "topic";
+        Broker broker = new Broker("host", 1234);
+        when(brokerRepository.getById(brokerId)).thenReturn(broker);
+        ArgumentCaptor<SubscribeEvent> eventCaptor = ArgumentCaptor.forClass(SubscribeEvent.class);
+
+        // exercise
+        channel.writeInbound(new OnSubscribeMessage(brokerId, topic));
+
+        // verify
+        verify(systemEvents).publishEvent(eventCaptor.capture());
+        assertThat(eventCaptor.getValue().getHost(), is(equalTo(broker)));
+        assertThat(eventCaptor.getValue().getTopic(), is(equalTo(topic)));
+    }
+
+    @Test
+    public void handles_OnSubscribeMessage_invalid_brokerId() {
+        // setup
+        String brokerId = "brokerId";
+        String topic = "topic";
+        when(brokerRepository.getById(brokerId)).thenReturn(null);
+
+        // exercise
+        channel.writeInbound(new OnSubscribeMessage(brokerId, topic));
+
+        // verify
+        verify(systemEvents, never()).publishEvent(any());
+    }
+
+    @Test
+    public void handles_OnUnsubscribeMessage() {
+        // setup
+        String brokerId = "brokerId";
+        String topic = "topic";
+        Broker broker = new Broker("host", 1234);
+        when(brokerRepository.getById(brokerId)).thenReturn(broker);
+        ArgumentCaptor<UnsubscribeEvent> eventCaptor = ArgumentCaptor.forClass(UnsubscribeEvent.class);
+
+        // exercise
+        channel.writeInbound(new OnUnsubscribeMessage(brokerId, topic));
+
+        // verify
+        verify(systemEvents).publishEvent(eventCaptor.capture());
+        assertThat(eventCaptor.getValue().getHost(), is(equalTo(broker)));
+        assertThat(eventCaptor.getValue().getTopic(), is(equalTo(topic)));
+    }
+
+    @Test
+    public void handles_OnUnsubscribeMessage_invalid_brokerId() {
+        // setup
+        String brokerId = "brokerId";
+        String topic = "topic";
+        when(brokerRepository.getById(brokerId)).thenReturn(null);
+
+        // exercise
+        channel.writeInbound(new OnUnsubscribeMessage(brokerId, topic));
+
+        // verify
+        verify(systemEvents, never()).publishEvent(any());
     }
 }

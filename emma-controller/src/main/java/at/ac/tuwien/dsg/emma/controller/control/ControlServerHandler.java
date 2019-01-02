@@ -2,9 +2,7 @@ package at.ac.tuwien.dsg.emma.controller.control;
 
 import at.ac.tuwien.dsg.emma.NodeInfo;
 import at.ac.tuwien.dsg.emma.control.msg.*;
-import at.ac.tuwien.dsg.emma.controller.event.ClientConnectEvent;
-import at.ac.tuwien.dsg.emma.controller.event.ClientDeregisterEvent;
-import at.ac.tuwien.dsg.emma.controller.event.ClientRegisterEvent;
+import at.ac.tuwien.dsg.emma.controller.event.*;
 import at.ac.tuwien.dsg.emma.controller.model.Broker;
 import at.ac.tuwien.dsg.emma.controller.model.BrokerRepository;
 import at.ac.tuwien.dsg.emma.controller.model.Client;
@@ -166,5 +164,38 @@ public class ControlServerHandler implements ControlMessageHandler {
             LOG.info("No broker connected {}", e.getMessage());
             ctx.writeAndFlush(GetBrokerResponseMessage.ERROR_NO_BROKER_AVAILABLE);
         }
+    }
+
+    @Override
+    public void handleMessage(OnSubscribeMessage message, ChannelHandlerContext ctx) {
+        String id = message.getBrokerId();
+        String topic = message.getTopic();
+        LOG.debug("Broker {} subscribes topic {}", id, topic);
+
+        Broker broker = brokerRepository.getById(id);
+
+        if (broker == null) {
+            LOG.warn("Broker with id {} not found", id);
+            // FIXME
+            return;
+        }
+
+        systemEvents.publishEvent(new SubscribeEvent(broker, topic));
+    }
+
+    @Override
+    public void handleMessage(OnUnsubscribeMessage message, ChannelHandlerContext ctx) {
+        String id = message.getBrokerId();
+        String topic = message.getTopic();
+        LOG.debug("Broker {} unsubscribes topic {}", id, topic);
+
+        Broker broker = brokerRepository.getById(id);
+        if (broker == null) {
+            LOG.warn("Broker with id {} not found", id);
+            // FIXME
+            return;
+        }
+
+        systemEvents.publishEvent(new UnsubscribeEvent(broker, topic));
     }
 }

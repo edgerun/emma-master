@@ -23,25 +23,12 @@ public class ControlClient {
     }
 
     @SuppressWarnings("unchecked")
-    public <Response extends ControlMessage> Response connectAndRequest(final ControlMessage request) {
+    public <Response extends ControlMessage> Response requestResponse(final ControlMessage request) {
         EventLoopGroup group = new NioEventLoopGroup();
         try {
-            ClientHandler clientHandler = new ClientHandler(request);
-            Bootstrap clientBootstrap = new Bootstrap();
-            clientBootstrap.group(group);
-            clientBootstrap.channel(NioSocketChannel.class);
-            clientBootstrap.remoteAddress(new InetSocketAddress(host, port));
-            clientBootstrap.handler(new ChannelInitializer<SocketChannel>() {
-                protected void initChannel(SocketChannel socketChannel) throws Exception {
-                    socketChannel.pipeline()
-                            .addLast(new LengthFieldBasedFrameDecoder(1024 * 1024, 1, 4))
-                            .addLast(new ControlPacketCodec())
-                            .addLast(clientHandler)
-                            .addLast(new ControlPacketCodec());
-                }
-            });
-            clientBootstrap.connect().sync();
-            return (Response) clientHandler.getResponse();
+            RequestResponseHandler requestResponseHandler = new RequestResponseHandler(request);
+            bootstrapClient(group, requestResponseHandler);
+            return (Response) requestResponseHandler.getResponse();
         } catch (InterruptedException e) {
             return null;
         } finally {
@@ -53,11 +40,44 @@ public class ControlClient {
         }
     }
 
-    private class ClientHandler extends ChannelInboundHandlerAdapter {
+    public void request(final ControlMessage request) {
+        EventLoopGroup group = new NioEventLoopGroup();
+        try {
+            RequestHandler requestHandler = new RequestHandler(request);
+            bootstrapClient(group, requestHandler);
+        } catch (InterruptedException e) {
+            // ignore
+        } finally {
+            try {
+                group.shutdownGracefully().sync();
+            } catch (InterruptedException e) {
+                // ignore
+            }
+        }
+    }
+
+    private void bootstrapClient(EventLoopGroup group, ChannelHandler handler) throws InterruptedException {
+        Bootstrap clientBootstrap = new Bootstrap();
+        clientBootstrap.group(group);
+        clientBootstrap.channel(NioSocketChannel.class);
+        clientBootstrap.remoteAddress(new InetSocketAddress(host, port));
+        clientBootstrap.handler(new ChannelInitializer<SocketChannel>() {
+            protected void initChannel(SocketChannel socketChannel) throws Exception {
+                socketChannel.pipeline()
+                        .addLast(new LengthFieldBasedFrameDecoder(1024 * 1024, 1, 4))
+                        .addLast(new ControlPacketCodec())
+                        .addLast(handler)
+                        .addLast(new ControlPacketCodec());
+            }
+        });
+        clientBootstrap.connect().sync();
+    }
+
+    private class RequestResponseHandler extends ChannelInboundHandlerAdapter {
         private final ControlMessage request;
         private final BlockingQueue<Object> response = new LinkedBlockingQueue<>(1);
 
-        ClientHandler(ControlMessage request) {
+        RequestResponseHandler(ControlMessage request) {
             this.request = request;
         }
 
@@ -78,6 +98,20 @@ public class ControlClient {
             } catch (InterruptedException e) {
                 return null;
             }
+        }
+    }
+
+    private class RequestHandler extends ChannelInboundHandlerAdapter {
+        private final ControlMessage request;
+
+        RequestHandler(ControlMessage request) {
+            this.request = request;
+        }
+
+        @Override
+        public void channelActive(ChannelHandlerContext ctx) throws Exception {
+            ctx.writeAndFlush(request);
+            ctx.close();
         }
     }
 }
