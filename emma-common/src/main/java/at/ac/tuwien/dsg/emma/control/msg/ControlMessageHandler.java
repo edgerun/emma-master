@@ -20,4 +20,10 @@ public interface ControlMessageHandler {
 
     default void handleMessage(GetBrokerResponseMessage getBrokerMessage, ChannelHandlerContext ctx) {
     }
+
+    default void handleMessage(OnSubscribeMessage onSubscribeMessage, ChannelHandlerContext ctx) {
+    }
+
+    default void handleMessage(OnUnsubscribeMessage onUnsubscribeMessage, ChannelHandlerContext ctx) {
+    }
 }

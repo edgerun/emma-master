@@ -48,6 +48,12 @@ public class ControlPacketCodec extends ByteToMessageCodec<ControlMessage> {
             case GET_BROKER_RESPONSE:
                 list.add(new GetBrokerResponseMessage(byteBuf));
                 break;
+            case ON_SUBSCRIBE:
+                list.add(new OnSubscribeMessage(byteBuf));
+                break;
+            case ON_UNSUBSCRIBE:
+                list.add(new OnUnsubscribeMessage(byteBuf));
+                break;
             default:
                 throw new CodecException("Invalid packet type");
         }

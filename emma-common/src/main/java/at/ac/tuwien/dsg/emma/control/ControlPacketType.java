@@ -7,7 +7,9 @@ public enum ControlPacketType {
     UNREGISTER,
     UNREGISTER_RESPONSE,
     GET_BROKER,
-    GET_BROKER_RESPONSE;
+    GET_BROKER_RESPONSE,
+    ON_SUBSCRIBE,
+    ON_UNSUBSCRIBE;
 
     public int getId() {
         return ordinal();

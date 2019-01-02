@@ -44,10 +44,9 @@ public class ControlPacketCodecTest {
         ByteBuf buffer = channel.readOutbound();
 
         assertPacketType(buffer, ControlPacketType.REGISTER);
-        assertPayloadLength(buffer, 16);
-        int hostLength = buffer.readInt();
-        assertThat("host length", hostLength, is(equalTo(nodeInfo.getHost().length())));
-        assertThat("host", buffer.readCharSequence(hostLength, Charset.forName("UTF-8")), is(equalTo(nodeInfo.getHost())));
+        assertPayloadLength(buffer, 17);
+        assertByte(buffer, "node type", NodeType.CLIENT_GATEWAY.ordinal());
+        assertString(buffer, "host", nodeInfo.getHost());
         assertThat("port", buffer.readInt(), is(equalTo(nodeInfo.getPort())));
         assertThat("monitoring port", buffer.readInt(), is(equalTo(nodeInfo.getMonitoringPort())));
         assertEndOfBuffer(buffer);
@@ -57,6 +56,7 @@ public class ControlPacketCodecTest {
     public void decodes_register_packet() {
         // prepare payload
         ByteBuf payload = channel.alloc().buffer();
+        payload.writeByte(NodeType.CLIENT_GATEWAY.ordinal());
         payload.writeInt(4);
         payload.writeCharSequence(nodeInfo.getHost(), Charset.forName("UTF-8"));
         payload.writeInt(nodeInfo.getPort());
@@ -67,6 +67,7 @@ public class ControlPacketCodecTest {
         RegisterMessage message = channel.readInbound();
 
         // verify
+        assertThat(message.getNodeType(), is(equalTo(NodeType.CLIENT_GATEWAY)));
         assertThat(message.toNodeInfo(), is(equalTo(nodeInfo)));
     }
 
@@ -79,10 +80,9 @@ public class ControlPacketCodecTest {
         ByteBuf buffer = channel.readOutbound();
 
         assertPacketType(buffer, ControlPacketType.UNREGISTER);
-        assertPayloadLength(buffer, 6);
-        int idLength = buffer.readInt();
-        assertThat("id length", idLength, is(equalTo(id.length())));
-        assertThat("id", buffer.readCharSequence(idLength, Charset.forName("UTF-8")), is(equalTo(id)));
+        assertPayloadLength(buffer, 7);
+        assertByte(buffer, "node type", NodeType.CLIENT_GATEWAY.ordinal());
+        assertString(buffer, "id", id);
         assertEndOfBuffer(buffer);
     }
 
@@ -92,6 +92,7 @@ public class ControlPacketCodecTest {
 
         // prepare payload
         ByteBuf payload = channel.alloc().buffer();
+        payload.writeByte(NodeType.CLIENT_GATEWAY.ordinal());
         payload.writeInt(2);
         payload.writeCharSequence(id, Charset.forName("UTF-8"));
 
@@ -100,6 +101,7 @@ public class ControlPacketCodecTest {
         UnregisterMessage message = channel.readInbound();
 
         // verify
+        assertThat(message.getNodeType(), is(equalTo(NodeType.CLIENT_GATEWAY)));
         assertThat(message.getId(), is(equalTo(id)));
     }
 
@@ -112,8 +114,7 @@ public class ControlPacketCodecTest {
         assertPacketType(buffer, ControlPacketType.REGISTER_RESPONSE);
         assertPayloadLength(buffer, 7);
         assertByte(buffer, "success flag", 1);
-        assertThat("id length", buffer.readInt(), is(equalTo(2)));
-        assertThat("id", buffer.readCharSequence(id.length(), Charset.forName("UTF-8")), is(equalTo(id)));
+        assertString(buffer, "id", id);
         assertEndOfBuffer(buffer);
     }
 
@@ -224,9 +225,7 @@ public class ControlPacketCodecTest {
 
         assertPacketType(buffer, ControlPacketType.GET_BROKER);
         assertPayloadLength(buffer, 6);
-        assertThat("gatewayId length", buffer.readInt(), is(equalTo(gatewayId.length())));
-        assertThat("gatewayId", buffer.readCharSequence(gatewayId.length(), Charset.forName("UTF-8")).toString(),
-                is(equalTo(gatewayId)));
+        assertString(buffer, "gatewayId", gatewayId);
         assertEndOfBuffer(buffer);
     }
 
@@ -255,9 +254,7 @@ public class ControlPacketCodecTest {
         assertPacketType(buffer, ControlPacketType.GET_BROKER_RESPONSE);
         assertPayloadLength(buffer, 8);
         assertByte(buffer, "success flag", 1);
-        assertThat("brokerUri length", buffer.readInt(), is(equalTo(brokerUri.length())));
-        assertThat("brokerUri", buffer.readCharSequence(brokerUri.length(), Charset.forName("UTF-8")).toString(),
-                is(equalTo(brokerUri)));
+        assertString(buffer, "brokerUri", brokerUri);
         assertEndOfBuffer(buffer);
     }
 
@@ -335,6 +332,76 @@ public class ControlPacketCodecTest {
         assertThat(message.getError(), is(equalTo(GetBrokerResponseMessage.GetBrokerError.NO_BROKER_AVAILABLE)));
     }
 
+    @Test
+    public void encodes_on_subscribe_packet() {
+        String brokerId = "id";
+        String topic = "topic";
+        channel.writeOutbound(new OnSubscribeMessage(brokerId, topic));
+        ByteBuf buffer = channel.readOutbound();
+
+        assertPacketType(buffer, ControlPacketType.ON_SUBSCRIBE);
+        assertPayloadLength(buffer, 15);
+        assertString(buffer, "brokerId", brokerId);
+        assertString(buffer, "topic", topic);
+        assertEndOfBuffer(buffer);
+    }
+
+    @Test
+    public void decodes_on_subscribe_packet() {
+        String brokerId = "brokerId";
+        String topic = "topic";
+
+        // prepare payload
+        ByteBuf payload = channel.alloc().buffer(15);
+        payload.writeInt(brokerId.length());
+        payload.writeCharSequence(brokerId, Charset.forName("UTF-8"));
+        payload.writeInt(topic.length());
+        payload.writeCharSequence(topic, Charset.forName("UTF-8"));
+
+        // write packiet and read object
+        channel.writeInbound(assemblePacket(ControlPacketType.ON_SUBSCRIBE, payload));
+        OnSubscribeMessage message = channel.readInbound();
+
+        // verify
+        assertThat(message.getBrokerId(), is(equalTo(brokerId)));
+        assertThat(message.getTopic(), is(equalTo(topic)));
+    }
+
+    @Test
+    public void encodes_on_unsubscribe_packet() {
+        String brokerId = "id";
+        String topic = "topic";
+        channel.writeOutbound(new OnUnsubscribeMessage(brokerId, topic));
+        ByteBuf buffer = channel.readOutbound();
+
+        assertPacketType(buffer, ControlPacketType.ON_UNSUBSCRIBE);
+        assertPayloadLength(buffer, 15);
+        assertString(buffer, "brokerId", brokerId);
+        assertString(buffer, "topic", topic);
+        assertEndOfBuffer(buffer);
+    }
+
+    @Test
+    public void decodes_on_unsubscribe_packet() {
+        String brokerId = "brokerId";
+        String topic = "topic";
+
+        // prepare payload
+        ByteBuf payload = channel.alloc().buffer(15);
+        payload.writeInt(brokerId.length());
+        payload.writeCharSequence(brokerId, Charset.forName("UTF-8"));
+        payload.writeInt(topic.length());
+        payload.writeCharSequence(topic, Charset.forName("UTF-8"));
+
+        // write packet and read object
+        channel.writeInbound(assemblePacket(ControlPacketType.ON_UNSUBSCRIBE, payload));
+        OnUnsubscribeMessage message = channel.readInbound();
+
+        // verify
+        assertThat(message.getBrokerId(), is(equalTo(brokerId)));
+        assertThat(message.getTopic(), is(equalTo(topic)));
+    }
+
     private ByteBuf assemblePacket(ControlPacketType type, ByteBuf payload) {
         ByteBuf packet = channel.alloc().buffer();
         packet.writeByte(type.getId());
@@ -357,5 +424,10 @@ public class ControlPacketCodecTest {
 
     private static void assertPacketType(ByteBuf buffer, ControlPacketType packetType) {
         assertByte(buffer, "packet type", (byte) packetType.getId());
+    }
+
+    private static void assertString(ByteBuf buffer, String reason, String value) {
+        assertThat(reason + " length", buffer.readInt(), is(equalTo(value.length())));
+        assertThat(reason, buffer.readCharSequence(value.length(), Charset.forName("UTF-8")).toString(), is(equalTo(value)));
     }
 }
