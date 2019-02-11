@@ -2,9 +2,11 @@ package at.ac.tuwien.dsg.emma.controller;
 
 import java.util.concurrent.Executor;
 
+import at.ac.tuwien.dsg.emma.controller.control.ControlServer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.scheduling.TaskScheduler;
@@ -72,5 +74,10 @@ public class ControllerAppConfig {
     @Bean
     public BridgingTable bridgingTable(JedisPool jedis) {
         return new RedisBridgingTable(jedis);
+    }
+
+    @Bean(initMethod = "start", destroyMethod = "stop")
+    public ControlServer controlServer(@Value("${emma.controller.control.port}") Integer port) {
+        return new ControlServer(port);
     }
 }
