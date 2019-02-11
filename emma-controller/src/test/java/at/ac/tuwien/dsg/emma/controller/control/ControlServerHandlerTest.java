@@ -1,7 +1,34 @@
 package at.ac.tuwien.dsg.emma.controller.control;
 
+import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.notNullValue;
+import static org.hamcrest.CoreMatchers.nullValue;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.eq;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.ArgumentCaptor;
+import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.test.context.junit4.SpringRunner;
+
 import at.ac.tuwien.dsg.emma.NodeInfo;
-import at.ac.tuwien.dsg.emma.control.msg.*;
+import at.ac.tuwien.dsg.emma.control.msg.GetBrokerMessage;
+import at.ac.tuwien.dsg.emma.control.msg.GetBrokerResponseMessage;
+import at.ac.tuwien.dsg.emma.control.msg.NodeType;
+import at.ac.tuwien.dsg.emma.control.msg.OnSubscribeMessage;
+import at.ac.tuwien.dsg.emma.control.msg.OnUnsubscribeMessage;
+import at.ac.tuwien.dsg.emma.control.msg.RegisterMessage;
+import at.ac.tuwien.dsg.emma.control.msg.RegisterResponseMessage;
+import at.ac.tuwien.dsg.emma.control.msg.UnregisterMessage;
+import at.ac.tuwien.dsg.emma.control.msg.UnregisterResponseMessage;
 import at.ac.tuwien.dsg.emma.controller.event.ClientDeregisterEvent;
 import at.ac.tuwien.dsg.emma.controller.event.ClientRegisterEvent;
 import at.ac.tuwien.dsg.emma.controller.event.SubscribeEvent;
@@ -12,20 +39,7 @@ import at.ac.tuwien.dsg.emma.controller.model.Client;
 import at.ac.tuwien.dsg.emma.controller.model.ClientRepository;
 import at.ac.tuwien.dsg.emma.controller.network.NetworkManager;
 import at.ac.tuwien.dsg.emma.controller.network.sel.BrokerSelectionStrategy;
-import com.sun.org.apache.bcel.internal.generic.BREAKPOINT;
 import io.netty.channel.embedded.EmbeddedChannel;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.mockito.ArgumentCaptor;
-import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.context.ApplicationEventPublisher;
-import org.springframework.test.context.junit4.SpringRunner;
-
-import static org.hamcrest.CoreMatchers.*;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.*;
 
 @RunWith(SpringRunner.class)
 public class ControlServerHandlerTest {

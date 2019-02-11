@@ -1,11 +1,11 @@
 package at.ac.tuwien.dsg.emma.control.msg;
 
+import java.nio.charset.Charset;
+
 import at.ac.tuwien.dsg.emma.NodeInfo;
 import at.ac.tuwien.dsg.emma.control.ControlPacketType;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
-
-import java.nio.charset.Charset;
 
 public class RegisterMessage implements ControlMessage {
     private final NodeType nodeType;

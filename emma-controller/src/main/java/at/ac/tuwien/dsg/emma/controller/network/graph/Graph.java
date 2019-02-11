@@ -10,9 +10,9 @@ public interface Graph<V, E> {
 
     Collection<Node<V>> getNodes();
 
-    Collection<Edge<V,E>> getEdges();
+    Collection<Edge<V, E>> getEdges();
 
-    Collection<Edge<V,E>> getEdges(Node node);
+    Collection<Edge<V, E>> getEdges(Node node);
 
     boolean addNode(Node node);
 

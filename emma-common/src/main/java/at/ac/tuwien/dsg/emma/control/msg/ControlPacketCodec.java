@@ -1,12 +1,12 @@
 package at.ac.tuwien.dsg.emma.control.msg;
 
+import java.util.List;
+
 import at.ac.tuwien.dsg.emma.control.CodecException;
 import at.ac.tuwien.dsg.emma.control.ControlPacketType;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.ByteToMessageCodec;
-
-import java.util.List;
 
 public class ControlPacketCodec extends ByteToMessageCodec<ControlMessage> {
     @Override

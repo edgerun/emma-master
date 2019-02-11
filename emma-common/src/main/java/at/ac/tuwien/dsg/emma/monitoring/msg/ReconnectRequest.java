@@ -33,7 +33,7 @@ public class ReconnectRequest extends AbstractMonitoringMessage {
         return "ReconnectRequest{" +
                 "clientId='" + clientId + '\'' +
                 ", brokerHost='" + brokerHost + '\'' +
-                ", destination='" + getDestination()+ '\'' +
+                ", destination='" + getDestination() + '\'' +
                 '}';
     }
 }

@@ -1,8 +1,29 @@
 package at.ac.tuwien.dsg.emma.controller.control;
 
+import java.net.InetSocketAddress;
+import java.net.SocketAddress;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.stereotype.Component;
+
 import at.ac.tuwien.dsg.emma.NodeInfo;
-import at.ac.tuwien.dsg.emma.control.msg.*;
-import at.ac.tuwien.dsg.emma.controller.event.*;
+import at.ac.tuwien.dsg.emma.control.msg.ControlMessageHandler;
+import at.ac.tuwien.dsg.emma.control.msg.GetBrokerMessage;
+import at.ac.tuwien.dsg.emma.control.msg.GetBrokerResponseMessage;
+import at.ac.tuwien.dsg.emma.control.msg.OnSubscribeMessage;
+import at.ac.tuwien.dsg.emma.control.msg.OnUnsubscribeMessage;
+import at.ac.tuwien.dsg.emma.control.msg.RegisterMessage;
+import at.ac.tuwien.dsg.emma.control.msg.RegisterResponseMessage;
+import at.ac.tuwien.dsg.emma.control.msg.UnregisterMessage;
+import at.ac.tuwien.dsg.emma.control.msg.UnregisterResponseMessage;
+import at.ac.tuwien.dsg.emma.controller.event.ClientConnectEvent;
+import at.ac.tuwien.dsg.emma.controller.event.ClientDeregisterEvent;
+import at.ac.tuwien.dsg.emma.controller.event.ClientRegisterEvent;
+import at.ac.tuwien.dsg.emma.controller.event.SubscribeEvent;
+import at.ac.tuwien.dsg.emma.controller.event.UnsubscribeEvent;
 import at.ac.tuwien.dsg.emma.controller.model.Broker;
 import at.ac.tuwien.dsg.emma.controller.model.BrokerRepository;
 import at.ac.tuwien.dsg.emma.controller.model.Client;
@@ -10,17 +31,6 @@ import at.ac.tuwien.dsg.emma.controller.model.ClientRepository;
 import at.ac.tuwien.dsg.emma.controller.network.NetworkManager;
 import at.ac.tuwien.dsg.emma.controller.network.sel.BrokerSelectionStrategy;
 import io.netty.channel.ChannelHandlerContext;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.ApplicationEventPublisher;
-import org.springframework.stereotype.Component;
-
-import java.net.InetSocketAddress;
-import java.net.SocketAddress;
-
-import static at.ac.tuwien.dsg.emma.control.msg.NodeType.BROKER;
-import static at.ac.tuwien.dsg.emma.control.msg.NodeType.CLIENT_GATEWAY;
 
 @Component
 public class ControlServerHandler implements ControlMessageHandler {
@@ -33,8 +43,8 @@ public class ControlServerHandler implements ControlMessageHandler {
 
     @Autowired
     public ControlServerHandler(ApplicationEventPublisher systemEvents, BrokerRepository brokerRepository,
-                                ClientRepository clientRepository, BrokerSelectionStrategy brokerSelectionStrategy,
-                                NetworkManager networkManager) {
+            ClientRepository clientRepository, BrokerSelectionStrategy brokerSelectionStrategy,
+            NetworkManager networkManager) {
         this.systemEvents = systemEvents;
         this.brokerRepository = brokerRepository;
         this.clientRepository = clientRepository;

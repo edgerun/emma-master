@@ -1,19 +1,20 @@
 package at.ac.tuwien.dsg.emma.control.msg;
 
+import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.CoreMatchers.nullValue;
+import static org.hamcrest.core.Is.is;
+import static org.junit.Assert.assertThat;
+
+import java.nio.charset.Charset;
+
+import org.junit.Before;
+import org.junit.Test;
+
 import at.ac.tuwien.dsg.emma.NodeInfo;
 import at.ac.tuwien.dsg.emma.control.ControlPacketType;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.embedded.EmbeddedChannel;
 import io.netty.handler.codec.DecoderException;
-import org.junit.Before;
-import org.junit.Test;
-
-import java.nio.charset.Charset;
-
-import static org.hamcrest.CoreMatchers.equalTo;
-import static org.hamcrest.CoreMatchers.nullValue;
-import static org.hamcrest.core.Is.is;
-import static org.junit.Assert.assertThat;
 
 public class ControlPacketCodecTest {
     private EmbeddedChannel channel;

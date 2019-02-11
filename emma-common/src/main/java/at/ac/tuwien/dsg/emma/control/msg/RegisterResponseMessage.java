@@ -1,10 +1,10 @@
 package at.ac.tuwien.dsg.emma.control.msg;
 
+import java.nio.charset.Charset;
+
 import at.ac.tuwien.dsg.emma.control.ControlPacketType;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
-
-import java.nio.charset.Charset;
 
 public class RegisterResponseMessage implements ControlMessage {
     public enum RegisterError {
@@ -18,9 +18,11 @@ public class RegisterResponseMessage implements ControlMessage {
     private RegisterResponseMessage(RegisterError error) {
         this.error = error;
     }
+
     public RegisterResponseMessage(String id) {
         this.id = id;
     }
+
     RegisterResponseMessage(ByteBuf byteBuf) {
         boolean success = byteBuf.readByte() == 1;
         if (success) {

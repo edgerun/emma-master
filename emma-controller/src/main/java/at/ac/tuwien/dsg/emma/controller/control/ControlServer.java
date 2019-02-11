@@ -1,21 +1,21 @@
 package at.ac.tuwien.dsg.emma.controller.control;
 
-import at.ac.tuwien.dsg.emma.control.msg.ControlPacketCodec;
-import io.netty.bootstrap.ServerBootstrap;
-import io.netty.channel.ChannelInboundHandlerAdapter;
-import io.netty.channel.ChannelInitializer;
-import io.netty.channel.ChannelOption;
-import io.netty.channel.nio.NioEventLoopGroup;
-import io.netty.channel.socket.SocketChannel;
-import io.netty.channel.socket.nio.NioServerSocketChannel;
-import io.netty.handler.codec.LengthFieldBasedFrameDecoder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 
-public class ControlServer implements ApplicationContextAware  {
+import at.ac.tuwien.dsg.emma.control.msg.ControlPacketCodec;
+import io.netty.bootstrap.ServerBootstrap;
+import io.netty.channel.ChannelInitializer;
+import io.netty.channel.ChannelOption;
+import io.netty.channel.nio.NioEventLoopGroup;
+import io.netty.channel.socket.SocketChannel;
+import io.netty.channel.socket.nio.NioServerSocketChannel;
+import io.netty.handler.codec.LengthFieldBasedFrameDecoder;
+
+public class ControlServer implements ApplicationContextAware {
     private static final Logger LOG = LoggerFactory.getLogger(ControlServer.class);
     private ApplicationContext context;
     private NioEventLoopGroup managerGroup;
@@ -38,7 +38,7 @@ public class ControlServer implements ApplicationContextAware  {
                     @Override
                     protected void initChannel(SocketChannel channel) {
                         channel.pipeline()
-                                .addLast(new LengthFieldBasedFrameDecoder(1024*1024, 1, 4))
+                                .addLast(new LengthFieldBasedFrameDecoder(1024 * 1024, 1, 4))
                                 .addLast(new ControlPacketCodec())
                                 .addLast(context.getBean(ControlServerInboundAdapter.class))
                                 .addLast(new ControlPacketCodec());

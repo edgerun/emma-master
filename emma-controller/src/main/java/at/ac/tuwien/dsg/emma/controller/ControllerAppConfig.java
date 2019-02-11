@@ -2,11 +2,9 @@ package at.ac.tuwien.dsg.emma.controller;
 
 import java.util.concurrent.Executor;
 
-import at.ac.tuwien.dsg.emma.controller.control.ControlServer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.scheduling.TaskScheduler;
@@ -14,6 +12,7 @@ import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
 
 import at.ac.tuwien.dsg.emma.bridge.BridgingTable;
+import at.ac.tuwien.dsg.emma.controller.control.ControlServer;
 import at.ac.tuwien.dsg.emma.controller.network.balancing.BalancingStrategy;
 import at.ac.tuwien.dsg.emma.controller.network.balancing.ConnectionBalancingStrategy;
 import at.ac.tuwien.dsg.emma.controller.network.sel.BrokerSelectionStrategy;

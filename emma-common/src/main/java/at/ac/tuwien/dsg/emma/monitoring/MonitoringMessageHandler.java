@@ -22,6 +22,7 @@ public interface MonitoringMessageHandler {
     void onMessage(MonitoringLoop loop, PingRespMessage message);
 
     void onMessage(MonitoringLoop loop, ReconnectRequest message);
+
     void onMessage(MonitoringLoop loop, ReconnectAck message);
 
     void onMessage(MonitoringLoop loop, UsageRequest message);

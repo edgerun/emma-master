@@ -48,7 +48,7 @@ public class EventBusTest {
         assertEquals(0, eventAACall.get());
     }
 
-    public static class EventA  {
+    public static class EventA {
 
     }
 
@@ -56,7 +56,7 @@ public class EventBusTest {
 
     }
 
-    public static class EventB  {
+    public static class EventB {
 
     }
 }

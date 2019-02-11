@@ -1,10 +1,10 @@
 package at.ac.tuwien.dsg.emma.control.msg;
 
+import java.nio.charset.Charset;
+
 import at.ac.tuwien.dsg.emma.control.ControlPacketType;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
-
-import java.nio.charset.Charset;
 
 public class GetBrokerResponseMessage implements ControlMessage {
     public enum GetBrokerError {

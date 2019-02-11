@@ -6,6 +6,8 @@ import io.netty.channel.ChannelHandlerContext;
 
 public interface ControlMessage {
     ControlPacketType getPacketType();
+
     void writeToBuffer(ByteBuf buffer);
+
     void callHandler(ControlMessageHandler handler, ChannelHandlerContext ctx);
 }

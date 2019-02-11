@@ -15,10 +15,10 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Component;
 
-import at.ac.tuwien.dsg.emma.io.Decode;
 import at.ac.tuwien.dsg.emma.controller.event.BrokerConnectEvent;
 import at.ac.tuwien.dsg.emma.controller.model.Broker;
 import at.ac.tuwien.dsg.emma.controller.model.BrokerRepository;
+import at.ac.tuwien.dsg.emma.io.Decode;
 import at.ac.tuwien.dsg.emma.util.IOUtils;
 
 @Component
