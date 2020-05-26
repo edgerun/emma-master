@@ -145,28 +145,28 @@ public class MonitoringLoop extends DatagramLoop {
 
     private void callHandler(MonitoringMessageHandler handler, MonitoringMessage message) {
         switch (message.getMonitoringPacketType()) {
-            case MonitoringPacketType.PING:
+            case PING:
                 handler.onMessage(this, (PingMessage) message);
                 return;
-            case MonitoringPacketType.PONG:
+            case PONG:
                 handler.onMessage(this, (PongMessage) message);
                 return;
-            case MonitoringPacketType.PINGREQ:
+            case PINGREQ:
                 handler.onMessage(this, (PingReqMessage) message);
                 return;
-            case MonitoringPacketType.PINGRESP:
+            case PINGRESP:
                 handler.onMessage(this, (PingRespMessage) message);
                 return;
-            case MonitoringPacketType.USAGEREQ:
+            case USAGEREQ:
                 handler.onMessage(this, (UsageRequest) message);
                 break;
-            case MonitoringPacketType.USAGERESP:
+            case USAGERESP:
                 handler.onMessage(this, (UsageResponse) message);
                 break;
-            case MonitoringPacketType.RECONNREQ:
+            case RECONNREQ:
                 handler.onMessage(this, (ReconnectRequest) message);
                 return;
-            case MonitoringPacketType.RECONNACK:
+            case RECONNACK:
                 handler.onMessage(this, (ReconnectAck) message);
                 return;
             default:
