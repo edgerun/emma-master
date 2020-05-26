@@ -17,6 +17,7 @@
     <java.version>11</java.version>
 
     <jedis.version>3.3.0</jedis.version>
+    <netty.version>4.1.49.Final</netty.version>
     <logback.version>1.2.3</logback.version>
     <orvell.version>0.2.0</orvell.version>
     <slf4j.version>1.7.25</slf4j.version>
