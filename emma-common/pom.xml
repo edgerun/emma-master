@@ -4,7 +4,7 @@
   <modelVersion>4.0.0</modelVersion>
 
   <parent>
-    <groupId>at.ac.tuwien.dsg.emma</groupId>
+    <groupId>io.edgerun.emma</groupId>
     <artifactId>emma-master</artifactId>
     <version>0.0.1-SNAPSHOT</version>
     <relativePath>..</relativePath>
