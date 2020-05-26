@@ -57,7 +57,7 @@ public class HeartbeatListener implements Runnable, InitializingBean, Disposable
 
     @Override
     public void run() {
-        LOG.debug("Starting HeartbeatListener", bind);
+        LOG.debug("Starting HeartbeatListener on {}", bind);
         DatagramPacket packet = new DatagramPacket(new byte[2], 2);
 
         while (true) {
