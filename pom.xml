@@ -9,7 +9,31 @@
 
   <packaging>pom</packaging>
 
-  <name>emma-parent</name>
+  <name>emma master</name>
+
+  <inceptionYear>2013</inceptionYear>
+
+  <url>https://github.com/edgerun/emma-master</url>
+
+  <scm>
+    <url>https://github.com/edgerun/emma-master</url>
+    <connection>scm:git:git://git@github.com:edgerun/emma-master.git</connection>
+    <developerConnection>scm:git:git@github.com:edgerun/emma-master.git</developerConnection>
+    <tag>HEAD</tag>
+  </scm>
+
+  <developers>
+    <developer>
+      <id>thrau</id>
+      <name>Thomas Rausch</name>
+      <email>thomas@rauschig.org</email>
+    </developer>
+    <developer>
+      <id>a13r</id>
+      <name>Andreas Bruckner</name>
+      <email>andreas@bruckner.cc</email>
+    </developer>
+  </developers>
 
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>

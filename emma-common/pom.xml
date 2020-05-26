@@ -12,7 +12,7 @@
 
   <artifactId>emma-common</artifactId>
 
-  <name>emma :: common</name>
+  <name>emma master :: common</name>
 
   <dependencies>
     <dependency>
